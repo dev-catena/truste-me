@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:flutter/foundation.dart';
 import 'package:meta/meta.dart';
 
 import '../../../data/data_source/contract_datasource.dart';
@@ -31,24 +32,28 @@ class ContractDetailBloc extends Bloc<ContractDetailEvent, ContractDetailState> 
       datasource.getContractFullInfo(preliminaryContract).then((value) => contract = value),
     ]);
 
-    possibleClauses = _removeCurrentClausesFromAll(preliminaryContract.clauses, possibleClauses);
+    final List<Clause> contractClauses = List<Clause>.of(contract.clauses);
 
-    emit(ContractDetailReady(contract: contract, possibleClauses: possibleClauses));
+    final filteredClauses = _removeCurrentClausesFromAll(possibleClauses, contractClauses);
+
+    emit(ContractDetailReady(contract: contract, possibleClauses: filteredClauses));
   }
 
   Future<void> _onClauseSet(ContractDetailClauseSet event, Emitter<ContractDetailState> emit) async {
     if (state is! ContractDetailReady) return;
     final internState = state as ContractDetailReady;
-    final updatedContract = internState.contract..clauses.remove(event.selectedClause);
+    final updatedContract = internState.contract..clauses.add(event.selectedClause);
 
-    final possibleClauses = internState.possibleClauses..remove(event.selectedClause);
-    emit(internState.copyWith(contract: updatedContract, possibleClauses: possibleClauses));
+    // final possibleClauses = internState.possibleClauses..remove(event.selectedClause);
+    final filteredClauses = List<Clause>.of(internState.possibleClauses);
+    filteredClauses.remove(event.selectedClause);
+
+    emit(internState.copyWith(contract: updatedContract, possibleClauses: filteredClauses));
   }
 
-  List<Clause> _removeCurrentClausesFromAll(List<Clause> allClauses, List<Clause> currentClauses){
-
+  List<Clause> _removeCurrentClausesFromAll(List<Clause> allClauses, List<Clause> currentClauses) {
     for (final ele in currentClauses) {
-      allClauses.removeWhere((element) => element == ele);
+      allClauses.remove(ele);
     }
 
     return allClauses;

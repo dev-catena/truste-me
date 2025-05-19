@@ -13,4 +13,8 @@ final class HomeReady extends HomeState {
   HomeReady({required this.info});
 }
 
-final class HomeError extends HomeState {}
+final class HomeError extends HomeState {
+  final String msg;
+
+  HomeError(this.msg);
+}

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../../core/providers/user_data_cubit.dart';
 import '../../../../../core/routes.dart';
 import '../../../../../core/utils/custom_colors.dart';
 import '../../../domain/entities/person.dart';
@@ -20,6 +22,7 @@ class CustomScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final headlineMedium = Theme.of(context).textTheme.headlineMedium!;
+    final userData = context.read<UserDataCubit>();
 
     return Scaffold(
       floatingActionButton: floatingActionButton,
@@ -48,7 +51,7 @@ class CustomScaffold extends StatelessWidget {
               }
             },
             child: CircleAvatar(
-              backgroundImage: userLoggedIn.photoPath != null ? NetworkImage(userLoggedIn.photoPath!) : null,
+              // backgroundImage: userData.getUser.photoPath != null ? NetworkImage(userData.getUser.photoPath!) : null,
             ),
           ),
           const SizedBox(width: 10),

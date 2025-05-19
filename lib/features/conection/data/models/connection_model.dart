@@ -5,7 +5,7 @@ class ConnectionModel extends Connection {
   ConnectionModel.fromJson(Map<String, dynamic> json)
       : super(
           id: json['id'],
-          user: PersonModel.fromJson(json['destinatario']).toEntity(),
+          user: PersonModel.fromJson(json['conectado_com']).toEntity(),
           status: ConnectionStatus.fromString(json['status']),
           since: DateTime.parse(json['created_at']),
         );

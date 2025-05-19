@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 import '../../../../core/api_provider.dart';
 
 class HomeDataSource {
@@ -27,6 +25,31 @@ class GeneralUserInfo {
     pendingConnections: json['conexoes']['ativas'],
   );
 
-  GeneralUserInfo({required this.activeContracts, required this.pendingContracts, required this.pendingSeals, required this.activeConnections, required this.pendingConnections});
+  GeneralUserInfo copyWith({
+    int? activeContracts,
+    int? pendingContracts,
+    int? pendingSeals,
+    int? activeConnections,
+    int? pendingConnections,
+  }) {
+    return GeneralUserInfo(
+      activeContracts: activeContracts ?? this.activeContracts,
+      pendingContracts: pendingContracts ?? this.pendingContracts,
+      pendingSeals: pendingSeals ?? this.pendingSeals,
+      activeConnections: activeConnections ?? this.activeConnections,
+      pendingConnections: pendingConnections ?? this.pendingConnections,
+    );
+  }
 
+  @override
+  String toString() {
+    return 'GeneralUserInfo('
+        'activeContracts: $activeContracts, '
+        'pendingContracts: $pendingContracts, '
+        'pendingSeals: $pendingSeals, '
+        'activeConnections: $activeConnections, '
+        'pendingConnections: $pendingConnections)';
+  }
+
+  GeneralUserInfo({required this.activeContracts, required this.pendingContracts, required this.pendingSeals, required this.activeConnections, required this.pendingConnections});
 }

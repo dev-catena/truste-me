@@ -9,13 +9,12 @@ import 'package:http_parser/http_parser.dart';
 import '../features/common/domain/entities/person.dart';
 
 class ApiProvider {
-
   ApiProvider([this.useToken = true]);
-  final String _host = '10.100.0.10:8010';
+
+  final String _host = 'api-trustme.catenasystem.com.br';
   final bool useToken;
 
   // final _header = {'Content-Type': 'application/json; charset=UTF-8', 'Authorization': 'Bearer ${userLoggedIn?.token ?? ''}'};
-
 
   Map<String, String> get _header {
     final tokenizedHeader = {
@@ -35,7 +34,7 @@ class ApiProvider {
     endPoint = 'api/$endPoint';
 
     final Uri url;
-    url = Uri.http(_host, endPoint, params);
+    url = Uri.https(_host, endPoint, params);
 
     final Map<String, dynamic> responseData;
     debugPrint('$runtimeType - GET url $url');
@@ -65,7 +64,7 @@ class ApiProvider {
   Future<Map<String, dynamic>> post(String endPoint, String content) async {
     endPoint = 'api/$endPoint';
     final Uri url;
-    url = Uri.http(_host, endPoint);
+    url = Uri.https(_host, endPoint);
     final http.Response response;
 
     debugPrint('$runtimeType - POST url $url - content $content');
@@ -89,7 +88,7 @@ class ApiProvider {
   Future<Map<String, dynamic>> put(String endPoint, String content) async {
     endPoint = 'api/$endPoint';
     final Uri url;
-    url = Uri.http(_host, endPoint);
+    url = Uri.https(_host, endPoint);
     final http.Response response;
 
     try {
@@ -119,12 +118,13 @@ class ApiProvider {
 
     final http.Response response;
     final Uri url;
-    url = Uri.http(_host, endPoint);
+    url = Uri.https(_host, endPoint);
 
     response = await http.delete(url, headers: _header, body: content);
   }
 
-  Future<Map<String, dynamic>> postWithFiles(String endPoint, List<File> files, [Map<String, dynamic>? otherFields]) async {
+  Future<Map<String, dynamic>> postWithFiles(String endPoint, List<File> files,
+      [Map<String, dynamic>? otherFields]) async {
     endPoint = 'api/$endPoint';
     final http.StreamedResponse response;
 
@@ -132,7 +132,7 @@ class ApiProvider {
     if (kReleaseMode) {
       url = Uri.https(_host, endPoint);
     } else {
-      url = Uri.http(_host, endPoint);
+      url = Uri.https(_host, endPoint);
     }
 
     final http.MultipartRequest request = http.MultipartRequest('POST', url);
@@ -140,7 +140,8 @@ class ApiProvider {
     request.headers.addAll(_header);
 
     for (final file in files) {
-      request.files.add(await http.MultipartFile.fromPath('anexos[]', file.path, contentType: MediaType('image', 'jpg')));
+      request.files
+          .add(await http.MultipartFile.fromPath('anexos[]', file.path, contentType: MediaType('image', 'jpg')));
     }
 
     if (otherFields != null) {

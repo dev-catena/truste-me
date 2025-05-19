@@ -1,6 +1,9 @@
+import 'package:brasil_fields/brasil_fields.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/providers/user_data_cubit.dart';
 import '../../../../core/routes.dart';
 import '../../../../core/utils/custom_colors.dart';
 import '../../data/data_source/login_datasource.dart';
@@ -15,20 +18,25 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final displayMedium = Theme.of(context).textTheme.displayMedium!;
+    final userData = context.read<UserDataCubit>();
 
     return BlocProvider(
-      create: (_) => LoginBloc(LoginDataSource(false)),
+      create: (_) => LoginBloc(LoginDataSource(false, userData), userData),
       child: Scaffold(
         backgroundColor: CustomColor.backgroundPrimaryColor,
         body: Padding(
           padding: const EdgeInsets.all(16.0),
           child: BlocConsumer<LoginBloc, LoginState>(
             listener: (_, state) {
-              if(state.isSuccess){
+              if (state.isSuccess) {
                 context.goNamed('home');
+              } else if (state.isFailure){
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.errorMsg!)));
               }
             },
-            builder: (_, state) {
+            builder: (blocCtx, state) {
+              final bloc = blocCtx.read<LoginBloc>();
+
               return SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -39,6 +47,7 @@ class LoginScreen extends StatelessWidget {
                     Image.asset('assets/imgs/trustme-logo.png', height: 100),
                     const SizedBox(height: 20),
                     LoginCard(
+                      bloc,
                       state,
                       emailController: emailController,
                       pwdController: passwordController,
@@ -60,12 +69,14 @@ class LoginScreen extends StatelessWidget {
 
 class LoginCard extends StatelessWidget {
   const LoginCard(
+    this.bloc,
     this.state, {
     super.key,
     required this.emailController,
     required this.pwdController,
   });
 
+  final LoginBloc bloc;
   final LoginState state;
   final TextEditingController emailController;
   final TextEditingController pwdController;
@@ -84,10 +95,18 @@ class LoginCard extends StatelessWidget {
         children: [
           const SizedBox(height: 20),
           getTextField(
+            obscure: false,
             labelText: 'CPF',
-            hintText: '12345678900',
+            hintText: '123.456.789-00',
             leadingIcon: Icons.person_outlined,
             controller: emailController,
+            maxLength: 14,
+            keyboardType: TextInputType.number,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+              CpfInputFormatter(),
+            ],
+
             // onChanged: (value) => context.read<LoginBloc>().add(PasswordChanged(value)),
           ),
           const SizedBox(height: 20),
@@ -96,6 +115,11 @@ class LoginCard extends StatelessWidget {
             hintText: '*****',
             leadingIcon: Icons.lock_outline,
             controller: pwdController,
+            trailingWidget: IconButton(
+              onPressed: () => bloc.add(LoginPwdObscured()),
+              icon: Icon(state.isPwdObscured ? Icons.visibility_off_outlined : Icons.visibility_outlined),
+            ),
+            obscure: state.isPwdObscured,
             // onChanged: (value) => context.read<LoginBloc>().add(PasswordChanged(value)),
           ),
           const SizedBox(height: 20),
@@ -115,12 +139,15 @@ class LoginCard extends StatelessWidget {
   }
 
   TextField getTextField({
+    required bool obscure,
     required String labelText,
     required String hintText,
     required IconData leadingIcon,
     required TextEditingController controller,
-    void Function(String value)? onChanged,
+    List<TextInputFormatter>? inputFormatters,
     Widget? trailingWidget,
+    TextInputType? keyboardType,
+    int? maxLength,
   }) {
     return TextField(
       decoration: InputDecoration(
@@ -129,25 +156,18 @@ class LoginCard extends StatelessWidget {
         ),
         labelText: labelText,
         hintText: hintText,
-        // enabledBorder: const UnderlineInputBorder(
-        //   borderSide: BorderSide(
-        //     color: CustomColor.activeColor,
-        //   ),
-        // ),
-
         focusedBorder: const UnderlineInputBorder(
           borderSide: BorderSide(
             color: CustomColor.activeColor,
           ),
         ),
-        // border: const UnderlineInputBorder(
-        //   borderSide: BorderSide(
-        //     color: CustomColor.activeColor,
-        //   ),
-        // ),
         suffixIcon: trailingWidget,
       ),
+      obscureText: obscure,
+      maxLength: maxLength,
+      inputFormatters: inputFormatters,
       controller: controller,
+      keyboardType: keyboardType,
     );
   }
 }

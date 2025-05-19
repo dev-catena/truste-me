@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../../core/providers/user_data_cubit.dart';
 import '../../../../../core/utils/custom_colors.dart';
 import '../../../../../core/utils/date_parser.dart';
 import '../../../../common/presentation/widgets/components/custom_scaffold.dart';
-import '../../../data/data_source/connection_datasource.dart';
 import '../../../domain/entities/connection.dart';
 import '../components/seals_board.dart';
 
@@ -20,9 +21,10 @@ class ConnectionDetailScreen extends StatefulWidget {
 class _ConnectionDetailScreenState extends State<ConnectionDetailScreen> {
   bool acceptInProgress = false;
 
+
   Future<void> acceptContract(bool hasAccepted) async {
     acceptInProgress = true;
-    await ConnectionDatasource().acceptConnection(widget.connection, hasAccepted);
+    await context.read<UserDataCubit>().establishConnection(widget.connection, hasAccepted);
     acceptInProgress = false;
 
     if (context.mounted) {

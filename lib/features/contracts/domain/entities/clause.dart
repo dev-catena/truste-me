@@ -1,24 +1,25 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
 
 import '../../../../core/utils/custom_colors.dart';
 
 class Clause extends Equatable {
   final int id;
   final String name;
+  final String code;
   final String description;
   final ClauseStatus status;
 
   const Clause({
     required this.id,
+    required this.code,
     required this.description,
     required this.name,
     this.status = ClauseStatus.pending,
   });
 
   @override
-  List<Object?> get props => [id, description, name];
+  List<Object?> get props => [id, description, code, name];
 
   ClauseTile buildTile([String? titlePrefix]) {
     return ClauseTile(this, titlePrefix: titlePrefix);
@@ -27,11 +28,13 @@ class Clause extends Equatable {
   Clause copyWith({
     int? id,
     String? name,
+    String? code,
     String? description,
     ClauseStatus? status,
   }) {
     return Clause(
       id: id ?? this.id,
+      code: code ?? this.code,
       description: description ?? this.description,
       name: name ?? this.name,
       status: status ?? this.status,
@@ -41,18 +44,19 @@ class Clause extends Equatable {
 
 class ClauseModel extends Clause {
   Clause toEntity() {
-    return Clause(id: id, description: description, name: name, status: status);
+    return Clause(id: id, description: description, name: name, status: status, code: code);
   }
 
   ClauseModel.fromJson(Map<String, dynamic> json)
       : super(
           id: json['id'] ?? json['clausula_id'],
           name: json['nome'],
+          code: json['codigo'],
           description: json['descricao'],
           status: ClauseStatus.byStatusCode(json['status'] ?? 3),
         );
 
-  const ClauseModel({required super.id, required super.description, required super.name, required super.status});
+  const ClauseModel({required super.id, required super.code, required super.description, required super.name, required super.status});
 }
 
 enum ClauseStatus {
@@ -95,7 +99,7 @@ class ClauseTile extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          clause.status!.buildIcon(),
+          clause.status.buildIcon(),
           const SizedBox(width: 8),
           Expanded(
             child: Column(

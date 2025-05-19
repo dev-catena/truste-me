@@ -55,6 +55,15 @@ class Person extends Equatable {
     this.authToken = '',
   });
 
+  @override
+  String toString() {
+    return 'Person{id: $id, fullName: $fullName, cpf: $cpf, '
+        'profession: $profession, birthDate: $birthDate, '
+        'country: $country, state: $state, sealsObtained: $sealsObtained, '
+        'photoPath: $photoPath, memberSince: $memberSince, '
+        'connectionCode: $connectionCode, authToken: $authToken}';
+  }
+
   PersonSummaryCard buildSummaryCard() {
     return PersonSummaryCard(this);
   }

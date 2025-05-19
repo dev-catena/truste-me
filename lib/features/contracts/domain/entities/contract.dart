@@ -12,12 +12,14 @@ part '../../presentation/widgets/components/contract_card.dart';
 
 part '../../presentation/widgets/components/contract_detail_summary_card.dart';
 
+
 class Contract extends Equatable {
   final int id;
   final String contractNumber;
   final ContractStatus status;
   final ContractType type;
   final List<Clause> clauses;
+  final Person? contractor;
   final Person? stakeHolder;
   final DateTime? startDate;
   final DateTime? endDate;
@@ -35,6 +37,7 @@ class Contract extends Equatable {
     required this.contractNumber,
     required this.status,
     required this.type,
+    this.contractor,
     this.stakeHolder,
     required this.clauses,
     this.startDate,
@@ -51,6 +54,7 @@ class ContractModel extends Contract {
     required super.contractNumber,
     required super.status,
     required super.type,
+    super.contractor,
     super.stakeHolder,
     required super.clauses,
     super.startDate,
@@ -64,8 +68,9 @@ class ContractModel extends Contract {
           status: ContractStatus.fromString(json['status']),
           type: ContractType.fromCode(json['contrato_tipo_id']),
           clauses: (json['clausulas'] as List? ?? json['clausulas_unicas'] as List? ?? []).map((e) => ClauseModel.fromJson(e).toEntity()).toList(),
-          stakeHolder: json['participantes'][0]['usuario'] != null
-              ? PersonModel.fromJson(json['participantes'][0]['usuario']).toEntity()
+          contractor: json['contratante'] != null ? PersonModel.fromJson(json['contratante']).toEntity() : null,
+          stakeHolder: json['participantes']?[0] != null
+              ? PersonModel.fromJson(json['participantes'][0]).toEntity()
               : null,
           startDate: DateTime.tryParse(json['inicio_vigencia'] ?? ''),
           endDate: DateTime.tryParse(json['fim_vigencia'] ?? ''),
@@ -75,6 +80,7 @@ class ContractModel extends Contract {
     return Contract(
       id: id,
       contractNumber: contractNumber,
+      contractor: contractor,
       status: status,
       clauses: clauses,
       type: type,

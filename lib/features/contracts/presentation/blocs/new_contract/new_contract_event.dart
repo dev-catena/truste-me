@@ -24,5 +24,4 @@ class NewContractClauseAdded extends NewContractEvent {
 }
 
 class NewContractContractCreated extends NewContractEvent {
-  NewContractContractCreated();
 }

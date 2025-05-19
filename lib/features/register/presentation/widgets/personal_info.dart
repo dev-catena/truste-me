@@ -89,9 +89,13 @@ class _PersonalInfoState extends State<_PersonalInfo> {
         TextField(
           onChanged: widget.onCpfSet,
           controller: _cpfController,
-          maxLength: 11,
+          maxLength: 14,
           decoration: getDecoration('CPF', _isCpfEmpty),
           keyboardType: TextInputType.number,
+          inputFormatters: [
+            FilteringTextInputFormatter.digitsOnly,
+            CpfInputFormatter(),
+          ],
         ),
         const SizedBox(height: 8),
         TextField(

@@ -13,15 +13,14 @@ class ContractDataSource {
   Future<Contract> getContractFullInfo(Contract cont) async {
     final rawData = await _apiProvider.get('contrato/buscar-completo/${cont.id}');
 
-    final contract = ContractModel.fromJson(rawData);
+    final contract = ContractModel.fromJson(rawData).toEntity();
 
     return contract;
   }
 
-  Future<List<Contract>> getContractsForUser() async {
-    final rawData = await _apiProvider.get('usuario/${userLoggedIn.id}/contratos');
+  Future<List<Contract>> getContractsForUser(final Person user) async {
+    final rawData = await _apiProvider.get('usuario/${user.id}/contratos');
     final List<Contract> convertedData = [];
-    debugPrint('$runtimeType - rawData $rawData');
 
     for (final ele in rawData['contratos_como_contratante']) {
       convertedData.add(ContractModel.fromJson(ele).toEntity());
@@ -31,6 +30,7 @@ class ContractDataSource {
       convertedData.add(ContractModel.fromJson(ele).toEntity());
     }
 
+    debugPrint('$runtimeType - convertedData length ${convertedData.length}');
     return convertedData;
   }
 
@@ -44,7 +44,7 @@ class ContractDataSource {
     return convertedData;
   }
 
-  Future<void> createContract(ContractType type, List<Person> participants, List<Clause> clauses) async {
+  Future<Contract> createContract(ContractType type, List<Person> participants, List<Clause> clauses) async {
     final personsId = participants.map((p) => p.id).toList();
     final clausesId = clauses.map((c) => c.id).toList();
 
@@ -56,6 +56,10 @@ class ContractDataSource {
     };
 
     final response = await _apiProvider.post('contrato/gravar', jsonEncode(content));
+
+    final newContract = ContractModel.fromJson(response).toEntity();
+
+    return newContract;
   }
 }
 

@@ -1,25 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../common/domain/entities/person.dart';
 import '../../../../common/presentation/widgets/components/custom_selectable_tile.dart';
 import '../../../../common/presentation/widgets/components/start_end_datepicker.dart';
 import '../../../../common/presentation/widgets/dialogs/single_select_dialog.dart';
+import '../../../../conection/domain/entities/connection.dart';
 import '../../../domain/entities/contract.dart';
-import '../../blocs/new_contract/new_contract_bloc.dart';
 
 class NewContractHeader extends StatelessWidget {
-  const NewContractHeader(this.state, {super.key});
+  const NewContractHeader(
+    this.connections, {
+    this.currentStakeHolder,
+    this.currentType,
+    required this.onStakeHolderSelected,
+    required this.onTypeSelected,
+    super.key,
+  });
 
-  final NewContractReady state;
+  final List<Connection> connections;
+  final ValueChanged<Person> onStakeHolderSelected;
+  final ValueChanged<ContractType> onTypeSelected;
+
+  final Person? currentStakeHolder;
+  final ContractType? currentType;
 
   @override
   Widget build(BuildContext context) {
     final titleMedium = Theme.of(context).textTheme.titleMedium!;
     final List<Person> personList = [];
-    final bloc = context.read<NewContractBloc>();
 
-    for (final ele in state.acceptedConnections) {
+    for (final ele in connections.where((element) => element.status == ConnectionStatus.accepted)) {
       personList.add(ele.user);
     }
 
@@ -35,8 +45,8 @@ class NewContractHeader extends StatelessWidget {
           Text('Parte interessada', style: titleMedium),
           const SizedBox(height: 6),
           CustomSelectableTile(
-            title: state.stakeHolderSelected?.fullName ?? 'Selecione uma pessoa',
-            isActive: state.stakeHolderSelected != null,
+            title: currentStakeHolder?.fullName ?? 'Selecione uma pessoa',
+            isActive: currentStakeHolder != null,
             onTap: () {
               showDialog(
                 context: context,
@@ -45,8 +55,8 @@ class NewContractHeader extends StatelessWidget {
                     title: 'Selecione a parte interessada',
                     options: personList,
                     getName: (option) => option.fullName,
-                    onChoose: (value) => bloc.add(NewContractStakeHolderSelected(value)),
-                    optionSelected: state.stakeHolderSelected,
+                    onChoose: onStakeHolderSelected,
+                    optionSelected: currentStakeHolder,
                   );
                 },
               );
@@ -56,8 +66,8 @@ class NewContractHeader extends StatelessWidget {
           Text('Tipo de contrato', style: titleMedium),
           const SizedBox(height: 6),
           CustomSelectableTile(
-            title: state.contractTypeSelected?.description ?? 'Selecione um tipo',
-            isActive: state.contractTypeSelected != null,
+            title: currentType?.description ?? 'Selecione um tipo',
+            isActive: currentType != null,
             onTap: () {
               showDialog(
                 context: context,
@@ -66,8 +76,8 @@ class NewContractHeader extends StatelessWidget {
                     title: 'Selecione a parte interessada',
                     options: ContractType.values,
                     getName: (option) => option.description,
-                    onChoose: (value) => bloc.add(NewContractTypeSelected(value)),
-                    optionSelected: state.contractTypeSelected,
+                    onChoose: onTypeSelected,
+                    optionSelected: currentType,
                   );
                 },
               );

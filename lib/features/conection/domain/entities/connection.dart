@@ -23,6 +23,22 @@ class Connection extends Equatable {
     required this.since,
   });
 
+  static const _sentinel = Object();
+
+  Connection copyWith({
+    Object? id = _sentinel,
+    Object? user = _sentinel,
+    Object? status = _sentinel,
+    Object? since = _sentinel,
+  }) {
+    return Connection(
+      id: identical(id, _sentinel) ? this.id : id as int,
+      user: identical(user, _sentinel) ? this.user : user as Person,
+      status: identical(status, _sentinel) ? this.status : status as ConnectionStatus,
+      since: identical(since, _sentinel) ? this.since : since as DateTime,
+    );
+  }
+
   @override
   List<Object?> get props => [id, user, status];
 }

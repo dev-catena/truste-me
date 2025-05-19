@@ -99,6 +99,7 @@ class _ContractReady extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             ClauseSelectionCard(
+              contractor: state.contract.contractor!,
               stakeHolder: state.contract.stakeHolder,
               possibleClauses: state.possibleClauses,
               clausesChosen: state.contract.clauses,

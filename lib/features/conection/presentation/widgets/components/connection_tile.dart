@@ -27,9 +27,10 @@ class ConnectionTile extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: connection.status.color),
-              color: Colors.white),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: connection.status.color),
+            color: Colors.white,
+          ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [

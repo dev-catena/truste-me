@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../features/common/domain/entities/person.dart';
 import '../features/conection/domain/entities/connection.dart';
 import '../features/conection/presentation/widgets/screens/connection_detail_screen.dart';
 import '../features/conection/presentation/widgets/screens/connection_panel_screen.dart';
@@ -13,6 +13,7 @@ import '../features/home/presentation/widgets/screens/home_screen.dart';
 import '../features/login/presentation/widgets/login_screen.dart';
 import '../features/profile/presentation/widgets/profile_screen.dart';
 import '../features/register/presentation/register_screen.dart';
+import 'providers/user_data_cubit.dart';
 import 'scaffold_with_nested_navigation.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -130,7 +131,10 @@ final GoRouter _routes = GoRouter(
     GoRoute(
       path: AppRoutes.profileScreen,
       name: AppRoutes.profileScreen,
-      builder: (_, __) => ProfileScreen(userLoggedIn),
+      builder: (context, __) {
+
+        return ProfileScreen();
+      },
     ),
   ],
 );

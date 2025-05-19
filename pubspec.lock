@@ -33,6 +33,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.1"
+  brasil_fields:
+    dependency: "direct main"
+    description:
+      name: brasil_fields
+      sha256: "1e20e5974b6dd25e1a909171773aeaceb0fe80c3a5f0d1d8d9e6b3dd3d9e55b5"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.17.0"
   chalkdart:
     dependency: transitive
     description:

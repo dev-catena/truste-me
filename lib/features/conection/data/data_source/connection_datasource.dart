@@ -7,11 +7,11 @@ import '../../../common/domain/entities/person.dart';
 import '../../domain/entities/connection.dart';
 import '../models/connection_model.dart';
 
-class ConnectionDatasource {
+class ConnectionDataSource {
   final _apiProvider = ApiProvider();
 
-  Future<List<Connection>> getConnectionsForUser() async {
-    final rawData = await _apiProvider.get('usuario/${userLoggedIn.id}/conexoes');
+  Future<List<Connection>> getConnectionsForUser(Person user) async {
+    final rawData = await _apiProvider.get('usuario/${user.id}/conexoes');
     // final rawData = _MockData().connections;
     final List<Connection> connectionList = [];
 
@@ -41,6 +41,8 @@ class ConnectionDatasource {
 
     final rawData = await _apiProvider.post('conexao/responder', jsonEncode(content));
   }
+
+  ConnectionDataSource();
 }
 
 class _MockData {

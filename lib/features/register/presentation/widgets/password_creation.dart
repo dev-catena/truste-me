@@ -17,12 +17,17 @@ class _PasswordCreation extends StatelessWidget {
       children: [
         Text('Senha', style: titleLarge),
         const SizedBox(height: 16),
+        const Text('A senha deve conter pelo menos 6 caracteres'),
+        const SizedBox(height: 8),
         TextField(
           onChanged: onPasswordSet,
           decoration: const InputDecoration(
             labelText: 'Senha',
             border: OutlineInputBorder(),
           ),
+          onTapOutside: (_) => FocusScope.of(context).unfocus(),
+          onSubmitted: (_) => FocusScope.of(context).unfocus(),
+          onEditingComplete: () => FocusScope.of(context).unfocus(),
         ),
         const SizedBox(height: 16),
         TextField(
@@ -31,6 +36,9 @@ class _PasswordCreation extends StatelessWidget {
             labelText: 'Confirme a senha',
             border: OutlineInputBorder(),
           ),
+          onTapOutside: (_) => FocusScope.of(context).unfocus(),
+          onSubmitted: (_) => FocusScope.of(context).unfocus(),
+          onEditingComplete: () => FocusScope.of(context).unfocus(),
         ),
         const SizedBox(height: 16),
       ],

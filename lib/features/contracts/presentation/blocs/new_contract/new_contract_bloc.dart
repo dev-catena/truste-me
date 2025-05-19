@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 
+import '../../../../../core/providers/user_data_cubit.dart';
 import '../../../../common/domain/entities/person.dart';
 import '../../../../conection/data/data_source/connection_datasource.dart';
 import '../../../../conection/domain/entities/connection.dart';
@@ -14,10 +15,11 @@ part 'new_contract_event.dart';
 part 'new_contract_state.dart';
 
 class NewContractBloc extends Bloc<NewContractEvent, NewContractState> {
-  final ConnectionDatasource connectionDatasource;
+  final ConnectionDataSource connectionDatasource;
   final ContractDataSource dataSource;
+  final UserDataCubit userData;
 
-  NewContractBloc(this.dataSource, this.connectionDatasource) : super(NewContractInitial()) {
+  NewContractBloc(this.userData, this.dataSource, this.connectionDatasource) : super(NewContractInitial()) {
     on<NewContractStarted>(_onStated);
     on<NewContractStakeHolderSelected>(_onStakeHolderSelected);
     on<NewContractTypeSelected>(_onTypeSelected);
@@ -28,14 +30,14 @@ class NewContractBloc extends Bloc<NewContractEvent, NewContractState> {
   Future<void> _onStated(NewContractStarted event, Emitter<NewContractState> emit) async {
     List<Connection> connections = [];
 
-    await Future.wait([
-      connectionDatasource.getConnectionsForUser().then(
-            (value) => connections = value.where((element) => element.status == ConnectionStatus.accepted).toList(),
-          ),
-    ]);
+    // await Future.wait([
+    //   connectionDatasource.getConnectionsForUser().then(
+    //         (value) => connections = value.where((element) => element.status == ConnectionStatus.accepted).toList(),
+    //       ),
+    // ]);
 
     emit(NewContractReady(
-      acceptedConnections: connections,
+      acceptedConnections: userData.getConnections,
       clausesChosen: const [],
       possibleClauses: const [],
       stakeHolderSelected: null,
@@ -70,7 +72,7 @@ class NewContractBloc extends Bloc<NewContractEvent, NewContractState> {
     if (state is! NewContractReady) return;
     final internalState = state as NewContractReady;
 
-    if(internalState.contractTypeSelected == null || internalState.stakeHolderSelected == null){
+    if(internalState.contractTypeSelected == null || internalState.stakeHolderSelected == null || internalState.clausesChosen.isEmpty){
       emit(NewContractInsufficientData());
       emit(internalState);
       return;

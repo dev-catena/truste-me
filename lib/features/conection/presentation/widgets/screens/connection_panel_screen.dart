@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../../../../core/providers/user_data_cubit.dart';
 import '../../../../common/presentation/widgets/components/custom_scaffold.dart';
+import '../../../../common/presentation/widgets/components/generic_error_component.dart';
 import '../../../../common/presentation/widgets/components/header_line.dart';
 import '../../../data/data_source/connection_datasource.dart';
 import '../../blocs/connection_panel_bloc.dart';
@@ -13,8 +15,53 @@ class ConnectionPanelScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userData = context.read<UserDataCubit>();
+
+    return CustomScaffold(
+      floatingActionButton: FloatingActionButton(
+        heroTag: 'btn1',
+        onPressed: () {
+          showDialog(
+              context: context,
+              builder: (_) {
+                return RequestConnectionDialog(onRequested: userData.requestConnection);
+              });
+        },
+        child: const Icon(Icons.add),
+      ),
+      child: BlocBuilder<UserDataCubit, UserDataState>(
+        builder: (context, state) {
+          if (state is UserDataReady) {
+            return Column(
+              children: [
+                const HeaderLine('Conexões', Symbols.partner_exchange),
+                const SizedBox(height: 12),
+                state.connections.isEmpty
+                    ? const Text('Nenhuma conexão')
+                    : Expanded(
+                        child: ListView.separated(
+                          shrinkWrap: true,
+                          separatorBuilder: (_, __) {
+                            return const SizedBox(height: 10);
+                          },
+                          itemCount: state.connections.length,
+                          itemBuilder: (context, index) {
+                            final connection = state.connections[index];
+
+                            return connection.buildTile();
+                          },
+                        ),
+                      )
+              ],
+            );
+          }
+          return Container();
+        },
+      ),
+    );
+
     return BlocProvider<ConnectionPanelBloc>(
-      create: (_) => ConnectionPanelBloc(ConnectionDatasource()),
+      create: (_) => ConnectionPanelBloc(userData, ConnectionDataSource()),
       child: CustomScaffold(
         floatingActionButton: BlocSelector<ConnectionPanelBloc, ConnectionPanelState, bool>(
           selector: (state) => state is ConnectionPanelReady,
@@ -46,6 +93,8 @@ class ConnectionPanelScreen extends StatelessWidget {
               return const CircularProgressIndicator();
             } else if (state is ConnectionPanelReady) {
               return _ReadyScreen(state);
+            } else if (state is ConnectionPanelError) {
+              return GenericErrorComponent(state.error, onRefresh: () => bloc.add(ConnectionPanelStarted()));
             } else {
               return Column(
                 children: [

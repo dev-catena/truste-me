@@ -1,4 +1,4 @@
-package com.example.trustme
+package com.episteme.trustme
 
 import io.flutter.embedding.android.FlutterActivity
 

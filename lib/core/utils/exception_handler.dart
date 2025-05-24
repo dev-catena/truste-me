@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 
 class ExceptionHandler {
@@ -7,6 +8,7 @@ class ExceptionHandler {
   final StackTrace s;
 
   ExceptionHandler(this.e, this.s) {
+    debugPrint('$runtimeType - error: $e\n    stack: $s');
     // _logException(e, s);
   }
 

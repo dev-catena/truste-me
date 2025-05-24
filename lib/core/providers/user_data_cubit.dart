@@ -19,8 +19,6 @@ class UserDataCubit extends Cubit<UserDataState> {
   final ConnectionDataSource connectionDataSource;
 
   late GeneralUserInfo _userInfo;
-  final List<Contract> _contracts = [];
-  final List<Connection> _connections = [];
 
   UserDataCubit(
     this.userDataSource,
@@ -37,21 +35,22 @@ class UserDataCubit extends Cubit<UserDataState> {
   List<Connection> get getConnections => (state as UserDataReady).connections;
 
   Future<void> initialize(Person user) async {
-    _contracts.clear();
+    final List<Contract> contracts = [];
+    final List<Connection> connections = [];
 
     setLoggedInUser(user);
 
     await Future.wait([
       userDataSource.getGeneralInfo().then((value) => _userInfo = value),
-      contractDataSource.getContractsForUser(user).then((value) => _contracts.addAll(value)),
-      connectionDataSource.getConnectionsForUser(user).then((value) => _connections.addAll(value)),
+      contractDataSource.getContractsForUser(user).then((value) => contracts.addAll(value)),
+      connectionDataSource.getConnectionsForUser(user).then((value) => connections.addAll(value)),
     ]);
 
-    final activeContracts = _contracts.where((element) => element.status == ContractStatus.active).length;
-    final pendingContracts = _contracts.where((element) => element.status == ContractStatus.pending).length;
-    final pendingSeals = 0;
-    final activeConnections = _connections.where((element) => element.status == ConnectionStatus.accepted).length;
-    final pendingConnections = _connections.where((element) => element.status == ConnectionStatus.pending).length;
+    final activeContracts = contracts.where((element) => element.status == ContractStatus.active).length;
+    final pendingContracts = contracts.where((element) => element.status == ContractStatus.pending).length;
+    const pendingSeals = 0;
+    final activeConnections = connections.where((element) => element.status == ConnectionStatus.accepted).length;
+    final pendingConnections = connections.where((element) => element.status == ConnectionStatus.pending).length;
 
     final info = GeneralUserInfo(
       activeContracts: activeContracts,
@@ -63,8 +62,8 @@ class UserDataCubit extends Cubit<UserDataState> {
     emit(UserDataReady(
       user: user,
       userInfo: info,
-      contracts: _contracts,
-      connections: _connections,
+      contracts: contracts,
+      connections: connections,
     ));
   }
 
@@ -108,8 +107,17 @@ class UserDataCubit extends Cubit<UserDataState> {
 
   Future<void> refreshContracts() async {
     final internState = state as UserDataReady;
-    final newContracts = await contractDataSource.getContractsForUser(getUser);
+    final newContracts = await contractDataSource.getContractsForUser(internState.user);
 
     emit(internState.copyWith(contracts: newContracts));
+  }
+
+  Future<void> refreshConnections(Person user) async {
+    final internState  = state as UserDataReady;
+
+    final updatedConnections = await connectionDataSource.getConnectionsForUser(user);
+
+    emit(internState.copyWith(connections: updatedConnections));
+
   }
 }

@@ -194,6 +194,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
         onCpfSet: (value) => userCpf = value,
         onEmailSet: (value) => userEmail = value,
         onBirthDateChanged: (value) => birthDate = value,
+        currentName: userName,
+        currentBirthDate: birthDate,
+        currentCpf: userCpf,
+        currentEmail: userEmail,
       );
     } else if (step == 3) {
       return _AddressInfo(

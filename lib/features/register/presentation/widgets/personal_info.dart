@@ -1,12 +1,20 @@
 part of '../register_screen.dart';
 
 class _PersonalInfo extends StatefulWidget {
+  final String? currentName;
+  final String? currentCpf;
+  final String? currentEmail;
+  final DateTime? currentBirthDate;
   final ValueChanged<String> onNameSet;
   final ValueChanged<String> onCpfSet;
   final ValueChanged<String> onEmailSet;
   final ValueChanged<DateTime?> onBirthDateChanged;
 
   const _PersonalInfo({
+    required this.currentName,
+    required this.currentCpf,
+    required this.currentEmail,
+    required this.currentBirthDate,
     required this.onNameSet,
     required this.onCpfSet,
     required this.onBirthDateChanged,
@@ -18,9 +26,9 @@ class _PersonalInfo extends StatefulWidget {
 }
 
 class _PersonalInfoState extends State<_PersonalInfo> {
-  final _nameController = TextEditingController();
-  final _cpfController = TextEditingController();
-  final _emailController = TextEditingController();
+  late final _nameController = TextEditingController(text: widget.currentEmail);
+  late final _cpfController = TextEditingController(text: widget.currentCpf);
+  late final _emailController = TextEditingController(text: widget.currentEmail);
   bool _isNameEmpty = true;
   bool _isCpfEmpty = true;
   bool _isEmailEmpty = true;
@@ -105,7 +113,9 @@ class _PersonalInfoState extends State<_PersonalInfo> {
         ),
         const SizedBox(height: 8),
         CustomSelectableTile(
-          title: datePicked != null ? '${datePicked!.day.toString().padLeft(2, '0')}/${datePicked!.month.toString().padLeft(2, '0')}/${datePicked!.year}': 'Data de nascimento',
+          title: datePicked != null
+              ? '${datePicked!.day.toString().padLeft(2, '0')}/${datePicked!.month.toString().padLeft(2, '0')}/${datePicked!.year}'
+              : 'Data de nascimento',
           width: double.infinity,
           isActive: false,
           borderColor: datePicked == null ? CustomColor.vividRed : CustomColor.activeColor,
@@ -118,9 +128,7 @@ class _PersonalInfoState extends State<_PersonalInfo> {
             ).then((value) {
               datePicked = value;
               widget.onBirthDateChanged(value);
-              setState(() {
-
-              });
+              setState(() {});
             });
           },
         ),

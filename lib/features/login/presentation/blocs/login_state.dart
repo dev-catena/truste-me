@@ -1,57 +1,58 @@
-part of 'login_bloc.dart';
+part of 'login_cubit.dart';
 
 @immutable
-class LoginState extends Equatable {
-  final String email;
-  final String password;
+sealed class LoginState {}
+
+final class LoginInitial extends LoginState {}
+
+final class LoginReady extends LoginState {
+  final TextEditingController emailController;
+  final TextEditingController pwdController;
+  final FocusNode emailFocusNode;
+  final FocusNode pwdFocusNode;
+
   final bool isSubmitting;
-  final bool isPwdObscured;
-  final bool isSuccess;
-  final bool isFailure;
+  final bool loginSuccess;
+  final bool isPwdObscure;
+  final bool error;
   final String? errorMsg;
 
-  const LoginState({
-    required this.email,
-    required this.password,
-    required this.isSubmitting,
-    required this.isPwdObscured,
-    required this.isSuccess,
-    required this.isFailure,
-    this.errorMsg,
-  });
+  static const _sentinel = Object();
 
-  factory LoginState.initial() {
-    return const LoginState(
-      email: '',
-      password: '',
-      isPwdObscured: true,
-      isSubmitting: false,
-      isSuccess: false,
-      isFailure: false,
-      errorMsg: '',
-    );
-  }
-
-  LoginState copyWith({
-    String? email,
-    String? password,
-    bool? isSubmitting,
-    bool? isPwdObscure,
-    bool? isSuccess,
-    bool? isFailure,
-    String? errorMsg,
+  LoginReady copyWith({
+    Object? emailController = _sentinel,
+    Object? pwdController = _sentinel,
+    Object? emailFocusNode = _sentinel,
+    Object? pwdFocusNode = _sentinel,
+    Object? isSubmitting = _sentinel,
+    Object? loginSuccess = _sentinel,
+    Object? isPwdObscure = _sentinel,
+    Object? error = _sentinel,
+    Object? errorMsg = _sentinel,
   }) {
-    return LoginState(
-      email: email ?? this.email,
-      password: password ?? this.password,
-      isSubmitting: isSubmitting ?? this.isSubmitting,
-      isPwdObscured: isPwdObscure ?? this.isPwdObscured,
-      isSuccess: isSuccess ?? this.isSuccess,
-      isFailure: isFailure ?? this.isFailure,
-      errorMsg: errorMsg,
+    return LoginReady(
+      emailController:
+          identical(emailController, _sentinel) ? this.emailController : emailController as TextEditingController,
+      pwdController: identical(pwdController, _sentinel) ? this.pwdController : pwdController as TextEditingController,
+      emailFocusNode: identical(emailFocusNode, _sentinel) ? this.emailFocusNode : emailFocusNode as FocusNode,
+      pwdFocusNode: identical(pwdFocusNode, _sentinel) ? this.pwdFocusNode : pwdFocusNode as FocusNode,
+      isSubmitting: identical(isSubmitting, _sentinel) ? this.isSubmitting : isSubmitting as bool,
+      loginSuccess: identical(loginSuccess, _sentinel) ? this.loginSuccess : loginSuccess as bool,
+      isPwdObscure: identical(isPwdObscure, _sentinel) ? this.isPwdObscure : isPwdObscure as bool,
+      error: identical(error, _sentinel) ? this.error : error as bool,
+      errorMsg: identical(errorMsg, _sentinel) ? this.errorMsg : errorMsg as String?,
     );
   }
 
-  @override
-  List<Object?> get props => [email, password, isSubmitting, isPwdObscured, isSuccess, isFailure];
+  LoginReady({
+    required this.emailController,
+    required this.pwdController,
+    required this.emailFocusNode,
+    required this.pwdFocusNode,
+    required this.isPwdObscure,
+    required this.isSubmitting,
+    required this.loginSuccess,
+    required this.error,
+    required this.errorMsg,
+  });
 }

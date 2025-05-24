@@ -39,19 +39,22 @@ class ConnectionPanelScreen extends StatelessWidget {
                 state.connections.isEmpty
                     ? const Text('Nenhuma conexão')
                     : Expanded(
-                        child: ListView.separated(
-                          shrinkWrap: true,
-                          separatorBuilder: (_, __) {
-                            return const SizedBox(height: 10);
-                          },
-                          itemCount: state.connections.length,
-                          itemBuilder: (context, index) {
-                            final connection = state.connections[index];
+                        child: RefreshIndicator(
+                          onRefresh: () async => userData.refreshConnections(userData.getUser),
+                          child: ListView.separated(
+                            shrinkWrap: true,
+                            separatorBuilder: (_, __) {
+                              return const SizedBox(height: 10);
+                            },
+                            itemCount: state.connections.length,
+                            itemBuilder: (context, index) {
+                              final connection = state.connections[index];
 
-                            return connection.buildTile();
-                          },
+                              return connection.buildTile();
+                            },
+                          ),
                         ),
-                      )
+                      ),
               ],
             );
           }

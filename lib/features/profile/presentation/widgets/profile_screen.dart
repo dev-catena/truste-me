@@ -32,7 +32,7 @@ class ProfileScreen extends StatelessWidget {
               onTap: () {
                 LoginDataSource(true, userData).logout().whenComplete(() => context.goNamed(AppRoutes.loginScreen));
               },
-            )
+            ),
           ],
         ),
       ),

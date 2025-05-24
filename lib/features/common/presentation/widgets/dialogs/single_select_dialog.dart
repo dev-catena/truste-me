@@ -78,29 +78,51 @@ class _SingleSelectDialogState<T> extends State<SingleSelectDialog<T>> {
         widget.options.isEmpty
             ? const Center(child: Text('Nenhuma opção disponível', textAlign: TextAlign.center))
             : SingleChildScrollView(
-              child: ListView.separated(
-                  itemCount: filteredOptions.length,
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                  separatorBuilder: (_, __) => const Divider(height: 10),
-                  padding: const EdgeInsets.all(20),
-                  itemBuilder: (context, index) {
-                    final option = filteredOptions[index];
-                    final isActive = option == widget.optionSelected;
+                child: Column(
+                  children: List.generate(
+                    filteredOptions.length,
+                    (index) {
+                      final option = filteredOptions[index];
+                      final isActive = option == widget.optionSelected;
 
-                    return CustomSelectableTile(
-                      width: 80,
-                      isActive: isActive,
-                      onTap: () {
-                        widget.onChoose(filteredOptions[index]);
-                        context.pop();
-                      },
-                      title: widget.getName(option),
-                      leadingWidget: widget.trailingWidget != null ? widget.trailingWidget!(option) : null,
-                    );
-                  },
+                      return CustomSelectableTile(
+                        isActive: isActive,
+                        onTap: () {
+                          widget.onChoose(filteredOptions[index]);
+                          context.pop();
+                        },
+                        title: widget.getName(option),
+                        leadingWidget: widget.trailingWidget != null ? widget.trailingWidget!(option) : null,
+                      );
+                    },
+                  ),
                 ),
-            )
+              )
+        // : SizedBox(
+        //     height: 400,
+        //     child: ListView.separated(
+        //       itemCount: filteredOptions.length,
+        //       shrinkWrap: true,
+        //       physics: const NeverScrollableScrollPhysics(),
+        //       separatorBuilder: (_, __) => const Divider(height: 10),
+        //       padding: const EdgeInsets.all(20),
+        //       itemBuilder: (context, index) {
+        //         final option = filteredOptions[index];
+        //         final isActive = option == widget.optionSelected;
+        //
+        //         return CustomSelectableTile(
+        //           width: 80,
+        //           isActive: isActive,
+        //           onTap: () {
+        //             widget.onChoose(filteredOptions[index]);
+        //             context.pop();
+        //           },
+        //           title: widget.getName(option),
+        //           leadingWidget: widget.trailingWidget != null ? widget.trailingWidget!(option) : null,
+        //         );
+        //       },
+        //     ),
+        //   )
       ],
     );
   }

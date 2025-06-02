@@ -6,6 +6,8 @@ sealed class LoginState {}
 final class LoginInitial extends LoginState {}
 
 final class LoginReady extends LoginState {
+  final String version;
+
   final TextEditingController emailController;
   final TextEditingController pwdController;
   final FocusNode emailFocusNode;
@@ -20,6 +22,7 @@ final class LoginReady extends LoginState {
   static const _sentinel = Object();
 
   LoginReady copyWith({
+    Object? version = _sentinel,
     Object? emailController = _sentinel,
     Object? pwdController = _sentinel,
     Object? emailFocusNode = _sentinel,
@@ -31,6 +34,7 @@ final class LoginReady extends LoginState {
     Object? errorMsg = _sentinel,
   }) {
     return LoginReady(
+      version: identical(version, _sentinel) ? this.version : version as String,
       emailController:
           identical(emailController, _sentinel) ? this.emailController : emailController as TextEditingController,
       pwdController: identical(pwdController, _sentinel) ? this.pwdController : pwdController as TextEditingController,
@@ -45,6 +49,7 @@ final class LoginReady extends LoginState {
   }
 
   LoginReady({
+    required this.version,
     required this.emailController,
     required this.pwdController,
     required this.emailFocusNode,

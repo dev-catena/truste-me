@@ -36,6 +36,50 @@ class AppTheme {
           color: Colors.white,
         ),
       ),
+      segmentedButtonTheme: SegmentedButtonThemeData(
+        style: ButtonStyle(
+          backgroundColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return CustomColor.activeColor;
+            }
+            return null;
+          }),
+          foregroundColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return Colors.white;
+            }
+            return Colors.black54;
+          }),
+
+        ),
+      ),
+      checkboxTheme: CheckboxThemeData(
+        checkColor: WidgetStateProperty.all(Colors.black),
+        fillColor: WidgetStateProperty.resolveWith<Color>((Set<WidgetState> states) {
+          if (states.contains(WidgetState.selected)) {
+            return CustomColor.activeColor;
+          }
+          return Colors.transparent;
+        }),
+      ),
+      radioTheme: RadioThemeData(
+        fillColor: WidgetStateProperty.resolveWith<Color>((Set<WidgetState> states) {
+          if (states.contains(WidgetState.selected)) {
+            return CustomColor.activeColor;
+          }
+          return Colors.black54;
+        }),
+      ),
+      chipTheme: ChipThemeData(
+        color: WidgetStateProperty.resolveWith<Color>((Set<WidgetState> states) {
+          if (states.contains(WidgetState.selected)) {
+            return CustomColor.activeColor;
+          } else {
+            return CustomColor.activeColor.withAlpha(20);
+          }
+        }),
+        checkmarkColor: Colors.white,
+      ),
     );
   }
 }

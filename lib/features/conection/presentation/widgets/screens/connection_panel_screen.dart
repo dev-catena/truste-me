@@ -2,19 +2,34 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../../../../core/enums/connection_status.dart';
+import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/providers/user_data_cubit.dart';
 import '../../../../common/presentation/widgets/components/custom_scaffold.dart';
-import '../../../../common/presentation/widgets/components/generic_error_component.dart';
 import '../../../../common/presentation/widgets/components/header_line.dart';
-import '../../../data/data_source/connection_datasource.dart';
-import '../../blocs/connection_panel_bloc.dart';
+import '../../../../common/presentation/widgets/components/stateful_filter_chips.dart';
+import '../../../domain/entities/connection.dart';
 import '../dialogs/request_connection_dialog.dart';
 
-class ConnectionPanelScreen extends StatelessWidget {
+class ConnectionPanelScreen extends StatefulWidget {
   const ConnectionPanelScreen({super.key});
 
   @override
+  State<ConnectionPanelScreen> createState() => _ConnectionPanelScreenState();
+}
+
+class _ConnectionPanelScreenState extends State<ConnectionPanelScreen> {
+  String activeFilter = 'Todos';
+
+  void setFilter(String filterSelected) {
+    setState(() {
+      activeFilter = filterSelected;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     final userData = context.read<UserDataCubit>();
 
     return CustomScaffold(
@@ -29,26 +44,60 @@ class ConnectionPanelScreen extends StatelessWidget {
         },
         child: const Icon(Icons.add),
       ),
-      child: BlocBuilder<UserDataCubit, UserDataState>(
-        builder: (context, state) {
+      child: BlocConsumer<UserDataCubit, UserDataState>(
+        bloc: userData,
+        listener: (context, state) {
           if (state is UserDataReady) {
+            if (state.connectionRequestStatus == ConnectionRequestStatus.failure) {
+              context.showSnack('Não foi possível fazer a solicitação. Verifique o código do usuário destino.');
+            } else if (state.connectionRequestStatus == ConnectionRequestStatus.success) {
+              context.showSnack('Conexão solicitada!');
+            }
+          }
+        },
+        builder: (_, state) {
+          if (state is UserDataReady) {
+            final allConnections = state.connections;
+
+            final filteredConnections = activeFilter == 'Todos'
+                ? allConnections
+                : allConnections.where((c) => c.status.description == activeFilter).toList();
+
             return Column(
               children: [
                 const HeaderLine('Conexões', Symbols.partner_exchange),
                 const SizedBox(height: 12),
-                state.connections.isEmpty
-                    ? const Text('Nenhuma conexão')
+                SizedBox(
+                  height: 50,
+                  width: size.width * 0.95,
+                  child: StatefulFilterChips(
+                    filtersLabel: ConnectionStatus.values.map((e) => e.description).toList()..insert(0, 'Todos'),
+                    initialFilter: 'Todos',
+                    onSelected: (value) => setFilter(value),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                filteredConnections.isEmpty
+                    ? Column(
+                        children: [
+                          const Text('Nenhuma conexão'),
+                          IconButton(
+                            onPressed: () => userData.refreshConnections(userData.getUser),
+                            icon: const Icon(Icons.refresh_outlined),
+                          ),
+                        ],
+                      )
                     : Expanded(
                         child: RefreshIndicator(
-                          onRefresh: () async => userData.refreshConnections(userData.getUser),
+                          onRefresh: () async => await userData.refreshConnections(userData.getUser),
                           child: ListView.separated(
                             shrinkWrap: true,
                             separatorBuilder: (_, __) {
                               return const SizedBox(height: 10);
                             },
-                            itemCount: state.connections.length,
+                            itemCount: filteredConnections.length,
                             itemBuilder: (context, index) {
-                              final connection = state.connections[index];
+                              final connection = filteredConnections[index];
 
                               return connection.buildTile();
                             },
@@ -61,89 +110,6 @@ class ConnectionPanelScreen extends StatelessWidget {
           return Container();
         },
       ),
-    );
-
-    return BlocProvider<ConnectionPanelBloc>(
-      create: (_) => ConnectionPanelBloc(userData, ConnectionDataSource()),
-      child: CustomScaffold(
-        floatingActionButton: BlocSelector<ConnectionPanelBloc, ConnectionPanelState, bool>(
-          selector: (state) => state is ConnectionPanelReady,
-          builder: (selectorCtx, isReady) {
-            final bloc = selectorCtx.read<ConnectionPanelBloc>();
-            if (isReady) {
-              return FloatingActionButton(
-                heroTag: 'btn1',
-                onPressed: () {
-                  showDialog(
-                      context: selectorCtx,
-                      builder: (_) {
-                        return RequestConnectionDialog(onRequested: (code) => bloc.add(ConnectionPanelRequested(code)));
-                      });
-                },
-                child: const Icon(Icons.add),
-              );
-            }
-            return const SizedBox.shrink();
-          },
-        ),
-        child: BlocBuilder<ConnectionPanelBloc, ConnectionPanelState>(
-          builder: (ctx, state) {
-            final bloc = ctx.read<ConnectionPanelBloc>();
-            if (state is ConnectionPanelInitial) {
-              bloc.add(ConnectionPanelStarted());
-              return const CircularProgressIndicator();
-            } else if (state is ConnectionPanelLoadInProgress) {
-              return const CircularProgressIndicator();
-            } else if (state is ConnectionPanelReady) {
-              return _ReadyScreen(state);
-            } else if (state is ConnectionPanelError) {
-              return GenericErrorComponent(state.error, onRefresh: () => bloc.add(ConnectionPanelStarted()));
-            } else {
-              return Column(
-                children: [
-                  const Text('NoState'),
-                  IconButton(
-                    onPressed: () => bloc.add(ConnectionPanelStarted()),
-                    icon: const Icon(Icons.refresh_outlined),
-                  )
-                ],
-              );
-            }
-          },
-        ),
-      ),
-    );
-  }
-}
-
-class _ReadyScreen extends StatelessWidget {
-  const _ReadyScreen(this.state);
-
-  final ConnectionPanelReady state;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const HeaderLine('Conexões', Symbols.partner_exchange),
-        const SizedBox(height: 12),
-        state.connections.isEmpty
-            ? const Text('Nenhuma conexão')
-            : Expanded(
-                child: ListView.separated(
-                  shrinkWrap: true,
-                  separatorBuilder: (_, __) {
-                    return const SizedBox(height: 10);
-                  },
-                  itemCount: state.connections.length,
-                  itemBuilder: (context, index) {
-                    final connection = state.connections[index];
-
-                    return connection.buildTile();
-                  },
-                ),
-              )
-      ],
     );
   }
 }

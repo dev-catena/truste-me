@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/providers/app_data_cubit.dart';
 import '../../../../core/providers/user_data_cubit.dart';
 import '../../../../core/routes.dart';
 import '../../../../core/utils/custom_colors.dart';
@@ -15,6 +16,7 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final userData = context.read<UserDataCubit>();
+    final appData = context.read<AppDataCubit>();
     final displayMedium = Theme.of(context).textTheme.displayMedium!;
 
     return Scaffold(
@@ -22,7 +24,7 @@ class LoginScreen extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: BlocProvider<LoginCubit>(
-          create: (_) => LoginCubit(userData, LoginDataSource(false, userData)),
+          create: (_) => LoginCubit(userData, LoginDataSource(false, userData, appData)),
           child: BlocConsumer<LoginCubit, LoginState>(
             listener: (_, state) {
               if (state is LoginReady) {
@@ -106,6 +108,10 @@ class LoginScreen extends StatelessWidget {
                                     },
                                     child: const Text('Login'),
                                   ),
+                            Align(
+                              alignment: Alignment.bottomRight,
+                              child: Text('ver. ${state.version}'),
+                            )
                           ],
                         ),
                       ),

@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../../../core/providers/user_data_cubit.dart';
 import '../../../../core/utils/exception_handler.dart';
@@ -20,9 +21,16 @@ class LoginCubit extends Cubit<LoginState> {
   final FocusNode _emailFocusNode = FocusNode();
   final FocusNode _pwdFocusNode = FocusNode();
 
-  void initialize() {
+  Future<void> initialize() async {
+
+    final PackageInfo packageInfo = await PackageInfo.fromPlatform();
+
+    final String version = packageInfo.version;
+    final String buildNumber = packageInfo.buildNumber;
+
     emit(
       LoginReady(
+        version: '$version+$buildNumber',
         emailController: _emailController,
         pwdController: _pwdController,
         emailFocusNode: _emailFocusNode,

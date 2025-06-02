@@ -20,11 +20,11 @@ class ConnectionDetailScreen extends StatefulWidget {
 
 class _ConnectionDetailScreenState extends State<ConnectionDetailScreen> {
   bool acceptInProgress = false;
+  late final userData = context.read<UserDataCubit>();
 
-
-  Future<void> acceptContract(bool hasAccepted) async {
+  Future<void> acceptConnection(bool hasAccepted) async {
     acceptInProgress = true;
-    await context.read<UserDataCubit>().establishConnection(widget.connection, hasAccepted);
+    await userData.establishConnection(widget.connection, hasAccepted);
     acceptInProgress = false;
 
     if (context.mounted) {
@@ -47,13 +47,13 @@ class _ConnectionDetailScreenState extends State<ConnectionDetailScreen> {
                   children: [
                     OutlinedButton(
                       onPressed: () {
-                        acceptContract(false);
+                        acceptConnection(false);
                       },
                       child: const Text('Recusar'),
                     ),
                     FilledButton(
                       onPressed: () {
-                        acceptContract(true);
+                        acceptConnection(true);
                       },
                       child: const Text('Aceitar'),
                     ),
@@ -76,7 +76,16 @@ class _ConnectionDetailScreenState extends State<ConnectionDetailScreen> {
         ],
       );
     } else if (widget.connection.status == ConnectionStatus.accepted) {
-      return OutlinedButton(onPressed: () {}, child: const Text('Desfazer conexão'));
+      return OutlinedButton(
+        onPressed: () async {
+          await userData.deleteConnection(widget.connection);
+
+          if(context.mounted) {
+            context.pop();
+          }
+        },
+        child: const Text('Desfazer conexão'),
+      );
     } else {
       return const SizedBox();
     }

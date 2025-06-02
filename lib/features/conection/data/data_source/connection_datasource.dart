@@ -26,11 +26,12 @@ class ConnectionDataSource {
     return connectionList;
   }
 
-  Future<void> requestConnection(int code) async {
+  Future<Map<String, dynamic>> requestConnection(int code) async {
     final content = {'usuario_codigo': code};
     final rawData = await _apiProvider.post('conexao/solicitar', jsonEncode(content));
 
     debugPrint('$runtimeType - rawData $rawData');
+    return rawData;
   }
 
   Future<void> acceptConnection(Connection connection, bool hasAccepted)async  {
@@ -42,7 +43,9 @@ class ConnectionDataSource {
     final rawData = await _apiProvider.post('conexao/responder', jsonEncode(content));
   }
 
-  ConnectionDataSource();
+  Future<void> deleteConnection(Connection user) async {
+    await _apiProvider.delete('conexao/excluir/${user.id}');
+  }
 }
 
 class _MockData {

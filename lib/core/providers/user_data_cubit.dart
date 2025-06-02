@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/foundation.dart';
-import 'package:meta/meta.dart';
 
 import '../../features/common/data/data_source/user_data_source.dart';
 import '../../features/common/domain/entities/person.dart';
@@ -10,6 +9,7 @@ import '../../features/contracts/data/data_source/contract_datasource.dart';
 import '../../features/contracts/domain/entities/clause.dart';
 import '../../features/contracts/domain/entities/contract.dart';
 import '../../features/home/data/data_source/home_datasource.dart';
+import '../enums/connection_status.dart';
 
 part 'user_data_state.dart';
 
@@ -91,7 +91,35 @@ class UserDataCubit extends Cubit<UserDataState> {
   }
 
   Future<void> requestConnection(int userCode) async {
-    await connectionDataSource.requestConnection(userCode);
+    final internState = state as UserDataReady;
+
+    try {
+      final resp = await connectionDataSource.requestConnection(userCode);
+
+      if (resp.containsKey('error')) {
+        emit(internState.copyWith(connectionStatus: ConnectionRequestStatus.failure));
+      } else {
+        emit(internState.copyWith(connectionStatus: ConnectionRequestStatus.success));
+      }
+
+      emit(internState.copyWith(connectionStatus: ConnectionRequestStatus.initial));
+    } catch (_) {
+      final internState = state as UserDataReady;
+      emit(internState.copyWith(connectionStatus: ConnectionRequestStatus.failure));
+    }
+  }
+
+  Future<void> deleteConnection(Connection connection) async {
+    final internState = state as UserDataReady;
+
+    await connectionDataSource.deleteConnection(connection);
+
+    final connectionIndex = internState.connections.indexOf(connection);
+    final updatedConnections = List<Connection>.of(internState.connections);
+
+    updatedConnections.removeAt(connectionIndex);
+
+    emit(internState.copyWith(connections: updatedConnections));
   }
 
   Future<void> createContract(Person user, ContractType type, List<Clause> clauses) async {
@@ -113,11 +141,11 @@ class UserDataCubit extends Cubit<UserDataState> {
   }
 
   Future<void> refreshConnections(Person user) async {
-    final internState  = state as UserDataReady;
+    final internState = state as UserDataReady;
 
     final updatedConnections = await connectionDataSource.getConnectionsForUser(user);
+    debugPrint('$runtimeType - connections refreshed');
 
     emit(internState.copyWith(connections: updatedConnections));
-
   }
 }

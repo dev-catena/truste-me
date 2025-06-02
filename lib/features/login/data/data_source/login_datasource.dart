@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
 import '../../../../core/api_provider.dart';
+import '../../../../core/providers/app_data_cubit.dart';
 import '../../../../core/providers/user_data_cubit.dart';
 import '../../../common/data/models/person_model.dart';
 import '../../../common/domain/entities/person.dart';
@@ -10,8 +11,9 @@ import '../../../common/domain/entities/person.dart';
 class LoginDataSource {
   final bool useToken;
   final UserDataCubit userData;
+  final AppDataCubit appData;
 
-  LoginDataSource(this.useToken, this.userData);
+  LoginDataSource(this.useToken, this.userData, this.appData);
 
   late final ApiProvider _apiProvider = ApiProvider(useToken);
 
@@ -22,6 +24,7 @@ class LoginDataSource {
     if (rawData['user'] != null) {
       final user = PersonModel.fromJson(rawData).toEntity();
       await userData.initialize(user);
+      await appData.initialize();
       // setLoggedInUser(user);
       return true;
     } else {

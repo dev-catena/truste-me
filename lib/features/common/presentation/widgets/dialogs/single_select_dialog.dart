@@ -59,7 +59,6 @@ class _SingleSelectDialogState<T> extends State<SingleSelectDialog<T>> {
 
   @override
   Widget build(BuildContext context) {
-    final Size size = MediaQuery.of(context).size;
 
     return SimpleDialog(
       title: Text(widget.title),
@@ -85,14 +84,17 @@ class _SingleSelectDialogState<T> extends State<SingleSelectDialog<T>> {
                       final option = filteredOptions[index];
                       final isActive = option == widget.optionSelected;
 
-                      return CustomSelectableTile(
-                        isActive: isActive,
-                        onTap: () {
-                          widget.onChoose(filteredOptions[index]);
-                          context.pop();
-                        },
-                        title: widget.getName(option),
-                        leadingWidget: widget.trailingWidget != null ? widget.trailingWidget!(option) : null,
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: CustomSelectableTile(
+                          isActive: isActive,
+                          onTap: () {
+                            widget.onChoose(filteredOptions[index]);
+                            context.pop();
+                          },
+                          title: widget.getName(option),
+                          leadingWidget: widget.trailingWidget != null ? widget.trailingWidget!(option) : null,
+                        ),
                       );
                     },
                   ),

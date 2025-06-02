@@ -4,9 +4,11 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 import 'core/app_theme.dart';
+import 'core/providers/app_data_cubit.dart';
 import 'core/providers/user_data_cubit.dart';
 import 'core/routes.dart';
 import 'core/utils/globals.dart';
+import 'features/common/data/data_source/app_data_source.dart';
 import 'features/common/data/data_source/user_data_source.dart';
 import 'features/conection/data/data_source/connection_datasource.dart';
 import 'features/contracts/data/data_source/contract_datasource.dart';
@@ -49,11 +51,18 @@ class TrustMeApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => UserDataCubit(UserDataSource(), ContractDataSource(), ConnectionDataSource()),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<UserDataCubit>(
+          create: (_) => UserDataCubit(UserDataSource(), ContractDataSource(), ConnectionDataSource()),
+        ),
+        BlocProvider<AppDataCubit>(
+          create: (_) => AppDataCubit(AppDataSource()),
+        ),
+      ],
       child: MaterialApp.router(
         scaffoldMessengerKey: Globals.scaffoldMessengerKey,
-        title: 'Laços',
+        title: 'TrustMe',
         theme: AppTheme().getAppTheme(context),
         routeInformationParser: _routes.routeInformationParser,
         routeInformationProvider: _routes.routeInformationProvider,

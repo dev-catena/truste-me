@@ -35,14 +35,16 @@ class RequestConnectionDialog extends StatelessWidget {
       actions: [
         OutlinedButton(onPressed: () => context.pop(), child: const Text('Cancelar')),
         FilledButton(
-            onPressed: () {
-              if (controller.text.length != 7) {
-                return;
-              } else {
-                onRequested(int.parse(controller.text));
-              }
-            },
-            child: const Text('Solicitar')),
+          onPressed: () {
+            if (controller.text.length != 7) {
+              return;
+            } else {
+              onRequested(int.parse(controller.text));
+              context.pop();
+            }
+          },
+          child: const Text('Solicitar'),
+        ),
       ],
     );
   }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/providers/app_data_cubit.dart';
 import '../../../../core/providers/user_data_cubit.dart';
 import '../../../../core/routes.dart';
 import '../../../../core/utils/custom_colors.dart';
@@ -16,6 +17,7 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final userData = context.read<UserDataCubit>();
+    final appData = context.read<AppDataCubit>();
 
     return CustomScaffold(
       child: SingleChildScrollView(
@@ -30,7 +32,7 @@ class ProfileScreen extends StatelessWidget {
               title: const Text('Sair'),
               leading: const Icon(Icons.logout_outlined, color: CustomColor.vividRed),
               onTap: () {
-                LoginDataSource(true, userData).logout().whenComplete(() => context.goNamed(AppRoutes.loginScreen));
+                LoginDataSource(true, userData, appData).logout().whenComplete(() => context.goNamed(AppRoutes.loginScreen));
               },
             ),
           ],

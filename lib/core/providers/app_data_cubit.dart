@@ -11,7 +11,7 @@ class AppDataCubit extends Cubit<AppDataState> {
 
   AppDataCubit(this._appDataSource) : super(AppDataInitial());
 
-  get getPractices {
+  List<SexualPractice> get getPractices {
     final internState = state as AppDataReady;
 
     return internState.sexualPractices;

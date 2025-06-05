@@ -7,11 +7,11 @@ import '../../../../core/utils/custom_colors.dart';
 import '../../../common/data/models/person_model.dart';
 import '../../../common/domain/entities/person.dart';
 import 'clause.dart';
+import 'sexual_practice.dart';
 
 part '../../presentation/widgets/components/contract_card.dart';
 
 part '../../presentation/widgets/components/contract_detail_summary_card.dart';
-
 
 class Contract extends Equatable {
   final int id;
@@ -19,8 +19,9 @@ class Contract extends Equatable {
   final ContractStatus status;
   final ContractType type;
   final List<Clause> clauses;
+  final List<SexualPractice> sexualPractices;
   final Person? contractor;
-  final Person? stakeHolder;
+  final List<Person> stakeHolders;
   final DateTime? startDate;
   final DateTime? endDate;
 
@@ -38,8 +39,9 @@ class Contract extends Equatable {
     required this.status,
     required this.type,
     this.contractor,
-    this.stakeHolder,
+    required this.stakeHolders,
     required this.clauses,
+    required this.sexualPractices,
     this.startDate,
     this.endDate,
   });
@@ -55,26 +57,49 @@ class ContractModel extends Contract {
     required super.status,
     required super.type,
     super.contractor,
-    super.stakeHolder,
+    required super.stakeHolders,
     required super.clauses,
+    required super.sexualPractices,
     super.startDate,
     super.endDate,
   });
 
-  ContractModel.fromJson(Map<String, dynamic> json)
-      : super(
-          id: json['id'],
-          contractNumber: json['codigo'],
-          status: ContractStatus.fromString(json['status']),
-          type: ContractType.fromCode(json['contrato_tipo_id']),
-          clauses: (json['clausulas'] as List? ?? json['clausulas_unicas'] as List? ?? []).map((e) => ClauseModel.fromJson(e).toEntity()).toList(),
-          contractor: json['contratante'] != null ? PersonModel.fromJson(json['contratante']).toEntity() : null,
-          stakeHolder: json['participantes']?[0] != null
-              ? PersonModel.fromJson(json['participantes'][0]).toEntity()
-              : null,
-          startDate: DateTime.tryParse(json['inicio_vigencia'] ?? ''),
-          endDate: DateTime.tryParse(json['fim_vigencia'] ?? ''),
-        );
+  factory ContractModel.fromJson(Map<String, dynamic> json) {
+    final cont = json['contratante'] != null ? PersonModel.fromJson(json['contratante']).toEntity() : null;
+    final stakeHold = (json['participantes'] as List? ?? []).map((e) => PersonModel.fromJson(e).toEntity()).toList()
+      ..remove(cont);
+    final List<Clause> clau = [];
+    final List<SexualPractice> pract = [];
+
+    for(final ele in json['clausulas'] as List? ?? []){
+      if(ele['sexual'] != null){
+        if(ele['sexual'] == 0){
+          clau.add(ClauseModel.fromJson(ele).toEntity());
+        } else if(ele['sexual'] == 1){
+          pract.add(SexualPractice.fromJson(ele));
+
+        }
+      }
+    }
+
+
+    return ContractModel(
+      id: json['id'],
+      contractNumber: json['codigo'],
+      status: ContractStatus.fromString(json['status']),
+      type: ContractType.fromCode(json['contrato_tipo_id'] ?? json['tipo']['id']),
+      clauses: clau,
+      sexualPractices: pract,
+      contractor: cont,
+      // contractor: json['contratante'] != null ? PersonModel.fromJson(json['contratante']).toEntity() : null,
+      stakeHolders: stakeHold,
+      // stakeHolder: json['participantes']?[0] != null
+      //     ? PersonModel.fromJson(json['participantes'][0]).toEntity()
+      //     : null,
+      startDate: DateTime.tryParse(json['inicio_vigencia'] ?? ''),
+      endDate: DateTime.tryParse(json['fim_vigencia'] ?? ''),
+    );
+  }
 
   Contract toEntity() {
     return Contract(
@@ -83,8 +108,9 @@ class ContractModel extends Contract {
       contractor: contractor,
       status: status,
       clauses: clauses,
+      sexualPractices: sexualPractices,
       type: type,
-      stakeHolder: stakeHolder,
+      stakeHolders: stakeHolders,
       startDate: startDate,
       endDate: endDate,
     );

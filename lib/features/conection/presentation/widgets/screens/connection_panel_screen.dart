@@ -12,19 +12,26 @@ import '../../../domain/entities/connection.dart';
 import '../dialogs/request_connection_dialog.dart';
 
 class ConnectionPanelScreen extends StatefulWidget {
-  const ConnectionPanelScreen({super.key});
+  const ConnectionPanelScreen({super.key, this.initialFilter});
+  final String? initialFilter;
 
   @override
   State<ConnectionPanelScreen> createState() => _ConnectionPanelScreenState();
 }
 
 class _ConnectionPanelScreenState extends State<ConnectionPanelScreen> {
-  String activeFilter = 'Todos';
+  late String activeFilter;
 
   void setFilter(String filterSelected) {
     setState(() {
       activeFilter = filterSelected;
     });
+  }
+
+  @override
+  void initState() {
+    setFilter(widget.initialFilter ?? 'Todos');
+    super.initState();
   }
 
   @override
@@ -72,7 +79,7 @@ class _ConnectionPanelScreenState extends State<ConnectionPanelScreen> {
                   width: size.width * 0.95,
                   child: StatefulFilterChips(
                     filtersLabel: ConnectionStatus.values.map((e) => e.description).toList()..insert(0, 'Todos'),
-                    initialFilter: 'Todos',
+                    initialFilter: activeFilter,
                     onSelected: (value) => setFilter(value),
                   ),
                 ),

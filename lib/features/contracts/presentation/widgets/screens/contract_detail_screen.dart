@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
 import '../../../../common/presentation/widgets/components/custom_scaffold.dart';
+import '../../../../common/presentation/widgets/components/generic_error_component.dart';
 import '../../../../common/presentation/widgets/components/header_line.dart';
 import '../../../../home/data/models/feature_data.dart';
 import '../../../../home/presentation/widgets/dialogs/contract_history_dialog.dart';
@@ -10,6 +11,7 @@ import '../../../data/data_source/contract_datasource.dart';
 import '../../../domain/entities/contract.dart';
 import '../../blocs/contract_detail/contract_detail_bloc.dart';
 import '../components/clause_selection_card.dart';
+import '../components/contract_specification_widget.dart';
 
 class ContractDetailScreen extends StatelessWidget {
   const ContractDetailScreen(this.contract, {super.key});
@@ -26,16 +28,19 @@ class ContractDetailScreen extends StatelessWidget {
             final bloc = blocCtx.read<ContractDetailBloc>();
             if (state is ContractDetailInitial) {
               bloc.add(ContractDetailStarted());
-              return const CircularProgressIndicator();
+              return const Center(child: CircularProgressIndicator());
             } else if (state is ContractDetailLoadInProgress) {
-              return const CircularProgressIndicator();
+              return const Center(child: CircularProgressIndicator());
             } else if (state is ContractDetailReady) {
               return _ContractReady(state);
+            } else if (state is ContractDetailError) {
+              return GenericErrorComponent(state.msg, onRefresh: () => bloc.add(ContractDetailStarted()));
             } else {
               return Column(
                 children: [
                   const Text('NoState'),
-                  IconButton(onPressed: ()=>bloc.add(ContractDetailStarted()), icon: const Icon(Icons.refresh_outlined))
+                  IconButton(
+                      onPressed: () => bloc.add(ContractDetailStarted()), icon: const Icon(Icons.refresh_outlined))
                 ],
               );
             }
@@ -47,15 +52,14 @@ class ContractDetailScreen extends StatelessWidget {
 }
 
 class _ContractReady extends StatelessWidget {
-  const _ContractReady(
-    this.state
-  );
+  const _ContractReady(this.state);
 
   final ContractDetailReady state;
 
   @override
   Widget build(BuildContext context) {
     final titleLarge = Theme.of(context).textTheme.titleLarge!;
+    final bloc = context.read<ContractDetailBloc>();
 
     return RefreshIndicator(
       onRefresh: () async => context.read<ContractDetailBloc>().add(ContractDetailStarted()),
@@ -100,10 +104,21 @@ class _ContractReady extends StatelessWidget {
             const SizedBox(height: 12),
             ClauseSelectionCard(
               contractor: state.contract.contractor!,
-              stakeHolder: state.contract.stakeHolder,
+              stakeHolders: state.contract.stakeHolders,
               possibleClauses: state.possibleClauses,
               clausesChosen: state.contract.clauses,
-              onClausePicked: (value) => context.read<ContractDetailBloc>().add(ContractDetailClauseSet(value)),
+              onClausePicked: (value) => bloc.add(ContractDetailClauseAdded(value)),
+              onAcceptOrDeny: (clause, value) => bloc.add(ContractDetailClauseSet(clause, value)),
+              onRemove: null,
+            ),
+            const SizedBox(height: 12),
+            ContractSpecificationWidget(
+              type: state.contract.type,
+              initialPractices: state.contract.sexualPractices,
+              users: [state.contract.contractor!, ...state.contract.stakeHolders],
+              showStatusPerPerson: true,
+              onPick: (value) {},
+              onRemove: (value) {},
             ),
           ],
         ),

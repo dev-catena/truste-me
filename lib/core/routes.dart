@@ -59,7 +59,15 @@ final GoRouter _routes = GoRouter(
             GoRoute(
               path: AppRoutes.contractsScreen,
               name: AppRoutes.contractsScreen,
-              pageBuilder: (context, state) => const NoTransitionPage(child: ContractsScreen()),
+              pageBuilder: (context, state) {
+                final initialFilter = (state.extra as Map<String, dynamic>? ?? {})['initialFilter'] as ContractStatus?;
+                return NoTransitionPage(
+                  child: ContractsScreen(
+                    key: ValueKey(initialFilter),
+                    initialFilter: initialFilter?.description,
+                  ),
+                );
+              },
               routes: [
                 GoRoute(
                   path: AppRoutes.contractDetailScreen,
@@ -93,7 +101,15 @@ final GoRouter _routes = GoRouter(
                 GoRoute(
                   path: AppRoutes.connectionPanelScreen,
                   name: AppRoutes.connectionPanelScreen,
-                  builder: (_, __) => const ConnectionPanelScreen(),
+                  builder: (_, state) {
+                    final initialFilter =
+                        (state.extra as Map<String, dynamic>? ?? {})['initialFilter'] as ConnectionStatus?;
+
+                    return ConnectionPanelScreen(
+                      key: ValueKey(initialFilter),
+                      initialFilter: initialFilter?.description,
+                    );
+                  },
                   routes: [
                     GoRoute(
                       path: AppRoutes.connectionDetailScreen,
@@ -132,7 +148,6 @@ final GoRouter _routes = GoRouter(
       path: AppRoutes.profileScreen,
       name: AppRoutes.profileScreen,
       builder: (context, __) {
-
         return ProfileScreen();
       },
     ),

@@ -1,9 +1,10 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/utils/custom_colors.dart';
 import '../../../common/domain/entities/person.dart';
 
-class SexualPractice {
+class SexualPractice extends Equatable {
   final int id;
   final String description;
   final PracticeStatus status;
@@ -11,7 +12,7 @@ class SexualPractice {
   final List<int>? acceptedBy;
   final List<int>? deniedBy;
 
-  SexualPractice({
+  const SexualPractice({
     required this.id,
     required this.description,
     required this.status,
@@ -48,22 +49,26 @@ class SexualPractice {
           deniedBy: json['recusado'],
         );
 
-  Widget buildTile(List<Person> connections) {
+  Widget buildTile(
+    List<Person> connections, {
+    required ValueChanged<SexualPractice> onRemove,
+    required bool showStatusPerPerson,
+  }) {
     final List<Person> pending = [];
     final List<Person> denied = [];
     final List<Person> accepted = [];
 
-    if(pendingFor != null) {
+    if (pendingFor != null) {
       for (final ele in pendingFor!) {
         pending.addAll(connections.where((element) => element.id == ele));
       }
     }
-    if(acceptedBy != null) {
+    if (acceptedBy != null) {
       for (final ele in acceptedBy!) {
         accepted.addAll(connections.where((element) => element.id == ele));
       }
     }
-    if(deniedBy != null) {
+    if (deniedBy != null) {
       for (final ele in deniedBy!) {
         denied.addAll(connections.where((element) => element.id == ele));
       }
@@ -73,25 +78,39 @@ class SexualPractice {
       children: [
         ListTile(
           title: Text(description),
+          trailing: IconButton(
+            onPressed: () {
+              onRemove(this);
+            },
+            icon: const Icon(
+              Icons.remove_circle_outline,
+              color: CustomColor.vividRed,
+            ),
+          ),
         ),
-        ...List.generate(
-          pending.length,
-          (index) {
-            final person = pending[index];
-            const status = PracticeStatus.pending;
+        if (showStatusPerPerson) ...[
+          ...List.generate(
+            pending.length,
+            (index) {
+              final person = pending[index];
+              const status = PracticeStatus.pending;
 
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(person.fullName, textAlign: TextAlign.center),
-                status.buildIcon(),
-              ],
-            );
-          },
-        ),
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(person.fullName, textAlign: TextAlign.center),
+                  status.buildIcon(),
+                ],
+              );
+            },
+          ),
+        ],
       ],
     );
   }
+
+  @override
+  List<Object?> get props => [id, description];
 }
 
 enum PracticeStatus {
@@ -109,7 +128,7 @@ enum PracticeStatus {
 
   const PracticeStatus(this.code, this.description, this.icon);
 
-  factory PracticeStatus.byCode(int code){
+  factory PracticeStatus.byCode(int code) {
     return PracticeStatus.values.firstWhere((element) => element.code == code);
   }
 

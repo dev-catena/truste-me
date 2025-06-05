@@ -18,7 +18,7 @@ class ContractDetailBloc extends Bloc<ContractDetailEvent, ContractDetailState> 
 
   ContractDetailBloc(this.datasource, this.preliminaryContract) : super(ContractDetailInitial()) {
     on<ContractDetailStarted>(_onStarted);
-    on<ContractDetailClauseSet>(_onClauseSet);
+    on<ContractDetailClauseAdded>(_onClauseAdded);
   }
 
   Future<void> _onStarted(ContractDetailStarted event, Emitter<ContractDetailState> emit) async {
@@ -27,6 +27,7 @@ class ContractDetailBloc extends Bloc<ContractDetailEvent, ContractDetailState> 
     List<Clause> possibleClauses = [];
     late final Contract contract;
 
+    // try {
     await Future.wait([
       datasource.getClausesForContractType(preliminaryContract.type).then((value) => possibleClauses = value),
       datasource.getContractFullInfo(preliminaryContract).then((value) => contract = value),
@@ -37,12 +38,21 @@ class ContractDetailBloc extends Bloc<ContractDetailEvent, ContractDetailState> 
     final filteredClauses = _removeCurrentClausesFromAll(possibleClauses, contractClauses);
 
     emit(ContractDetailReady(contract: contract, possibleClauses: filteredClauses));
+    // } catch(e, s){
+    //   emit(ContractDetailError(e.toString()));
+    // }
   }
 
-  Future<void> _onClauseSet(ContractDetailClauseSet event, Emitter<ContractDetailState> emit) async {
+  Future<void> _onClauseAdded(ContractDetailClauseAdded event, Emitter<ContractDetailState> emit) async {
     if (state is! ContractDetailReady) return;
     final internState = state as ContractDetailReady;
-    final updatedContract = internState.contract..clauses.add(event.selectedClause);
+    final updatedContract = internState.contract
+      ..clauses.add(
+        event.selectedClause.copyWith(
+          acceptedBy: [internState.contract.contractor!.id],
+          pendingFor: internState.contract.stakeHolders.map((e) => e.id).toList(),
+        ),
+      );
 
     // final possibleClauses = internState.possibleClauses..remove(event.selectedClause);
     final filteredClauses = List<Clause>.of(internState.possibleClauses);

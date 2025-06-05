@@ -8,17 +8,21 @@ class ClauseSelectionCard extends StatelessWidget {
   const ClauseSelectionCard({
     super.key,
     required this.contractor,
-    required this.stakeHolder,
+    required this.stakeHolders,
     required this.possibleClauses,
     required this.clausesChosen,
     required this.onClausePicked,
+    required this.onAcceptOrDeny,
+    required this.onRemove,
   });
 
   final Person contractor;
-  final Person? stakeHolder;
+  final List<Person> stakeHolders;
   final List<Clause> possibleClauses;
   final List<Clause> clausesChosen;
   final void Function(Clause clause) onClausePicked;
+  final void Function(Clause clause, bool value)? onAcceptOrDeny;
+  final void Function(Clause clause)? onRemove;
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +44,7 @@ class ClauseSelectionCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Entre ${contractor.fullName}, doravante denominada "PARTE A", e ${stakeHolder?.fullName ?? 'NÃO DEFINIDO'}, '
+            'Entre ${contractor.fullName}, doravante denominada "PARTE A", e ${stakeHolders.isNotEmpty ? stakeHolders[0].fullName : 'NÃO DEFINIDO'}, '
             'doravante denominada "PARTE B", foi acordado o seguinte:',
             textAlign: TextAlign.justify,
           ),
@@ -49,7 +53,12 @@ class ClauseSelectionCard extends StatelessWidget {
             (index) {
               final clause = clausesChosen[index];
 
-              return clause.buildTile('${clause.code} - ');
+              return clause.buildTile(
+                titlePrefix: '${clause.code} - ',
+                participants: [contractor, ...stakeHolders],
+                onAcceptOrDeny: onAcceptOrDeny,
+                onRemove: onRemove,
+              );
             },
           ),
           Center(

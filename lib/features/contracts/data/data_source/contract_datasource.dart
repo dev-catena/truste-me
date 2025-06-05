@@ -6,7 +6,6 @@ import '../../../../core/api_provider.dart';
 import '../../../common/domain/entities/person.dart';
 import '../../domain/entities/clause.dart';
 import '../../domain/entities/contract.dart';
-import '../../domain/entities/sexual_practice.dart';
 
 class ContractDataSource {
   final _apiProvider = ApiProvider();
@@ -31,7 +30,6 @@ class ContractDataSource {
       convertedData.add(ContractModel.fromJson(ele).toEntity());
     }
 
-    debugPrint('$runtimeType - convertedData length ${convertedData.length}');
     return convertedData;
   }
 

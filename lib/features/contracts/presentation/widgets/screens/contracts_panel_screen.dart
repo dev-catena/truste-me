@@ -11,20 +11,27 @@ import '../../../../common/presentation/widgets/components/stateful_filter_chips
 import '../../../domain/entities/contract.dart';
 
 class ContractsScreen extends StatefulWidget {
-  const ContractsScreen({super.key});
+  const ContractsScreen({this.initialFilter, super.key});
+
+  final String? initialFilter;
 
   @override
   State<ContractsScreen> createState() => _ContractsScreenState();
 }
 
 class _ContractsScreenState extends State<ContractsScreen> {
-
-  String activeFilter = 'Todos';
+  late String activeFilter;
 
   void setFilter(String filterSelected) {
     setState(() {
       activeFilter = filterSelected;
     });
+  }
+
+  @override
+  void initState() {
+    setFilter(widget.initialFilter ?? 'Todos');
+    super.initState();
   }
 
   @override
@@ -42,12 +49,11 @@ class _ContractsScreenState extends State<ContractsScreen> {
       child: BlocBuilder<UserDataCubit, UserDataState>(
         builder: (_, state) {
           if (state is UserDataReady) {
+            final allContracts = state.contracts;
 
-            final allConnections = state.contracts;
-
-            final filteredConnections = activeFilter == 'Todos'
-                ? allConnections
-                : allConnections.where((c) => c.status.description == activeFilter).toList();
+            final filteredContracts = activeFilter == 'Todos'
+                ? allContracts
+                : allContracts.where((c) => c.status.description == activeFilter).toList();
 
             return RefreshIndicator(
               onRefresh: () async => userData.refreshContracts(),
@@ -63,12 +69,12 @@ class _ContractsScreenState extends State<ContractsScreen> {
                       width: size.width * 0.95,
                       child: StatefulFilterChips(
                         filtersLabel: ContractStatus.values.map((e) => e.description).toList()..insert(0, 'Todos'),
-                        initialFilter: 'Todos',
+                        initialFilter: activeFilter,
                         onSelected: setFilter,
                       ),
                     ),
                     const SizedBox(height: 20),
-                    filteredConnections.isEmpty
+                    filteredContracts.isEmpty
                         ? const Text('Nenhum contrato existente')
                         : GridView.builder(
                             shrinkWrap: true,
@@ -79,9 +85,9 @@ class _ContractsScreenState extends State<ContractsScreen> {
                               mainAxisSpacing: 5,
                               childAspectRatio: 0.7,
                             ),
-                            itemCount: filteredConnections.length,
+                            itemCount: filteredContracts.length,
                             itemBuilder: (_, index) {
-                              final contract = filteredConnections[index];
+                              final contract = filteredContracts[index];
 
                               return contract.buildCard();
                             },

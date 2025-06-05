@@ -1,11 +1,13 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
-
 import '../../../../core/api_provider.dart';
 import '../../../common/domain/entities/person.dart';
 import '../../domain/entities/clause.dart';
 import '../../domain/entities/contract.dart';
+import '../../domain/entities/contract_type.dart';
+import '../../domain/entities/sexual_practice.dart';
+import '../models/clause_model.dart';
+import '../models/contract_model.dart';
 
 class ContractDataSource {
   final _apiProvider = ApiProvider();
@@ -33,22 +35,31 @@ class ContractDataSource {
     return convertedData;
   }
 
-  Future<List<Clause>> getClausesForContractType(ContractType type) async {
-    final rawData = await _apiProvider.get('contrato-tipos/${type.code}/clausulas');
+  Future<ClauseAndPractice> getClausesForContractType(ContractType type) async {
+    final rawData = await _apiProvider.get('contrato-tipos/${type.id}/clausulas');
 
-    final List<Clause> convertedData = [];
-    for (final ele in rawData['clausulas']) {
-      convertedData.add(ClauseModel.fromJson(ele).toEntity());
+    final List<Clause> clau = [];
+    final List<SexualPractice> pract = [];
+
+    for (final ele in rawData['clausulas'] as List? ?? []) {
+      if (ele['sexual'] != null) {
+        if (ele['sexual'] == 0) {
+          clau.add(ClauseModel.fromJson(ele).toEntity());
+        } else if (ele['sexual'] == 1) {
+          pract.add(SexualPractice.fromJson(ele));
+        }
+      }
     }
+    final convertedData = ClauseAndPractice(clau, pract);
+
     return convertedData;
   }
 
-  Future<Contract> createContract(ContractType type, List<Person> participants, List<Clause> clauses) async {
+  Future<Contract> createContract(ContractType type, List<Person> participants, List<int> clausesId) async {
     final personsId = participants.map((p) => p.id).toList();
-    final clausesId = clauses.map((c) => c.id).toList();
 
     final content = {
-      'contrato_tipo_id': type.code,
+      'contrato_tipo_id': type.id,
       'status': 'Pendente',
       'participantes': personsId,
       'clausulas': clausesId,
@@ -59,6 +70,18 @@ class ContractDataSource {
     final newContract = ContractModel.fromJson(response).toEntity();
 
     return newContract;
+  }
+
+  Future<void> acceptOrDenyClause(Contract contract, Clause clause, bool hasAccepted) async {
+    final content = [
+      {
+        'contrato_id': contract.id,
+        'clausula_id': clause.id,
+        'aceito': hasAccepted ? 1 : 0,
+      }
+    ];
+    
+    await _apiProvider.post('contrato/clausula/aceitar', jsonEncode(content));
   }
 }
 

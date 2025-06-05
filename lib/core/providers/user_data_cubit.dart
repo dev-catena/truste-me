@@ -8,6 +8,8 @@ import '../../features/conection/domain/entities/connection.dart';
 import '../../features/contracts/data/data_source/contract_datasource.dart';
 import '../../features/contracts/domain/entities/clause.dart';
 import '../../features/contracts/domain/entities/contract.dart';
+import '../../features/contracts/domain/entities/contract_type.dart';
+import '../../features/contracts/domain/entities/sexual_practice.dart';
 import '../../features/home/data/data_source/home_datasource.dart';
 import '../enums/connection_status.dart';
 
@@ -122,10 +124,13 @@ class UserDataCubit extends Cubit<UserDataState> {
     emit(internState.copyWith(connections: updatedConnections));
   }
 
-  Future<void> createContract(Person user, ContractType type, List<Clause> clauses) async {
+  Future<void> createContract(Person user, ContractType type, List<Clause> clauses, List<SexualPractice> practicesTaken) async {
     final internState = state as UserDataReady;
 
-    final newContract = await contractDataSource.createContract(type, [user], clauses);
+    final clausesId = clauses.map((e) => e.id).toList();
+    clausesId.addAll(practicesTaken.map((e) => e.id));
+
+    final newContract = await contractDataSource.createContract(type, [user], clausesId);
     final updatedContracts = List<Contract>.of(internState.contracts)..insert(0, newContract);
     final updatedQuantity = internState.userInfo.pendingContracts + 1;
     final updatedInfo = internState.userInfo.copyWith(pendingContracts: updatedQuantity);

@@ -1,39 +1,39 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../../core/providers/app_data_cubit.dart';
 import '../../../../common/domain/entities/person.dart';
 import '../../../../common/presentation/widgets/components/stateful_segmented_button.dart';
 import '../../../../common/presentation/widgets/dialogs/single_select_dialog.dart';
-import '../../../domain/entities/contract.dart';
+import '../../../domain/entities/contract_type.dart';
 import '../../../domain/entities/sexual_practice.dart';
 
 class ContractSpecificationWidget extends StatefulWidget {
   const ContractSpecificationWidget({
     required this.type,
+    required this.practicesAvailable,
     required this.initialPractices,
-    required this.users,
+    required this.participants,
     required this.showStatusPerPerson,
     required this.onPick,
     required this.onRemove,
+    required this.onAcceptOrDeny,
     super.key,
   });
 
   final ContractType type;
+  final List<SexualPractice> practicesAvailable;
   final List<SexualPractice> initialPractices;
-  final List<Person> users;
+  final List<Person> participants;
   final bool showStatusPerPerson;
   final ValueChanged<SexualPractice> onPick;
-  final ValueChanged<SexualPractice> onRemove;
+  final ValueChanged<SexualPractice>? onRemove;
+  final void Function(SexualPractice practice, bool hasAccepted)? onAcceptOrDeny;
 
   @override
   State<ContractSpecificationWidget> createState() => _ContractSpecificationWidgetState();
 }
 
 class _ContractSpecificationWidgetState extends State<ContractSpecificationWidget> {
-  late final AppDataCubit appData;
 
-  late final List<SexualPractice> practicesAvailable;
   bool sharesNeedle = false;
   String periodicitySelected = 'Nunca';
   final List<SexualPractice> internTaken = [];
@@ -47,14 +47,14 @@ class _ContractSpecificationWidgetState extends State<ContractSpecificationWidge
 
   void _removePractice(SexualPractice value) {
     internTaken.remove(value);
-    widget.onRemove(value);
+    if(widget.onRemove != null) {
+      widget.onRemove!(value);
+    }
     setState(() {});
   }
 
   @override
   void initState() {
-    appData = context.read<AppDataCubit>();
-    practicesAvailable = appData.getPractices;
     internTaken.addAll(widget.initialPractices);
     super.initState();
   }
@@ -63,8 +63,8 @@ class _ContractSpecificationWidgetState extends State<ContractSpecificationWidge
   Widget build(BuildContext context) {
     final titleMedium = Theme.of(context).textTheme.titleMedium!;
 
-    switch (widget.type) {
-      case ContractType.sexual:
+    // switch (widget.type) {
+    //   case ContractType.sexual:
         return Container(
           decoration: BoxDecoration(
             color: Colors.white,
@@ -83,9 +83,12 @@ class _ContractSpecificationWidgetState extends State<ContractSpecificationWidge
                   final practice = internTaken[index];
 
                   return practice.buildTile(
-                    widget.users,
-                    onRemove: _removePractice,
+                    widget.participants,
+                    onRemove: widget.onRemove == null ? null : _removePractice,
                     showStatusPerPerson: widget.showStatusPerPerson,
+                    onAcceptOrDeny: (clause, value) {
+
+                    },
                   );
                 },
               ),
@@ -95,7 +98,7 @@ class _ContractSpecificationWidgetState extends State<ContractSpecificationWidge
                     showDialog(
                         context: context,
                         builder: (_) {
-                          final currentAvailable = List.of(practicesAvailable);
+                          final currentAvailable = List.of(widget.practicesAvailable);
 
                           for (final ele in internTaken) {
                             currentAvailable.remove(ele);
@@ -103,7 +106,7 @@ class _ContractSpecificationWidgetState extends State<ContractSpecificationWidge
 
                           return SingleSelectDialog<SexualPractice>(
                             title: 'Selecione uma prática',
-                            getName: (option) => option.description,
+                            getName: (option) => option.name,
                             onChoose: _addPractice,
                             options: currentAvailable,
                             optionSelected: null,
@@ -172,8 +175,8 @@ class _ContractSpecificationWidgetState extends State<ContractSpecificationWidge
             ],
           ),
         );
-      case ContractType.buyAndSale:
-        return const SizedBox.shrink();
-    }
+    //   case ContractType.buyAndSale:
+    //     return const SizedBox.shrink();
+    // }
   }
 }

@@ -3,18 +3,32 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/utils/custom_colors.dart';
 import '../../../common/domain/entities/person.dart';
+import 'clause.dart';
 
 class SexualPractice extends Equatable {
   final int id;
-  final String description;
+  final String code;
+  final String name;
   final PracticeStatus status;
   final List<int>? pendingFor;
   final List<int>? acceptedBy;
   final List<int>? deniedBy;
 
+  Clause toClause() {
+    return Clause(
+        id: id,
+        code: code,
+        description: '',
+        name: name,
+        pendingFor: pendingFor ?? [],
+        acceptedBy: acceptedBy ?? [],
+        deniedBy: deniedBy ?? []);
+  }
+
   const SexualPractice({
     required this.id,
-    required this.description,
+    required this.code,
+    required this.name,
     required this.status,
     required this.pendingFor,
     required this.acceptedBy,
@@ -23,7 +37,8 @@ class SexualPractice extends Equatable {
 
   SexualPractice copyWith({
     int? id,
-    String? description,
+    String? name,
+    String? code,
     PracticeStatus? status,
     List<int>? pendingFor,
     List<int>? acceptedBy,
@@ -31,7 +46,8 @@ class SexualPractice extends Equatable {
   }) {
     return SexualPractice(
       id: id ?? this.id,
-      description: description ?? this.description,
+      name: name ?? this.name,
+      code: code ?? this.code,
       status: status ?? this.status,
       pendingFor: pendingFor ?? this.pendingFor,
       acceptedBy: acceptedBy ?? this.acceptedBy,
@@ -42,7 +58,8 @@ class SexualPractice extends Equatable {
   SexualPractice.fromJson(Map<String, dynamic> json)
       : this(
           id: json['id'],
-          description: json['descricao'],
+          name: json['nome'],
+          code: json['codigo'],
           status: PracticeStatus.byCode(json['status'] ?? 1),
           pendingFor: json['pendente'],
           acceptedBy: json['aceito'],
@@ -51,8 +68,9 @@ class SexualPractice extends Equatable {
 
   Widget buildTile(
     List<Person> connections, {
-    required ValueChanged<SexualPractice> onRemove,
     required bool showStatusPerPerson,
+    required ValueChanged<SexualPractice>? onRemove,
+    required void Function(SexualPractice clause, bool value)? onAcceptOrDeny,
   }) {
     final List<Person> pending = [];
     final List<Person> denied = [];
@@ -77,30 +95,117 @@ class SexualPractice extends Equatable {
     return Column(
       children: [
         ListTile(
-          title: Text(description),
-          trailing: IconButton(
-            onPressed: () {
-              onRemove(this);
-            },
-            icon: const Icon(
-              Icons.remove_circle_outline,
-              color: CustomColor.vividRed,
-            ),
-          ),
+          title: Text(name),
+          trailing: onRemove != null
+              ? IconButton(
+                  onPressed: () {
+                    onRemove(this);
+                  },
+                  icon: const Icon(
+                    Icons.remove_circle_outline,
+                    color: CustomColor.vividRed,
+                  ),
+                )
+              : null,
         ),
         if (showStatusPerPerson) ...[
           ...List.generate(
             pending.length,
             (index) {
-              final person = pending[index];
-              const status = PracticeStatus.pending;
+              final user = pending[index];
 
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(person.fullName, textAlign: TextAlign.center),
-                  status.buildIcon(),
-                ],
+              return ListTile(
+                title: Text(user.fullName),
+                leading: const Icon(Icons.pending_outlined, color: CustomColor.pendingYellow),
+                contentPadding: const EdgeInsets.only(left: 15),
+                trailing: user.id == userLoggedIn.id
+                    ? Wrap(
+                        spacing: 0,
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              onAcceptOrDeny!(this, false);
+                            },
+                            child: const Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.cancel_outlined, color: CustomColor.vividRed),
+                                SizedBox(height: 4),
+                                Text('Recusar', style: TextStyle(fontSize: 12)),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          InkWell(
+                            onTap: () {
+                              onAcceptOrDeny!(this, true);
+                            },
+                            child: const Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.check_circle_outline, color: CustomColor.successGreen),
+                                SizedBox(height: 4),
+                                Text('Aceitar', style: TextStyle(fontSize: 12)),
+                              ],
+                            ),
+                          ),
+                        ],
+                      )
+                    : null,
+              );
+            },
+          ),
+          ...List.generate(
+            accepted.length,
+            (index) {
+              final user = accepted[index];
+
+              return ListTile(
+                title: Text(user.fullName),
+                leading: const Icon(Icons.check_circle_outline, color: CustomColor.successGreen),
+                contentPadding: const EdgeInsets.only(left: 15),
+                trailing: user.id == userLoggedIn.id
+                    ? GestureDetector(
+                        onTap: () {
+                          onAcceptOrDeny!(this, false);
+                        },
+                        child: const Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.cancel_outlined, color: CustomColor.vividRed),
+                            SizedBox(height: 4),
+                            Text('Recusar', style: TextStyle(fontSize: 12)),
+                          ],
+                        ),
+                      )
+                    : null,
+              );
+            },
+          ),
+          ...List.generate(
+            denied.length,
+            (index) {
+              final user = denied[index];
+
+              return ListTile(
+                title: Text(user.fullName),
+                leading: const Icon(Icons.cancel_outlined, color: CustomColor.vividRed),
+                contentPadding: const EdgeInsets.only(left: 15),
+                trailing: user.id == userLoggedIn.id
+                    ? GestureDetector(
+                        onTap: () {
+                          onAcceptOrDeny!(this, true);
+                        },
+                        child: const Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.check_circle_outline, color: CustomColor.successGreen),
+                            SizedBox(height: 4),
+                            Text('Aceitar', style: TextStyle(fontSize: 12)),
+                          ],
+                        ),
+                      )
+                    : null,
               );
             },
           ),
@@ -110,7 +215,7 @@ class SexualPractice extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, description];
+  List<Object?> get props => [id, name];
 }
 
 enum PracticeStatus {
@@ -140,4 +245,11 @@ enum PracticeStatus {
       ],
     );
   }
+}
+
+class ClauseAndPractice {
+  final List<Clause> clauses;
+  final List<SexualPractice> practices;
+
+  ClauseAndPractice(this.clauses, this.practices);
 }

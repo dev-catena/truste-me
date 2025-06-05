@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../../core/providers/app_data_cubit.dart';
 import '../../../../common/domain/entities/person.dart';
 import '../../../../common/presentation/widgets/components/custom_selectable_tile.dart';
 import '../../../../common/presentation/widgets/components/start_end_datepicker.dart';
 import '../../../../common/presentation/widgets/dialogs/single_select_dialog.dart';
 import '../../../../conection/domain/entities/connection.dart';
 import '../../../domain/entities/contract.dart';
+import '../../../domain/entities/contract_type.dart';
 
 class NewContractHeader extends StatelessWidget {
   const NewContractHeader(
@@ -28,6 +31,7 @@ class NewContractHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final titleMedium = Theme.of(context).textTheme.titleMedium!;
     final List<Person> personList = [];
+    final appData = context.read<AppDataCubit>();
 
     for (final ele in connections.where((element) => element.status == ConnectionStatus.accepted)) {
       personList.add(ele.user);
@@ -74,8 +78,10 @@ class NewContractHeader extends StatelessWidget {
                 builder: (context) {
                   return SingleSelectDialog<ContractType>(
                     title: 'Selecione a parte interessada',
-                    options: ContractType.values,
+                    options: appData.getContractTypes,
                     getName: (option) => option.description,
+                    // onChoose: onTypeSelected,
+                    // optionSelected: currentType,
                     onChoose: onTypeSelected,
                     optionSelected: currentType,
                   );

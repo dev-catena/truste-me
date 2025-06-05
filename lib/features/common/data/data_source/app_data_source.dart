@@ -1,13 +1,26 @@
+import '../../../../core/api_provider.dart';
+import '../../../contracts/domain/entities/contract_type.dart';
 import '../../../contracts/domain/entities/sexual_practice.dart';
 
 class AppDataSource {
+  final _apiProvider = ApiProvider();
 
+  // Future<List<SexualPractice>> getSexualPractices() async {
+  //   final rawData = _MockData().practices;
+  //   final practices = rawData.map((e)=> SexualPractice.fromJson(e)).toList();
+  //
+  //   return practices;
+  // }
 
-  Future<List<SexualPractice>> getSexualPractices() async {
-    final rawData = _MockData().practices;
-    final practices = rawData.map((e)=> SexualPractice.fromJson(e)).toList();
+  Future<List<ContractType>> getContractTypes() async {
+    final rawData = await _apiProvider.get('contrato-tipos/listar');
+    final List<ContractType> types = [];
 
-    return practices;
+    for(final ele in rawData['data']){
+      types.add(ContractType.fromJson(ele));
+    }
+
+    return types;
   }
 }
 

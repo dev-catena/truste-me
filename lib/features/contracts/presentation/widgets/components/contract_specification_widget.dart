@@ -6,7 +6,7 @@ import '../../../../common/presentation/widgets/dialogs/single_select_dialog.dar
 import '../../../domain/entities/contract_type.dart';
 import '../../../domain/entities/sexual_practice.dart';
 
-class ContractSpecificationWidget extends StatefulWidget {
+class ContractSpecificationWidget extends StatelessWidget {
   const ContractSpecificationWidget({
     required this.type,
     required this.practicesAvailable,
@@ -28,36 +28,11 @@ class ContractSpecificationWidget extends StatefulWidget {
   final ValueChanged<SexualPractice>? onRemove;
   final void Function(SexualPractice practice, bool hasAccepted)? onAcceptOrDeny;
 
-  @override
-  State<ContractSpecificationWidget> createState() => _ContractSpecificationWidgetState();
-}
+  final bool sharesNeedle = false;
 
-class _ContractSpecificationWidgetState extends State<ContractSpecificationWidget> {
+  final String periodicitySelected = 'Nunca';
 
-  bool sharesNeedle = false;
-  String periodicitySelected = 'Nunca';
-  final List<SexualPractice> internTaken = [];
-
-  void _addPractice(SexualPractice value) {
-    final updatedValue = value.copyWith(acceptedBy: [userLoggedIn.id]);
-    internTaken.add(updatedValue);
-    widget.onPick(updatedValue);
-    setState(() {});
-  }
-
-  void _removePractice(SexualPractice value) {
-    internTaken.remove(value);
-    if(widget.onRemove != null) {
-      widget.onRemove!(value);
-    }
-    setState(() {});
-  }
-
-  @override
-  void initState() {
-    internTaken.addAll(widget.initialPractices);
-    super.initState();
-  }
+  // final List<SexualPractice> internTaken = [];
 
   @override
   Widget build(BuildContext context) {
@@ -65,118 +40,164 @@ class _ContractSpecificationWidgetState extends State<ContractSpecificationWidge
 
     // switch (widget.type) {
     //   case ContractType.sexual:
-        return Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      padding: const EdgeInsets.all(10),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text('Especificações', style: titleMedium),
+          const SizedBox(height: 6),
+          const Text('Práticas permitidas'),
+          ...List.generate(
+            initialPractices.length,
+            (index) {
+              final practice = initialPractices[index];
+
+              return practice.buildTile(
+                participants,
+                onRemove: onRemove,
+                showStatusPerPerson: showStatusPerPerson,
+                onAcceptOrDeny: onAcceptOrDeny,
+              );
+            },
           ),
-          padding: const EdgeInsets.all(10),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Especificações', style: titleMedium),
-              const SizedBox(height: 6),
-              const Text('Práticas permitidas'),
-              ...List.generate(
-                internTaken.length,
-                (index) {
-                  final practice = internTaken[index];
+          Center(
+            child: TextButton(
+              onPressed: () {
+                showDialog(
+                    context: context,
+                    builder: (_) {
+                      final currentAvailable = List.of(practicesAvailable);
 
-                  return practice.buildTile(
-                    widget.participants,
-                    onRemove: widget.onRemove == null ? null : _removePractice,
-                    showStatusPerPerson: widget.showStatusPerPerson,
-                    onAcceptOrDeny: (clause, value) {
+                      for (final ele in initialPractices) {
+                        currentAvailable.remove(ele);
+                      }
 
-                    },
-                  );
-                },
-              ),
-              Center(
-                child: TextButton(
-                  onPressed: () {
-                    showDialog(
-                        context: context,
-                        builder: (_) {
-                          final currentAvailable = List.of(widget.practicesAvailable);
-
-                          for (final ele in internTaken) {
-                            currentAvailable.remove(ele);
-                          }
-
-                          return SingleSelectDialog<SexualPractice>(
-                            title: 'Selecione uma prática',
-                            getName: (option) => option.name,
-                            onChoose: _addPractice,
-                            options: currentAvailable,
-                            optionSelected: null,
-                          );
-                        });
-                  },
-                  child: const IntrinsicWidth(
-                    child: Row(
-                      children: [
-                        Icon(Icons.add),
-                        SizedBox(width: 12),
-                        Text('Adicionar prática'),
-                      ],
-                    ),
-                  ),
+                      return SingleSelectDialog<SexualPractice>(
+                        title: 'Selecione uma prática',
+                        getName: (option) => option.name,
+                        onChoose: onPick,
+                        options: currentAvailable,
+                        optionSelected: null,
+                      );
+                    });
+              },
+              child: const IntrinsicWidth(
+                child: Row(
+                  children: [
+                    Icon(Icons.add),
+                    SizedBox(width: 12),
+                    Text('Adicionar prática'),
+                  ],
                 ),
               ),
-              const SizedBox(height: 10),
-              const Text('Com que frequência você realiza as práticas marcadas acima?'),
-              StatefulSegmentedButton<String>(
-                options: const ['Nunca', 'Ocasionalmente', 'Frequentemente', 'Sempre'],
-                getLabel: (value) => value,
-                getValue: (value) => value,
-                initialSelection: {periodicitySelected},
-                onChanged: (value) {
-                  periodicitySelected = value.first;
-                  setState(() {});
-                },
-              ),
-              const SizedBox(height: 10),
-              const Text('Você costuma usar preservativo nas práticas sexuais?'),
-              StatefulSegmentedButton<String>(
-                options: const ['Nunca', 'As vezes', 'Na maioria das vezes', 'Sempre'],
-                getLabel: (value) => value,
-                getValue: (value) => value,
-                initialSelection: {periodicitySelected},
-                onChanged: (value) {
-                  periodicitySelected = value.first;
-                  setState(() {});
-                },
-              ),
-              const SizedBox(height: 10),
-              const Text('Já compartilhou seringas, agulhas ou outros objetos perfurantes?'),
-              ListTile(
-                title: const Text('Sim'),
-                leading: Radio(
-                  value: true,
-                  groupValue: sharesNeedle,
-                  onChanged: (value) {
-                    sharesNeedle = true;
-                    setState(() {});
-                  },
-                ),
-              ),
-              ListTile(
-                title: const Text('Não'),
-                leading: Radio(
-                  value: false,
-                  groupValue: sharesNeedle,
-                  onChanged: (value) {
-                    sharesNeedle = false;
-                    setState(() {});
-                  },
-                ),
-              ),
-            ],
+            ),
           ),
-        );
+          const SizedBox(height: 10),
+          const Text('Com que frequência você realiza as práticas marcadas acima?'),
+          StatefulSegmentedButton<String>(
+            options: const ['Nunca', 'Ocasionalmente', 'Frequentemente', 'Sempre'],
+            getLabel: (value) => value,
+            getValue: (value) => value,
+            initialSelection: {periodicitySelected},
+            onChanged: (value) {
+              // periodicitySelected = value.first;
+            },
+          ),
+          const SizedBox(height: 10),
+          const Text('Você costuma usar preservativo nas práticas sexuais?'),
+          StatefulSegmentedButton<String>(
+            options: const ['Nunca', 'As vezes', 'Na maioria das vezes', 'Sempre'],
+            getLabel: (value) => value,
+            getValue: (value) => value,
+            initialSelection: {periodicitySelected},
+            onChanged: (value) {
+              // periodicitySelected = value.first;
+            },
+          ),
+          const SizedBox(height: 10),
+          const Text('Já compartilhou seringas, agulhas ou outros objetos perfurantes?'),
+          const _RadioStateful(),
+          // Row(
+          //   children: [
+          //     Expanded(
+          //       child: ListTile(
+          //         title: const Text('Não'),
+          //         leading: _RadioStateful(sharesNeedle: sharesNeedle),
+          //       ),
+          //     ),
+          //     // const Spacer(),
+          //     Expanded(
+          //       child: ListTile(
+          //         title: const Text('Sim'),
+          //         leading: Radio(
+          //           value: true,
+          //           groupValue: sharesNeedle,
+          //           onChanged: (value) {
+          //             // sharesNeedle = true;
+          //           },
+          //         ),
+          //       ),
+          //     ),
+          //   ],
+          // ),
+        ],
+      ),
+    );
     //   case ContractType.buyAndSale:
     //     return const SizedBox.shrink();
     // }
+  }
+}
+
+class _RadioStateful extends StatefulWidget {
+  const _RadioStateful({super.key});
+
+  @override
+  State<_RadioStateful> createState() => _RadioStatefulState();
+}
+
+class _RadioStatefulState extends State<_RadioStateful> {
+  bool sharesNeedle = false;
+
+  @override
+  Widget build(BuildContext context) {
+
+    return Row(
+      children: [
+        Expanded(
+          child: ListTile(
+            title: const Text('Não'),
+            leading: Radio(
+              value: false,
+              groupValue: sharesNeedle,
+              onChanged: (value) {
+                sharesNeedle = false;
+              },
+            ),
+          ),
+        ),
+        // const Spacer(),
+        Expanded(
+          child: ListTile(
+            title: const Text('Sim'),
+            leading: Radio(
+              value: true,
+              groupValue: sharesNeedle,
+              onChanged: (value) {
+                sharesNeedle = true;
+                setState(() {
+
+                });
+              },
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }

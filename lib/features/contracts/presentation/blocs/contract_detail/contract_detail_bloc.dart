@@ -22,6 +22,8 @@ class ContractDetailBloc extends Bloc<ContractDetailEvent, ContractDetailState> 
     on<ContractDetailStarted>(_onStarted);
     on<ContractDetailClauseAdded>(_onClauseAdded);
     on<ContractDetailClauseSet>(_onClauseSet);
+    on<ContractDetailPracticeAdded>(_onPracticeAdded);
+    on<ContractDetailPracticeSet>(_onPracticeSet);
   }
 
   Future<void> _onStarted(ContractDetailStarted event, Emitter<ContractDetailState> emit) async {
@@ -79,6 +81,21 @@ class ContractDetailBloc extends Bloc<ContractDetailEvent, ContractDetailState> 
     await datasource.acceptOrDenyClause(internState.contract, event.selectedClause, event.hasAccepted);
     final updatedClause = internState.contract.clauses.firstWhere((element) => element == event.selectedClause);
 
+
+
+    // late final Clause updatedClause;
+    // late final int clauseIndex;
+    //
+    // if (isSexual) {
+    //   updatedClause =
+    //       internState.contract.sexualPractices.firstWhere((element) => element == event.selectedClause).toClause();
+    //   clauseIndex = internState.contract.sexualPractices.indexOf(updatedClause);
+    // } else {
+    //   updatedClause = internState.contract.clauses.firstWhere((element) => element == event.selectedClause);
+    //   clauseIndex = internState.contract.clauses.indexOf(event.selectedClause);
+    // }
+
+
     updatedClause.pendingFor.remove(userLoggedIn.id);
 
     if (event.hasAccepted) {
@@ -102,6 +119,56 @@ class ContractDetailBloc extends Bloc<ContractDetailEvent, ContractDetailState> 
     emit(internState.copyWith(contract: updatedContract));
   }
 
+
+
+  Future<void> _onPracticeAdded(ContractDetailPracticeAdded event, Emitter<ContractDetailState> emit) async {
+    if (state is! ContractDetailReady) return;
+    final internState = state as ContractDetailReady;
+    final updatedContract = internState.contract
+      ..sexualPractices.add(
+        event.selectedPractice.copyWith(
+          acceptedBy: [internState.contract.contractor!.id],
+          pendingFor: internState.contract.stakeHolders.map((e) => e.id).toList(),
+        ),
+      );
+
+    // final possibleClauses = internState.possibleClauses..remove(event.selectedClause);
+    // final filteredClauses = List<Clause>.of(internState.possibleClauses);
+    // filteredClauses.remove(event.selectedPractice);
+
+    emit(internState.copyWith(contract: updatedContract));
+  }
+
+  Future<void> _onPracticeSet(ContractDetailPracticeSet event, Emitter<ContractDetailState> emit) async {
+    if (state is! ContractDetailReady) return;
+    final internState = state as ContractDetailReady;
+
+    await datasource.acceptOrDenyClause(internState.contract, event.selectedPractice.toClause(), event.hasAccepted);
+    final updatedPractice = internState.contract.sexualPractices.firstWhere((element) => element == event.selectedPractice);
+
+    updatedPractice.pendingFor!.remove(userLoggedIn.id);
+
+    if (event.hasAccepted) {
+      updatedPractice.deniedBy!.remove(userLoggedIn.id);
+      updatedPractice.acceptedBy!.add(userLoggedIn.id);
+    } else {
+      updatedPractice.acceptedBy!.remove(userLoggedIn.id);
+      updatedPractice.deniedBy!.add(userLoggedIn.id);
+    }
+
+    final index = internState.contract.sexualPractices.indexOf(event.selectedPractice);
+    final updatedClauseList = List.of(internState.contract.sexualPractices);
+
+    updatedClauseList.removeAt(index);
+    updatedClauseList.insert(index, updatedPractice);
+
+    final updatedContract = internState.contract;
+    updatedContract.sexualPractices.clear();
+    updatedContract.sexualPractices.addAll(updatedClauseList);
+
+    emit(internState.copyWith(contract: updatedContract));
+  }
+
   List<Clause> _removeCurrentClausesFromAll(List<Clause> allClauses, List<Clause> currentClauses) {
     for (final ele in currentClauses) {
       allClauses.remove(ele);
@@ -109,4 +176,5 @@ class ContractDetailBloc extends Bloc<ContractDetailEvent, ContractDetailState> 
 
     return allClauses;
   }
+
 }

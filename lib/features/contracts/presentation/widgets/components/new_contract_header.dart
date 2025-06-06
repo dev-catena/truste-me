@@ -7,7 +7,6 @@ import '../../../../common/presentation/widgets/components/custom_selectable_til
 import '../../../../common/presentation/widgets/components/start_end_datepicker.dart';
 import '../../../../common/presentation/widgets/dialogs/single_select_dialog.dart';
 import '../../../../conection/domain/entities/connection.dart';
-import '../../../domain/entities/contract.dart';
 import '../../../domain/entities/contract_type.dart';
 
 class NewContractHeader extends StatelessWidget {
@@ -17,12 +16,16 @@ class NewContractHeader extends StatelessWidget {
     this.currentType,
     required this.onStakeHolderSelected,
     required this.onTypeSelected,
+    required this.onStartSet,
+    required this.onEndSet,
     super.key,
   });
 
   final List<Connection> connections;
   final ValueChanged<Person> onStakeHolderSelected;
   final ValueChanged<ContractType> onTypeSelected;
+  final ValueChanged<DateTime> onStartSet;
+  final ValueChanged<DateTime> onEndSet;
 
   final Person? currentStakeHolder;
   final ContractType? currentType;
@@ -93,7 +96,10 @@ class NewContractHeader extends StatelessWidget {
           Text('Período de vigência', style: titleMedium),
           const SizedBox(height: 6),
           StartEndDatepicker(
-            onDatePicked: (initialDate, endDate) {},
+            onDatePicked: (initialDate, endDate) {
+              onStartSet(initialDate);
+              onEndSet(endDate);
+            },
           ),
         ],
       ),

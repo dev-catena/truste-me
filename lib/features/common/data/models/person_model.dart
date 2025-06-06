@@ -21,7 +21,7 @@ class PersonModel extends Person {
       : super(
           id: json['id'] ?? json['user']?['id'] ?? json['usuario']?['id'],
           fullName: json['nome_completo'] ?? json['user']?['nome_completo'] ?? json['usuario']?['nome_completo'],
-          cpf: json['cpf'] ?? json['user']?['CPF'] ?? 'Sem CPF',
+          cpf: json['CPF'] ?? json['user']?['CPF'] ?? 'Sem CPF',
           birthDate: DateTime.tryParse(json['dt_nascimento'] ?? '') ??
               DateTime.tryParse(json['user']?['dt_nascimento'] ?? '') ??
               DateTime.now(),

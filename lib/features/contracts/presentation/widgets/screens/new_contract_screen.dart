@@ -30,6 +30,8 @@ class _NewContractScreenState extends State<NewContractScreen> {
   final List<Clause> currentClauses = [];
   final List<SexualPractice> practicesTaken = [];
   bool sharesNeedle = false;
+  DateTime? startDate;
+  DateTime? endDate;
 
   List<Clause> allClauses = [];
   List<SexualPractice> allPractices = [];
@@ -73,10 +75,12 @@ class _NewContractScreenState extends State<NewContractScreen> {
 
   void onPracticeChosen(SexualPractice value) {
     practicesTaken.add(value);
+    setState(() {});
   }
 
   void onPracticeRemoved(SexualPractice value) {
     practicesTaken.remove(value);
+    setState(() {});
   }
 
   @override
@@ -106,6 +110,8 @@ class _NewContractScreenState extends State<NewContractScreen> {
                     onTypeSelected: (value) async => await _setType(value),
                     currentStakeHolder: stakeHolderSelected,
                     currentType: typeSelected,
+                    onStartSet: (value) => startDate = value,
+                    onEndSet: (value) => endDate = value,
                   ),
                   const SizedBox(height: 16),
                   ClauseSelectionCard(
@@ -134,8 +140,23 @@ class _NewContractScreenState extends State<NewContractScreen> {
                   const SizedBox(height: 12),
                   FilledButton(
                     onPressed: () async {
-                      await userData.createContract(
-                          stakeHolderSelected!, typeSelected!, currentClauses, practicesTaken);
+                      final newContract = Contract(
+                        id: 0,
+                        contractNumber: '',
+                        status: ContractStatus.pending,
+                        contractor: userLoggedIn,
+                        type: typeSelected!,
+                        stakeHolders: [stakeHolderSelected!],
+                        clauses: currentClauses,
+                        sexualPractices: practicesTaken,
+                        startDate: startDate,
+                        endDate: endDate,
+                      );
+
+                      await userData.createContract(newContract);
+
+                      // await userData.createContract(
+                      //     stakeHolderSelected!, typeSelected!, currentClauses, practicesTaken);
                       context.pop();
                       // final Contract contract = Contract(
                       //   id: 0,

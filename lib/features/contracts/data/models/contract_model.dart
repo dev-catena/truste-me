@@ -39,7 +39,7 @@ class ContractModel extends Contract {
     return ContractModel(
       id: json['id'],
       contractNumber: json['codigo'],
-      status: ContractStatus.fromString(json['status']),
+      status: ContractStatus.fromString(json['status'] ?? 'Pendente'),
       type: ContractType.fromJson(json['tipo']),
       clauses: clau,
       sexualPractices: pract,
@@ -49,9 +49,24 @@ class ContractModel extends Contract {
       // stakeHolder: json['participantes']?[0] != null
       //     ? PersonModel.fromJson(json['participantes'][0]).toEntity()
       //     : null,
-      startDate: DateTime.tryParse(json['inicio_vigencia'] ?? ''),
-      endDate: DateTime.tryParse(json['fim_vigencia'] ?? ''),
+      startDate: DateTime.tryParse(json['dt_inicio'] ?? ''),
+      endDate: DateTime.tryParse(json['dt_fim'] ?? ''),
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    final personsId = stakeHolders.map((p) => p.id).toList();
+    final clausesWithPractices = [...clauses, ...sexualPractices.map((e) => e.toClause())];
+
+    final content = {
+      'contrato_tipo_id': type.id,
+      'dt_inicio': startDate!.toString(),
+      'dt_fim': endDate!.toString(),
+      'participantes': personsId,
+      'clausulas': clausesWithPractices.map((e) => e.id).toList(),
+    };
+
+    return content;
   }
 
   Contract toEntity() {

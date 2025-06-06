@@ -23,6 +23,11 @@ class ConnectionDataSource {
       connectionList.add(ConnectionModel.fromJson(ele..['status'] = 'Aceito').toEntity());
     }
 
+
+    for (final ele in rawData['aguardando_resposta']) {
+      connectionList.add(ConnectionModel.fromJson(ele..['status'] = 'Aguardando aceitação').toEntity());
+    }
+
     return connectionList;
   }
 

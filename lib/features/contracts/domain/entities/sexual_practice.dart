@@ -16,13 +16,14 @@ class SexualPractice extends Equatable {
 
   Clause toClause() {
     return Clause(
-        id: id,
-        code: code,
-        description: '',
-        name: name,
-        pendingFor: pendingFor ?? [],
-        acceptedBy: acceptedBy ?? [],
-        deniedBy: deniedBy ?? []);
+      id: id,
+      code: code,
+      description: '',
+      name: name,
+      pendingFor: pendingFor ?? [],
+      acceptedBy: acceptedBy ?? [],
+      deniedBy: deniedBy ?? [],
+    );
   }
 
   const SexualPractice({
@@ -61,9 +62,9 @@ class SexualPractice extends Equatable {
           name: json['nome'],
           code: json['codigo'],
           status: PracticeStatus.byCode(json['status'] ?? 1),
-          pendingFor: json['pendente'],
-          acceptedBy: json['aceito'],
-          deniedBy: json['recusado'],
+          pendingFor: (json['pendente_para'] as List?)?.cast<int>(),
+          acceptedBy: (json['aceito_por'] as List?)?.cast<int>(),
+          deniedBy: (json['recusado_por'] as List?)?.cast<int>(),
         );
 
   Widget buildTile(

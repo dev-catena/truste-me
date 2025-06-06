@@ -22,6 +22,7 @@ class ConnectionTile extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: () {
+          // if(connection.status.description == 'Aguardando aceitação') return;
           context.pushNamed(AppRoutes.connectionDetailScreen, extra: connection);
         },
         child: Container(

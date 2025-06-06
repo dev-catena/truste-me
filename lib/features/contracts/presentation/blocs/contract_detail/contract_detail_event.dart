@@ -23,3 +23,16 @@ class ContractDetailClauseSet extends ContractDetailEvent {
 
   ContractDetailClauseSet(this.selectedClause, this.hasAccepted);
 }
+
+class ContractDetailPracticeAdded extends ContractDetailEvent {
+  final SexualPractice selectedPractice;
+
+  ContractDetailPracticeAdded(this.selectedPractice);
+}
+
+class ContractDetailPracticeSet extends ContractDetailEvent {
+  final SexualPractice selectedPractice;
+  final bool hasAccepted;
+
+  ContractDetailPracticeSet(this.selectedPractice, this.hasAccepted);
+}

@@ -7,6 +7,7 @@ import '../../../../core/utils/custom_colors.dart';
 import '../../../common/data/models/person_model.dart';
 import '../../../common/domain/entities/person.dart';
 import '../../data/models/clause_model.dart';
+import '../../data/models/contract_model.dart';
 import 'clause.dart';
 import 'contract_type.dart';
 import 'sexual_practice.dart';
@@ -47,6 +48,21 @@ class Contract extends Equatable {
     this.startDate,
     this.endDate,
   });
+
+  ContractModel toModel() {
+    return ContractModel(
+      id: id,
+      contractNumber: contractNumber,
+      status: status,
+      type: type,
+      stakeHolders: stakeHolders,
+      clauses: clauses,
+      sexualPractices: sexualPractices,
+      startDate: startDate,
+      endDate: endDate,
+      contractor: contractor,
+    );
+  }
 
   @override
   List<Object?> get props => [id, contractNumber, status, type];

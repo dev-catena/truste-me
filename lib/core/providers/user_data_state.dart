@@ -11,6 +11,7 @@ final class UserDataReady extends UserDataState {
   final List<Connection> connections;
   final GeneralUserInfo userInfo;
   final ConnectionRequestStatus connectionRequestStatus;
+  final String requestMessage;
 
   UserDataReady({
     required this.user,
@@ -18,6 +19,7 @@ final class UserDataReady extends UserDataState {
     required this.contracts,
     required this.connections,
     this.connectionRequestStatus = ConnectionRequestStatus.initial,
+    this.requestMessage = '',
   });
 
   static const _sentinel = Object();
@@ -27,14 +29,16 @@ final class UserDataReady extends UserDataState {
     Object? userInfo = _sentinel,
     Object? contracts = _sentinel,
     Object? connections = _sentinel,
-    Object? connectionStatus = _sentinel,
+    Object? connectionRequestStatus = _sentinel,
+    Object? requestMessage = _sentinel,
   }) {
     return UserDataReady(
       user: identical(user, _sentinel) ? this.user : user as Person,
       userInfo: identical(userInfo, _sentinel) ? this.userInfo : userInfo as GeneralUserInfo,
       contracts: identical(contracts, _sentinel) ? this.contracts : contracts as List<Contract>,
       connections: identical(connections, _sentinel) ? this.connections : connections as List<Connection>,
-      connectionRequestStatus: identical(connectionStatus, _sentinel) ? this.connectionRequestStatus : connectionStatus as ConnectionRequestStatus,
+      connectionRequestStatus: identical(connectionRequestStatus, _sentinel) ? this.connectionRequestStatus : connectionRequestStatus as ConnectionRequestStatus,
+      requestMessage: identical(requestMessage, _sentinel) ? this.requestMessage : requestMessage as String,
     );
   }
 }

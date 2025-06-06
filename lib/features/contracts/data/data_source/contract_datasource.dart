@@ -55,17 +55,25 @@ class ContractDataSource {
     return convertedData;
   }
 
-  Future<Contract> createContract(ContractType type, List<Person> participants, List<int> clausesId) async {
-    final personsId = participants.map((p) => p.id).toList();
+  // Future<Contract> createContract(ContractType type, List<Person> participants, List<int> clausesId) async {
+  //   final personsId = participants.map((p) => p.id).toList();
+  //
+  //   final content = {
+  //     'contrato_tipo_id': type.id,
+  //     'status': 'Pendente',
+  //     'participantes': personsId,
+  //     'clausulas': clausesId,
+  //   };
+  //
+  //   final response = await _apiProvider.post('contrato/gravar', jsonEncode(content));
+  //
+  //   final newContract = ContractModel.fromJson(response).toEntity();
+  //
+  //   return newContract;
+  // }
 
-    final content = {
-      'contrato_tipo_id': type.id,
-      'status': 'Pendente',
-      'participantes': personsId,
-      'clausulas': clausesId,
-    };
-
-    final response = await _apiProvider.post('contrato/gravar', jsonEncode(content));
+  Future<Contract> createContract(ContractModel contract) async {
+    final response = await _apiProvider.post('contrato/gravar', jsonEncode(contract.toJson()));
 
     final newContract = ContractModel.fromJson(response).toEntity();
 

@@ -25,7 +25,7 @@ class HomeScreen extends StatelessWidget {
     final List<FeatureData> features = [
       FeatureData(name: 'Conexões', icon: Symbols.partner_exchange, destinationRoute: AppRoutes.connectionPanelScreen),
       FeatureData(name: 'Selos', icon: Symbols.asterisk, destinationRoute: AppRoutes.contractsScreen),
-      FeatureData(name: 'Carteira', icon: Symbols.account_balance_wallet, destinationRoute: AppRoutes.contractsScreen),
+      // FeatureData(name: 'Carteira', icon: Symbols.account_balance_wallet, destinationRoute: AppRoutes.contractsScreen),
     ];
 
     return CustomScaffold(

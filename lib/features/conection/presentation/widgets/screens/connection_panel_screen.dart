@@ -56,7 +56,7 @@ class _ConnectionPanelScreenState extends State<ConnectionPanelScreen> {
         listener: (context, state) {
           if (state is UserDataReady) {
             if (state.connectionRequestStatus == ConnectionRequestStatus.failure) {
-              context.showSnack('Não foi possível fazer a solicitação. Verifique o código do usuário destino.');
+              context.showSnack('Erro ao solicitar conexão, ${state.requestMessage}');
             } else if (state.connectionRequestStatus == ConnectionRequestStatus.success) {
               context.showSnack('Conexão solicitada!');
             }

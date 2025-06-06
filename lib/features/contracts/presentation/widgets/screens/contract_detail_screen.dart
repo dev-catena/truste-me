@@ -70,31 +70,31 @@ class _ContractReady extends StatelessWidget {
             HeaderLine('Contrato ${state.contract.contractNumber}', Symbols.contract),
             const SizedBox(height: 12),
             state.contract.buildDetailCard(),
-            const SizedBox(height: 12),
-            Text(
-              'Atividades',
-              style: titleLarge.copyWith(fontWeight: FontWeight.w600),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                FeatureData(
-                  name: 'Histórico',
-                  icon: Icons.history,
-                  extraAction: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return const ContractHistoryDialog();
-                      },
-                    );
-                  },
-                ).buildCard(),
-                FeatureData(name: 'Download', icon: Symbols.file_save).buildCard(),
-              ],
-            ),
+            // const SizedBox(height: 12),
+            // Text(
+            //   'Atividades',
+            //   style: titleLarge.copyWith(fontWeight: FontWeight.w600),
+            //   textAlign: TextAlign.center,
+            // ),
+            // const SizedBox(height: 12),
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.spaceAround,
+            //   children: [
+            //     FeatureData(
+            //       name: 'Histórico',
+            //       icon: Icons.history,
+            //       extraAction: () {
+            //         showDialog(
+            //           context: context,
+            //           builder: (context) {
+            //             return const ContractHistoryDialog();
+            //           },
+            //         );
+            //       },
+            //     ).buildCard(),
+            //     FeatureData(name: 'Download', icon: Symbols.file_save).buildCard(),
+            //   ],
+            // ),
             const SizedBox(height: 12),
             Text(
               'Detalhes',
@@ -118,9 +118,9 @@ class _ContractReady extends StatelessWidget {
               initialPractices: state.contract.sexualPractices,
               participants: [state.contract.contractor!, ...state.contract.stakeHolders],
               showStatusPerPerson: true,
-              onPick: (value) {},
+              onPick: (value) => bloc.add(ContractDetailPracticeAdded(value)),
               onRemove: null,
-              onAcceptOrDeny: (practice, value) => bloc.add(ContractDetailClauseSet(practice.toClause(), value)),
+              onAcceptOrDeny: (practice, value) => bloc.add(ContractDetailPracticeSet(practice, value)),
             ),
           ],
         ),

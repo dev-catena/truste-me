@@ -38,7 +38,7 @@ class _ScaffoldWithNestedNavigationState extends State<ScaffoldWithNestedNavigat
         destinations: const [
           NavigationDestination(label: 'Contratos', icon: Icon(Symbols.contract_rounded)),
           NavigationDestination(label: 'Home', icon: Icon(Icons.home_outlined)),
-          NavigationDestination(label: 'Mensagens', icon: Icon(Icons.message_outlined)),
+          NavigationDestination(label: 'Notificações', icon: Icon(Icons.notifications_active_outlined)),
         ],
         onDestinationSelected: _goBranch,
       ),

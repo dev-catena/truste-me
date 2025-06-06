@@ -99,15 +99,15 @@ class UserDataCubit extends Cubit<UserDataState> {
       final resp = await connectionDataSource.requestConnection(userCode);
 
       if (resp.containsKey('error')) {
-        emit(internState.copyWith(connectionStatus: ConnectionRequestStatus.failure));
+        emit(internState.copyWith(connectionRequestStatus: ConnectionRequestStatus.failure, requestMessage: (resp['error'] as String).toLowerCase()));
       } else {
-        emit(internState.copyWith(connectionStatus: ConnectionRequestStatus.success));
+        emit(internState.copyWith(connectionRequestStatus: ConnectionRequestStatus.success));
       }
 
-      emit(internState.copyWith(connectionStatus: ConnectionRequestStatus.initial));
+      emit(internState.copyWith(connectionRequestStatus: ConnectionRequestStatus.initial));
     } catch (_) {
       final internState = state as UserDataReady;
-      emit(internState.copyWith(connectionStatus: ConnectionRequestStatus.failure));
+      emit(internState.copyWith(connectionRequestStatus: ConnectionRequestStatus.failure));
     }
   }
 
@@ -124,13 +124,27 @@ class UserDataCubit extends Cubit<UserDataState> {
     emit(internState.copyWith(connections: updatedConnections));
   }
 
-  Future<void> createContract(Person user, ContractType type, List<Clause> clauses, List<SexualPractice> practicesTaken) async {
+  // Future<void> createContract(Person user, ContractType type, List<Clause> clauses, List<SexualPractice> practicesTaken) async {
+  //   final internState = state as UserDataReady;
+  //
+  //   final clausesId = clauses.map((e) => e.id).toList();
+  //   clausesId.addAll(practicesTaken.map((e) => e.id));
+  //
+  //   final newContract = await contractDataSource.createContract(type, [user], clausesId);
+  //   final updatedContracts = List<Contract>.of(internState.contracts)..insert(0, newContract);
+  //   final updatedQuantity = internState.userInfo.pendingContracts + 1;
+  //   final updatedInfo = internState.userInfo.copyWith(pendingContracts: updatedQuantity);
+  //
+  //   emit(internState.copyWith(contracts: updatedContracts, userInfo: updatedInfo));
+  // }
+
+
+  Future<void> createContract(Contract contract) async {
     final internState = state as UserDataReady;
 
-    final clausesId = clauses.map((e) => e.id).toList();
-    clausesId.addAll(practicesTaken.map((e) => e.id));
+    final model = contract.toModel();
 
-    final newContract = await contractDataSource.createContract(type, [user], clausesId);
+    final newContract = await contractDataSource.createContract(model);
     final updatedContracts = List<Contract>.of(internState.contracts)..insert(0, newContract);
     final updatedQuantity = internState.userInfo.pendingContracts + 1;
     final updatedInfo = internState.userInfo.copyWith(pendingContracts: updatedQuantity);

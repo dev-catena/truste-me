@@ -26,34 +26,79 @@ class _PersonalInfo extends StatefulWidget {
 }
 
 class _PersonalInfoState extends State<_PersonalInfo> {
-  late final _nameController = TextEditingController(text: widget.currentEmail);
+  late final _nameController = TextEditingController(text: widget.currentName);
   late final _cpfController = TextEditingController(text: widget.currentCpf);
   late final _emailController = TextEditingController(text: widget.currentEmail);
   bool _isNameEmpty = true;
   bool _isCpfEmpty = true;
   bool _isEmailEmpty = true;
   DateTime? datePicked;
+  late final FocusNode _nameFocus;
+  late final FocusNode _cpfFocus;
+  late final FocusNode _emailFocus;
+  late final VoidCallback _nameListener;
+  late final VoidCallback _cpfListener;
+  late final VoidCallback _emailListener;
+
+  bool isValidEmail(String email) {
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    return emailRegex.hasMatch(email.trim());
+  }
 
   @override
   void initState() {
     super.initState();
-    _nameController.addListener(() {
-      setState(() {
-        _isNameEmpty = _nameController.text.trim().isEmpty;
-      });
-    });
 
-    _cpfController.addListener(() {
-      setState(() {
-        _isCpfEmpty = _cpfController.text.trim().isEmpty;
-      });
-    });
+    _nameListener = () {
+      if (mounted) {
+        setState(() {
+          _isNameEmpty = _nameController.text.trim().isEmpty;
+        });
+      }
+    };
 
-    _emailController.addListener(() {
-      setState(() {
-        _isEmailEmpty = _emailController.text.trim().isEmpty;
-      });
-    });
+    _cpfListener = () {
+      if (mounted) {
+        setState(() {
+          _isCpfEmpty = _cpfController.text.trim().isEmpty;
+        });
+      }
+    };
+
+    _emailListener = () {
+      if (mounted) {
+        final email = _emailController.text.trim();
+        final isValid = isValidEmail(email);
+
+        setState(() {
+          _isEmailEmpty = email.isEmpty || !isValid;
+        });
+      }
+    };
+
+    _nameController.addListener(_nameListener);
+    _cpfController.addListener(_cpfListener);
+    _emailController.addListener(_emailListener);
+
+    _nameFocus = FocusNode();
+    _cpfFocus = FocusNode();
+    _emailFocus = FocusNode();
+  }
+
+  @override
+  void dispose() {
+    _nameController.removeListener(_nameListener);
+    _cpfController.removeListener(_cpfListener);
+    _emailController.removeListener(_emailListener);
+
+    _nameController.dispose();
+    _cpfController.dispose();
+    _emailController.dispose();
+
+    _nameFocus.dispose();
+    _cpfFocus.dispose();
+    _emailFocus.dispose();
+    super.dispose();
   }
 
   @override
@@ -82,57 +127,76 @@ class _PersonalInfoState extends State<_PersonalInfo> {
       );
     }
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text('Dados Básicos', style: titleLarge),
-        const SizedBox(height: 16),
-        TextField(
-          onChanged: widget.onNameSet,
-          controller: _nameController,
-          decoration: getDecoration('Nome completo', _isNameEmpty),
-        ),
-        const SizedBox(height: 8),
-        TextField(
-          onChanged: widget.onCpfSet,
-          controller: _cpfController,
-          maxLength: 14,
-          decoration: getDecoration('CPF', _isCpfEmpty),
-          keyboardType: TextInputType.number,
-          inputFormatters: [
-            FilteringTextInputFormatter.digitsOnly,
-            CpfInputFormatter(),
-          ],
-        ),
-        const SizedBox(height: 8),
-        TextField(
-          controller: _emailController,
-          onChanged: widget.onEmailSet,
-          decoration: getDecoration('Email', _isEmailEmpty),
-        ),
-        const SizedBox(height: 8),
-        CustomSelectableTile(
-          title: datePicked != null
-              ? '${datePicked!.day.toString().padLeft(2, '0')}/${datePicked!.month.toString().padLeft(2, '0')}/${datePicked!.year}'
-              : 'Data de nascimento',
-          width: double.infinity,
-          isActive: false,
-          borderColor: datePicked == null ? CustomColor.vividRed : CustomColor.activeColor,
-          leadingWidget: const Icon(Icons.calendar_month_outlined),
-          onTap: () {
-            showDatePicker(
-              context: context,
-              firstDate: DateTime(1900),
-              lastDate: DateTime.now().subtract(const Duration(days: 6570)),
-            ).then((value) {
-              datePicked = value;
-              widget.onBirthDateChanged(value);
-              setState(() {});
-            });
-          },
-        ),
-      ],
+    return FocusScope(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text('Dados Básicos', style: titleLarge),
+          const SizedBox(height: 16),
+          TextField(
+            onChanged: widget.onNameSet,
+            controller: _nameController,
+            onTapOutside: (_) => _nameFocus.unfocus(),
+            focusNode: _nameFocus,
+            onSubmitted: (_) {
+              FocusScope.of(context).requestFocus(_cpfFocus);
+            },
+            decoration: getDecoration('Nome completo', _isNameEmpty),
+          ),
+          const SizedBox(height: 8),
+          TextField(
+            onChanged: widget.onCpfSet,
+            focusNode: _cpfFocus,
+            onTapOutside: (_) => _cpfFocus.unfocus(),
+            onSubmitted: (_) {
+              FocusScope.of(context).requestFocus(_emailFocus);
+            },
+            controller: _cpfController,
+            maxLength: 14,
+            decoration: getDecoration('CPF', _isCpfEmpty),
+            keyboardType: TextInputType.number,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+              CpfInputFormatter(),
+            ],
+          ),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _emailController,
+            focusNode: _emailFocus,
+            onTapOutside: (_) => _emailFocus.unfocus(),
+            keyboardType: TextInputType.emailAddress,
+            onSubmitted: (_) {
+              _emailFocus.unfocus();
+            },
+
+            onChanged: widget.onEmailSet,
+            decoration: getDecoration('Email', !isValidEmail(_emailController.text)),
+          ),
+          const SizedBox(height: 8),
+          CustomSelectableTile(
+            title: datePicked != null
+                ? '${datePicked!.day.toString().padLeft(2, '0')}/${datePicked!.month.toString().padLeft(2, '0')}/${datePicked!.year}'
+                : 'Data de nascimento',
+            width: double.infinity,
+            isActive: false,
+            borderColor: datePicked == null ? CustomColor.vividRed : CustomColor.activeColor,
+            leadingWidget: const Icon(Icons.calendar_month_outlined),
+            onTap: () {
+              showDatePicker(
+                context: context,
+                firstDate: DateTime(1900),
+                lastDate: DateTime.now().subtract(const Duration(days: 6570)),
+              ).then((value) {
+                datePicked = value;
+                widget.onBirthDateChanged(value);
+                setState(() {});
+              });
+            },
+          ),
+        ],
+      ),
     );
   }
 }

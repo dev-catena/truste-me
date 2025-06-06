@@ -59,20 +59,20 @@ class _ConnectionDetailScreenState extends State<ConnectionDetailScreen> {
                     ),
                   ],
                 ),
-          TextButton(
-            onPressed: () {},
-            child: const Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.warning_amber_outlined, color: CustomColor.vividRed),
-                SizedBox(width: 10),
-                Text(
-                  'Bloquear comunicação',
-                  style: TextStyle(color: CustomColor.vividRed),
-                ),
-              ],
-            ),
-          ),
+          // TextButton(
+          //   onPressed: () {},
+          //   child: const Row(
+          //     mainAxisSize: MainAxisSize.min,
+          //     children: [
+          //       Icon(Icons.warning_amber_outlined, color: CustomColor.vividRed),
+          //       SizedBox(width: 10),
+          //       Text(
+          //         'Bloquear comunicação',
+          //         style: TextStyle(color: CustomColor.vividRed),
+          //       ),
+          //     ],
+          //   ),
+          // ),
         ],
       );
     } else if (widget.connection.status == ConnectionStatus.accepted) {

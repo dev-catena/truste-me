@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/utils/custom_colors.dart';
-import '../../../common/domain/entities/person.dart';
+import '../../../common/domain/entities/user.dart';
 import 'clause.dart';
 
 class SexualPractice extends Equatable {
@@ -41,6 +41,7 @@ class SexualPractice extends Equatable {
     String? name,
     String? code,
     PracticeStatus? status,
+    List<ContractQuestion>? questions,
     List<int>? pendingFor,
     List<int>? acceptedBy,
     List<int>? deniedBy,
@@ -56,6 +57,16 @@ class SexualPractice extends Equatable {
     );
   }
 
+  bool isPracticeOk(List<int> participantsId) {
+    final accepted = acceptedBy?.toSet() ?? {};
+    final denied = deniedBy?.toSet() ?? {};
+
+    final isClauseOk = (accepted.containsAll(participantsId) && denied.isEmpty) ||
+        (denied.containsAll(participantsId) && accepted.isEmpty);
+
+    return isClauseOk;
+  }
+
   SexualPractice.fromJson(Map<String, dynamic> json)
       : this(
           id: json['id'],
@@ -68,14 +79,14 @@ class SexualPractice extends Equatable {
         );
 
   Widget buildTile(
-    List<Person> connections, {
-    required bool showStatusPerPerson,
+    List<User> connections, {
+    required bool showStatusPerUser,
     required ValueChanged<SexualPractice>? onRemove,
     required void Function(SexualPractice clause, bool value)? onAcceptOrDeny,
   }) {
-    final List<Person> pending = [];
-    final List<Person> denied = [];
-    final List<Person> accepted = [];
+    final List<User> pending = [];
+    final List<User> denied = [];
+    final List<User> accepted = [];
 
     if (pendingFor != null) {
       for (final ele in pendingFor!) {
@@ -93,10 +104,15 @@ class SexualPractice extends Equatable {
       }
     }
 
+    debugPrint('$runtimeType - onAcceptOrDeny ${onAcceptOrDeny == null}');
+
     return Column(
       children: [
         ListTile(
-          title: Text(name),
+          title: Text('$code - $name'),
+          leading: !isPracticeOk(connections.map((e) => e.id).toList())
+              ? const Icon(Icons.warning_amber_outlined, color: CustomColor.vividRed)
+              : null,
           trailing: onRemove != null
               ? IconButton(
                   onPressed: () {
@@ -109,7 +125,7 @@ class SexualPractice extends Equatable {
                 )
               : null,
         ),
-        if (showStatusPerPerson) ...[
+        if (showStatusPerUser) ...[
           ...List.generate(
             pending.length,
             (index) {
@@ -119,40 +135,42 @@ class SexualPractice extends Equatable {
                 title: Text(user.fullName),
                 leading: const Icon(Icons.pending_outlined, color: CustomColor.pendingYellow),
                 contentPadding: const EdgeInsets.only(left: 15),
-                trailing: user.id == userLoggedIn.id
-                    ? Wrap(
-                        spacing: 0,
-                        children: [
-                          InkWell(
-                            onTap: () {
-                              onAcceptOrDeny!(this, false);
-                            },
-                            child: const Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.cancel_outlined, color: CustomColor.vividRed),
-                                SizedBox(height: 4),
-                                Text('Recusar', style: TextStyle(fontSize: 12)),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          InkWell(
-                            onTap: () {
-                              onAcceptOrDeny!(this, true);
-                            },
-                            child: const Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.check_circle_outline, color: CustomColor.successGreen),
-                                SizedBox(height: 4),
-                                Text('Aceitar', style: TextStyle(fontSize: 12)),
-                              ],
-                            ),
-                          ),
-                        ],
-                      )
-                    : null,
+                trailing: onAcceptOrDeny == null
+                    ? null
+                    : user.id == userLoggedIn.id
+                        ? Wrap(
+                            spacing: 0,
+                            children: [
+                              InkWell(
+                                onTap: () {
+                                  onAcceptOrDeny(this, false);
+                                },
+                                child: const Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.cancel_outlined, color: CustomColor.vividRed),
+                                    SizedBox(height: 4),
+                                    Text('Recusar', style: TextStyle(fontSize: 12)),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              InkWell(
+                                onTap: () {
+                                  onAcceptOrDeny(this, true);
+                                },
+                                child: const Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.check_circle_outline, color: CustomColor.successGreen),
+                                    SizedBox(height: 4),
+                                    Text('Aceitar', style: TextStyle(fontSize: 12)),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          )
+                        : null,
               );
             },
           ),
@@ -165,21 +183,23 @@ class SexualPractice extends Equatable {
                 title: Text(user.fullName),
                 leading: const Icon(Icons.check_circle_outline, color: CustomColor.successGreen),
                 contentPadding: const EdgeInsets.only(left: 15),
-                trailing: user.id == userLoggedIn.id
-                    ? GestureDetector(
-                        onTap: () {
-                          onAcceptOrDeny!(this, false);
-                        },
-                        child: const Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.cancel_outlined, color: CustomColor.vividRed),
-                            SizedBox(height: 4),
-                            Text('Recusar', style: TextStyle(fontSize: 12)),
-                          ],
-                        ),
-                      )
-                    : null,
+                trailing: onAcceptOrDeny == null
+                    ? null
+                    : user.id == userLoggedIn.id
+                        ? GestureDetector(
+                            onTap: () {
+                              onAcceptOrDeny(this, false);
+                            },
+                            child: const Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.cancel_outlined, color: CustomColor.vividRed),
+                                SizedBox(height: 4),
+                                Text('Recusar', style: TextStyle(fontSize: 12)),
+                              ],
+                            ),
+                          )
+                        : null,
               );
             },
           ),
@@ -192,21 +212,23 @@ class SexualPractice extends Equatable {
                 title: Text(user.fullName),
                 leading: const Icon(Icons.cancel_outlined, color: CustomColor.vividRed),
                 contentPadding: const EdgeInsets.only(left: 15),
-                trailing: user.id == userLoggedIn.id
-                    ? GestureDetector(
-                        onTap: () {
-                          onAcceptOrDeny!(this, true);
-                        },
-                        child: const Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.check_circle_outline, color: CustomColor.successGreen),
-                            SizedBox(height: 4),
-                            Text('Aceitar', style: TextStyle(fontSize: 12)),
-                          ],
-                        ),
-                      )
-                    : null,
+                trailing: onAcceptOrDeny == null
+                    ? null
+                    : user.id == userLoggedIn.id
+                        ? GestureDetector(
+                            onTap: () {
+                              onAcceptOrDeny(this, true);
+                            },
+                            child: const Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.check_circle_outline, color: CustomColor.successGreen),
+                                SizedBox(height: 4),
+                                Text('Aceitar', style: TextStyle(fontSize: 12)),
+                              ],
+                            ),
+                          )
+                        : null,
               );
             },
           ),

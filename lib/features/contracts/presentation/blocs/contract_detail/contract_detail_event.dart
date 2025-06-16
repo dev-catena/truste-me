@@ -36,3 +36,14 @@ class ContractDetailPracticeSet extends ContractDetailEvent {
 
   ContractDetailPracticeSet(this.selectedPractice, this.hasAccepted);
 }
+
+class ContractDetailContractFinished extends ContractDetailEvent {}
+
+class ContractDetailContractQuestionAnswered extends ContractDetailEvent {
+  final ContractQuestion question;
+  final String answer;
+
+  ContractDetailContractQuestionAnswered(this.question, this.answer);
+}
+
+class ContractDetailContractSigned extends ContractDetailEvent {}

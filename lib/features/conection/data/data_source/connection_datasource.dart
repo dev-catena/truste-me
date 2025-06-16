@@ -3,14 +3,14 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
 import '../../../../core/api_provider.dart';
-import '../../../common/domain/entities/person.dart';
+import '../../../common/domain/entities/user.dart';
 import '../../domain/entities/connection.dart';
 import '../models/connection_model.dart';
 
 class ConnectionDataSource {
   final _apiProvider = ApiProvider();
 
-  Future<List<Connection>> getConnectionsForUser(Person user) async {
+  Future<List<Connection>> getConnectionsForUser(User user) async {
     final rawData = await _apiProvider.get('usuario/${user.id}/conexoes');
     // final rawData = _MockData().connections;
     final List<Connection> connectionList = [];
@@ -25,7 +25,7 @@ class ConnectionDataSource {
 
 
     for (final ele in rawData['aguardando_resposta']) {
-      connectionList.add(ConnectionModel.fromJson(ele..['status'] = 'Aguardando aceitação').toEntity());
+      connectionList.add(ConnectionModel.fromJson(ele..['status'] = 'Aguardando resposta').toEntity());
     }
 
     return connectionList;

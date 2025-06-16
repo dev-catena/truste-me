@@ -3,12 +3,12 @@ import 'dart:ui';
 import 'package:equatable/equatable.dart';
 
 import '../../../../core/utils/custom_colors.dart';
-import '../../../common/domain/entities/person.dart';
+import '../../../common/domain/entities/user.dart';
 import '../../presentation/widgets/components/connection_tile.dart';
 
 class Connection extends Equatable {
   final int id;
-  final Person user;
+  final User user;
   final ConnectionStatus status;
   final DateTime since;
 
@@ -33,7 +33,7 @@ class Connection extends Equatable {
   }) {
     return Connection(
       id: identical(id, _sentinel) ? this.id : id as int,
-      user: identical(user, _sentinel) ? this.user : user as Person,
+      user: identical(user, _sentinel) ? this.user : user as User,
       status: identical(status, _sentinel) ? this.status : status as ConnectionStatus,
       since: identical(since, _sentinel) ? this.since : since as DateTime,
     );
@@ -46,7 +46,8 @@ class Connection extends Equatable {
 enum ConnectionStatus {
   pending('Pendente', CustomColor.pendingYellow),
   accepted('Aceito', CustomColor.activeColor),
-  cancelled('Aguardando aceitação', CustomColor.activeGreyed);
+  // cancelled('Aguardando aceitação', CustomColor.activeGreyed);
+  cancelled('Aguardando resposta', CustomColor.activeGreyed);
 
   final String description;
   final Color color;

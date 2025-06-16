@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/utils/custom_colors.dart';
-import '../../../../common/domain/entities/person.dart';
+import '../../../../common/domain/entities/user.dart';
 import '../../../domain/entities/clause.dart';
+import 'inspect_clause_dialog.dart';
 
 class ClauseTile extends StatelessWidget {
   const ClauseTile(
@@ -16,7 +17,7 @@ class ClauseTile extends StatelessWidget {
 
   final Clause clause;
   final String titlePrefix;
-  final List<Person> participants;
+  final List<User> participants;
   final void Function(Clause clause)? onRemove;
   final void Function(Clause clause, bool value)? onAcceptOrDeny;
 
@@ -31,16 +32,21 @@ class ClauseTile extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              if (!clause.isClauseOk(participants.map((e) => e.id).toList()))
+                const Icon(Icons.warning_amber_outlined, color: CustomColor.vividRed),
               // clause.status.buildIcon(),
               const SizedBox(width: 8),
               Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('$titlePrefix${clause.name}', style: titleMedium),
-                    Text(clause.description, maxLines: 2, overflow: TextOverflow.ellipsis)
-                  ],
+                child: InkWell(
+                  onTap: () => showDialog(context: context, builder: (_) => InspectClauseDialog(clause)),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('$titlePrefix${clause.name}', style: titleMedium),
+                      Text(clause.description, maxLines: 2, overflow: TextOverflow.ellipsis)
+                    ],
+                  ),
                 ),
               ),
               if (onRemove != null)
@@ -60,40 +66,42 @@ class ClauseTile extends StatelessWidget {
                 title: Text(user.fullName),
                 leading: const Icon(Icons.pending_outlined, color: CustomColor.pendingYellow),
                 contentPadding: const EdgeInsets.only(left: 15),
-                trailing: user.id == userLoggedIn.id
-                    ? Wrap(
-                        spacing: 0,
-                        children: [
-                          InkWell(
-                            onTap: () {
-                              onAcceptOrDeny!(clause, false);
-                            },
-                            child: const Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.cancel_outlined, color: CustomColor.vividRed),
-                                SizedBox(height: 4),
-                                Text('Recusar', style: TextStyle(fontSize: 12)),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          InkWell(
-                            onTap: () {
-                              onAcceptOrDeny!(clause, true);
-                            },
-                            child: const Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.check_circle_outline, color: CustomColor.successGreen),
-                                SizedBox(height: 4),
-                                Text('Aceitar', style: TextStyle(fontSize: 12)),
-                              ],
-                            ),
-                          ),
-                        ],
-                      )
-                    : null,
+                trailing: onAcceptOrDeny == null
+                    ? null
+                    : user.id == userLoggedIn.id
+                        ? Wrap(
+                            spacing: 0,
+                            children: [
+                              InkWell(
+                                onTap: () {
+                                  onAcceptOrDeny!(clause, false);
+                                },
+                                child: const Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.cancel_outlined, color: CustomColor.vividRed),
+                                    SizedBox(height: 4),
+                                    Text('Recusar', style: TextStyle(fontSize: 12)),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              InkWell(
+                                onTap: () {
+                                  onAcceptOrDeny!(clause, true);
+                                },
+                                child: const Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.check_circle_outline, color: CustomColor.successGreen),
+                                    SizedBox(height: 4),
+                                    Text('Aceitar', style: TextStyle(fontSize: 12)),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          )
+                        : null,
               );
             },
           ),
@@ -107,21 +115,23 @@ class ClauseTile extends StatelessWidget {
                 title: Text(user.fullName),
                 leading: const Icon(Icons.check_circle_outline, color: CustomColor.successGreen),
                 contentPadding: const EdgeInsets.only(left: 15),
-                trailing: user.id == userLoggedIn.id
-                    ? GestureDetector(
-                        onTap: () {
-                          onAcceptOrDeny!(clause, false);
-                        },
-                        child: const Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.cancel_outlined, color: CustomColor.vividRed),
-                            SizedBox(height: 4),
-                            Text('Recusar', style: TextStyle(fontSize: 12)),
-                          ],
-                        ),
-                      )
-                    : null,
+                trailing: onAcceptOrDeny == null
+                    ? null
+                    : user.id == userLoggedIn.id
+                        ? GestureDetector(
+                            onTap: () {
+                              onAcceptOrDeny!(clause, false);
+                            },
+                            child: const Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.cancel_outlined, color: CustomColor.vividRed),
+                                SizedBox(height: 4),
+                                Text('Recusar', style: TextStyle(fontSize: 12)),
+                              ],
+                            ),
+                          )
+                        : null,
               );
             },
           ),
@@ -135,21 +145,23 @@ class ClauseTile extends StatelessWidget {
                 title: Text(user.fullName),
                 leading: const Icon(Icons.cancel_outlined, color: CustomColor.vividRed),
                 contentPadding: const EdgeInsets.only(left: 15),
-                trailing: user.id == userLoggedIn.id
-                    ? GestureDetector(
-                        onTap: () {
-                          onAcceptOrDeny!(clause, true);
-                        },
-                        child: const Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.check_circle_outline, color: CustomColor.successGreen),
-                            SizedBox(height: 4),
-                            Text('Aceitar', style: TextStyle(fontSize: 12)),
-                          ],
-                        ),
-                      )
-                    : null,
+                trailing: onAcceptOrDeny == null
+                    ? null
+                    : user.id == userLoggedIn.id
+                        ? GestureDetector(
+                            onTap: () {
+                              onAcceptOrDeny!(clause, true);
+                            },
+                            child: const Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.check_circle_outline, color: CustomColor.successGreen),
+                                SizedBox(height: 4),
+                                Text('Aceitar', style: TextStyle(fontSize: 12)),
+                              ],
+                            ),
+                          )
+                        : null,
               );
             },
           ),

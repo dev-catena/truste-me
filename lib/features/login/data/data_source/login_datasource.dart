@@ -5,8 +5,8 @@ import 'package:flutter/foundation.dart';
 import '../../../../core/api_provider.dart';
 import '../../../../core/providers/app_data_cubit.dart';
 import '../../../../core/providers/user_data_cubit.dart';
-import '../../../common/data/models/person_model.dart';
-import '../../../common/domain/entities/person.dart';
+import '../../../common/data/models/user_model.dart';
+import '../../../common/domain/entities/user.dart';
 
 class LoginDataSource {
   final bool useToken;
@@ -22,7 +22,7 @@ class LoginDataSource {
     final rawData = await _apiProvider.post('login', jsonEncode(content));
 
     if (rawData['user'] != null) {
-      final user = PersonModel.fromJson(rawData).toEntity();
+      final user = UserModel.fromJson(rawData).toEntity();
       await userData.initialize(user);
       await appData.initialize();
       // setLoggedInUser(user);

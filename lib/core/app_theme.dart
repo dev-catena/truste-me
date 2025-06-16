@@ -50,7 +50,6 @@ class AppTheme {
             }
             return Colors.black54;
           }),
-
         ),
       ),
       checkboxTheme: CheckboxThemeData(
@@ -65,9 +64,18 @@ class AppTheme {
       radioTheme: RadioThemeData(
         fillColor: WidgetStateProperty.resolveWith<Color>((Set<WidgetState> states) {
           if (states.contains(WidgetState.selected)) {
-            return CustomColor.activeColor;
+            if (states.contains(WidgetState.disabled)) {
+              return CustomColor.activeColor.withAlpha(120);
+            } else {
+              return CustomColor.activeColor;
+            }
           }
-          return Colors.black54;
+
+          if (states.contains(WidgetState.disabled)) {
+            return Colors.black26;
+          } else {
+            return Colors.black54;
+          }
         }),
       ),
       chipTheme: ChipThemeData(

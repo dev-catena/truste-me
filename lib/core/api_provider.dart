@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 
-import '../features/common/domain/entities/person.dart';
+import '../features/common/domain/entities/user.dart';
 
 class ApiProvider {
   ApiProvider([this.useToken = true]);
@@ -71,6 +71,30 @@ class ApiProvider {
 
     try {
       response = await http.post(url, body: content, headers: _header).timeout(const Duration(seconds: 7));
+
+      debugPrint('$runtimeType - POST response ${response.body}');
+
+      if (jsonDecode(response.body) is List<dynamic>) {
+        final Map<String, dynamic> mapData = {'data': jsonDecode(response.body)};
+        return mapData;
+      }
+      return jsonDecode(response.body) as Map<String, dynamic>;
+    } catch (e, s) {
+      debugPrint('$runtimeType - Error: $e\nStack:$s');
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> patch(String endPoint, String content) async {
+    endPoint = 'api/$endPoint';
+    final Uri url;
+    url = Uri.https(_host, endPoint);
+    final http.Response response;
+
+    debugPrint('$runtimeType - POST url $url - content $content');
+
+    try {
+      response = await http.patch(url, body: content, headers: _header).timeout(const Duration(seconds: 7));
 
       debugPrint('$runtimeType - POST response ${response.body}');
 

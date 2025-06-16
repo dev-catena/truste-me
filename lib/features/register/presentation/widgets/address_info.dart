@@ -1,127 +1,148 @@
 part of '../register_screen.dart';
 
+enum _InputType {
+  number,
+  complement;
+}
+
 class _AddressInfo extends StatefulWidget {
   const _AddressInfo({
-    required this.onStateSet,
-    required this.onCitySet,
-    required this.onStreetSet,
-    required this.onNumberSet,
-    required this.onComplementSet,
+    required this.onLocationChanged,
   });
 
-  final ValueChanged<String> onStateSet;
-  final ValueChanged<String> onCitySet;
-  final ValueChanged<String> onStreetSet;
-  final ValueChanged<String> onNumberSet;
-  final ValueChanged<String> onComplementSet;
+  final ValueChanged<Location> onLocationChanged;
 
   @override
   State<_AddressInfo> createState() => _AddressInfoState();
 }
 
 class _AddressInfoState extends State<_AddressInfo> {
+  final cepController = TextEditingController();
+  final numberController = TextEditingController();
+  final complementController = TextEditingController();
   Map<String, dynamic>? stateSelected;
   String? citySelected;
+  Location? location;
+
+  Future<void> searchCep(String cep) async {
+    if (cep.length <= 9) return;
+    try {
+      final cleanedCep = cep.replaceAll(RegExp(r'[^a-zA-Z0-9]+'), '');
+      location = await CepAPI().getCep(cleanedCep);
+      FocusScope.of(context).unfocus();
+
+      widget.onLocationChanged(location!);
+      setState(() {});
+    } catch (e) {
+      context.showSnack('CEP inválido!');
+    }
+  }
+
+  void locationUpdate(_InputType type) {
+    final Location updated;
+    if (type == _InputType.number) {
+      updated = location!.copyWith(complement: numberController.text);
+    } else {
+      updated = location!.copyWith(complement: complementController.text);
+    }
+    widget.onLocationChanged(updated);
+  }
 
   @override
   Widget build(BuildContext context) {
-    final titleLarge = Theme.of(context).textTheme.titleLarge!;
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text('Endereço', style: titleLarge),
-        const SizedBox(height: 16),
         Row(
           children: [
             Expanded(
-              child: CustomSelectableTile(
-                title: '${stateSelected?['nome'] ?? 'Estado'}',
-                isActive: stateSelected != null,
-                borderColor: stateSelected != null ? null : CustomColor.vividRed,
-                width: double.infinity,
-                onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return SingleSelectDialog<Map<String, dynamic>>(
-                        title: 'Estado',
-                        options: AppConsts.states,
-                        getName: (option) => option['nome']!,
-                        onChoose: (value) {
-                          widget.onStateSet(value['nome']);
-                          stateSelected = value;
-                          setState(() {});
-                        },
-                        optionSelected: stateSelected,
-                      );
-                    },
-                  );
-                },
+              child: TextField(
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'CEP',
+                ),
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  CepInputFormatter(),
+                ],
+                onEditingComplete: () => searchCep(cepController.text),
+                onSubmitted: (value) => searchCep(value),
+                controller: cepController,
               ),
             ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: CustomSelectableTile(
-                title: citySelected ?? 'Cidade',
-                isActive: citySelected != null,
-                width: double.infinity,
-                borderColor: citySelected != null ? null : CustomColor.vividRed,
-                onTap: () {
-                  if (stateSelected == null) return;
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return SingleSelectDialog<String>(
-                        title: 'Cidade',
-                        options: stateSelected!['cidades'],
-                        getName: (option) => option,
-                        onChoose: (value) {
-                          widget.onCitySet(value);
-                          citySelected = value;
-                          setState(() {});
-                        },
-                        optionSelected: citySelected,
-                      );
-                    },
-                  );
-                },
-              ),
+            const SizedBox(width: 20),
+            FilledButton(
+              onPressed: () => searchCep(cepController.text),
+              child: const Text('Buscar'),
             ),
           ],
         ),
-        const SizedBox(height: 16),
-        const TextField(
-          decoration: InputDecoration(
-            labelText: 'Rua',
-            border: OutlineInputBorder(),
-          ),
-        ),
-        const SizedBox(height: 16),
-        const Row(
-          mainAxisSize: MainAxisSize.min,
+        const SizedBox(height: 12),
+        Row(
           children: [
             Expanded(
               child: TextField(
                 decoration: InputDecoration(
-                  labelText: 'Número',
-                  border: OutlineInputBorder(),
+                  border: const OutlineInputBorder(),
+                  labelText: location?.state ?? 'Estado',
                 ),
-                keyboardType: TextInputType.number,
+                enabled: false,
               ),
             ),
-            SizedBox(width: 8),
+            const SizedBox(width: 20),
             Expanded(
               child: TextField(
                 decoration: InputDecoration(
-                  labelText: 'Complemento',
-                  border: OutlineInputBorder(),
+                  border: const OutlineInputBorder(),
+                  labelText: location?.city ?? 'Cidade',
                 ),
+                enabled: false,
               ),
             ),
           ],
-        )
+        ),
+        const SizedBox(height: 12),
+        TextField(
+          decoration: InputDecoration(
+            border: const OutlineInputBorder(),
+            labelText: location?.street ?? 'Rua',
+          ),
+          enabled: false,
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              flex: 2,
+              child: TextField(
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Número',
+                ),
+                controller: numberController,
+                onSubmitted: (_) => locationUpdate(_InputType.number),
+                onTapOutside: (_) => locationUpdate(_InputType.number),
+                onEditingComplete: () => locationUpdate(_InputType.number),
+              ),
+            ),
+            const SizedBox(width: 20),
+            Expanded(
+              flex: 3,
+              child: TextField(
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Complemento',
+                ),
+                controller: complementController,
+                onSubmitted: (_) => locationUpdate(_InputType.complement),
+                onTapOutside: (_) => locationUpdate(_InputType.complement),
+                onEditingComplete: () => locationUpdate(_InputType.complement),
+              ),
+            ),
+          ],
+        ),
       ],
     );
   }

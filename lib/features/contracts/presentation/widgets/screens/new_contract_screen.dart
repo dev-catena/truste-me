@@ -5,7 +5,7 @@ import 'package:material_symbols_icons/material_symbols_icons.dart';
 
 import '../../../../../core/providers/app_data_cubit.dart';
 import '../../../../../core/providers/user_data_cubit.dart';
-import '../../../../common/domain/entities/person.dart';
+import '../../../../common/domain/entities/user.dart';
 import '../../../../common/presentation/widgets/components/custom_scaffold.dart';
 import '../../../../common/presentation/widgets/components/header_line.dart';
 import '../../../data/data_source/contract_datasource.dart';
@@ -25,7 +25,7 @@ class NewContractScreen extends StatefulWidget {
 }
 
 class _NewContractScreenState extends State<NewContractScreen> {
-  Person? stakeHolderSelected;
+  User? stakeHolderSelected;
   ContractType? typeSelected;
   final List<Clause> currentClauses = [];
   final List<SexualPractice> practicesTaken = [];
@@ -38,7 +38,7 @@ class _NewContractScreenState extends State<NewContractScreen> {
 
   String periodicitySelected = 'Nunca';
 
-  void _setStakeHolder(Person user) {
+  void _setStakeHolder(User user) {
     if (stakeHolderSelected == user) {
       stakeHolderSelected = null;
     } else {
@@ -49,6 +49,7 @@ class _NewContractScreenState extends State<NewContractScreen> {
 
   Future<void> _setType(ContractType type) async {
     currentClauses.clear();
+    practicesTaken.clear();
 
     if (typeSelected == type) {
       typeSelected = null;
@@ -57,6 +58,8 @@ class _NewContractScreenState extends State<NewContractScreen> {
       final clausesFetched = await ContractDataSource().getClausesForContractType(typeSelected!);
       allClauses = clausesFetched.clauses;
       allPractices = clausesFetched.practices;
+      currentClauses.addAll(clausesFetched.clauses);
+      practicesTaken.addAll(clausesFetched.practices);
     }
     setState(() {});
   }
@@ -114,61 +117,73 @@ class _NewContractScreenState extends State<NewContractScreen> {
                     onEndSet: (value) => endDate = value,
                   ),
                   const SizedBox(height: 16),
-                  ClauseSelectionCard(
-                    contractor: userData.getUser,
-                    stakeHolders: stakeHolderSelected != null ? [stakeHolderSelected!] : [],
-                    possibleClauses: allClauses,
-                    clausesChosen: currentClauses,
-                    onClausePicked: _addClause,
-                    onRemove: _removeClause,
-                    onAcceptOrDeny: null,
-                  ),
+                  if (allClauses.isNotEmpty)
+                    ClauseSelectionCard(
+                      // canEdit: true,
+                      canEdit: false,
+                      contractor: userData.getUser,
+                      stakeHolders: stakeHolderSelected != null ? [stakeHolderSelected!] : [],
+                      possibleClauses: allClauses,
+                      // clausesChosen: allClauses,
+                      clausesChosen: currentClauses,
+                      onClausePicked: _addClause,
+                      onRemove: _removeClause,
+                      onAcceptOrDeny: null,
+                    ),
                   const SizedBox(height: 12),
-                  if (typeSelected != null && stakeHolderSelected != null)
+                  if (typeSelected != null && stakeHolderSelected != null && allPractices.isNotEmpty)
                     ContractSpecificationWidget(
+                      // canEdit: true,
+                      canEdit: false,
                       type: typeSelected!,
                       practicesAvailable: allPractices,
+                      // initialPractices: allPractices,
                       initialPractices: practicesTaken,
                       // participants: userData.getConnections.map((e) => e.user).toList(),
                       // participants: [userLoggedIn, stakeHolderSelected!],
                       participants: [userLoggedIn],
                       onPick: onPracticeChosen,
-                      onRemove: onPracticeRemoved,
-                      showStatusPerPerson: false,
+                      // onRemove: onPracticeRemoved,
+                      onRemove: null,
+                      showStatusPerUser: false,
                       onAcceptOrDeny: null,
+                      answers: [],
+                      onQuestionAnswered: (question, answer) {},
                     ),
                   const SizedBox(height: 12),
-                  FilledButton(
-                    onPressed: () async {
-                      final newContract = Contract(
-                        id: 0,
-                        contractNumber: '',
-                        status: ContractStatus.pending,
-                        contractor: userLoggedIn,
-                        type: typeSelected!,
-                        stakeHolders: [stakeHolderSelected!],
-                        clauses: currentClauses,
-                        sexualPractices: practicesTaken,
-                        startDate: startDate,
-                        endDate: endDate,
-                      );
+                  if (typeSelected != null && stakeHolderSelected != null)
+                    FilledButton(
+                      onPressed: () async {
+                        final newContract = Contract(
+                            id: 0,
+                            contractNumber: '',
+                            status: ContractStatus.pending,
+                            contractor: userLoggedIn,
+                            type: typeSelected!,
+                            stakeHolders: [stakeHolderSelected!],
+                            clauses: currentClauses,
+                            sexualPractices: practicesTaken,
+                            startDate: startDate,
+                            endDate: endDate,
+                            signatures: const [],
+                            answers: []);
 
-                      await userData.createContract(newContract);
+                        await userData.createContract(newContract);
 
-                      // await userData.createContract(
-                      //     stakeHolderSelected!, typeSelected!, currentClauses, practicesTaken);
-                      context.pop();
-                      // final Contract contract = Contract(
-                      //   id: 0,
-                      //   contractNumber: 'x',
-                      //   status: 'Pendente',
-                      //   type: typeSelected!,
-                      //   stakeHolders: stakeHolders,
-                      //   clauses: clauses,
-                      // );
-                    },
-                    child: const Text('Criar contrato'),
-                  )
+                        // await userData.createContract(
+                        //     stakeHolderSelected!, typeSelected!, currentClauses, practicesTaken);
+                        context.pop();
+                        // final Contract contract = Contract(
+                        //   id: 0,
+                        //   contractNumber: 'x',
+                        //   status: 'Pendente',
+                        //   type: typeSelected!,
+                        //   stakeHolders: stakeHolders,
+                        //   clauses: clauses,
+                        // );
+                      },
+                      child: const Text('Criar contrato'),
+                    )
                 ],
               ),
             );

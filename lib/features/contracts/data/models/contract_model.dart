@@ -1,4 +1,6 @@
-import '../../../common/data/models/person_model.dart';
+import 'package:flutter/foundation.dart';
+
+import '../../../common/data/models/user_model.dart';
 import '../../domain/entities/clause.dart';
 import '../../domain/entities/contract.dart';
 import '../../domain/entities/contract_type.dart';
@@ -15,16 +17,19 @@ class ContractModel extends Contract {
     required super.stakeHolders,
     required super.clauses,
     required super.sexualPractices,
+    required super.signatures,
+    required super.answers,
     super.startDate,
     super.endDate,
   });
 
   factory ContractModel.fromJson(Map<String, dynamic> json) {
-    final cont = json['contratante'] != null ? PersonModel.fromJson(json['contratante']).toEntity() : null;
-    final stakeHold = (json['participantes'] as List? ?? []).map((e) => PersonModel.fromJson(e).toEntity()).toList()
+    final cont = json['contratante'] != null ? UserModel.fromJson(json['contratante']).toEntity() : null;
+    final stakeHold = (json['participantes'] as List? ?? []).map((e) => UserModel.fromJson(e).toEntity()).toList()
       ..remove(cont);
     final List<Clause> clau = [];
     final List<SexualPractice> pract = [];
+    final List<ContractAnswer> repostas = [];
 
     for (final ele in json['clausulas'] as List? ?? []) {
       if (ele['sexual'] != null) {
@@ -32,6 +37,14 @@ class ContractModel extends Contract {
           clau.add(ClauseModel.fromJson(ele).toEntity());
         } else if (ele['sexual'] == 1) {
           pract.add(SexualPractice.fromJson(ele));
+        }
+      }
+    }
+
+    if (json['participantes'] != null) {
+      for (final ele in json['participantes']) {
+        for (final resp in ele['respostas']) {
+          repostas.add(ContractAnswer.fromJson(resp..['usuario_id'] = ele['id']));
         }
       }
     }
@@ -49,20 +62,23 @@ class ContractModel extends Contract {
       // stakeHolder: json['participantes']?[0] != null
       //     ? PersonModel.fromJson(json['participantes'][0]).toEntity()
       //     : null,
+      signatures: (json['assinaturas'] as List? ?? []).map((e) => ContractSignature.fromJson(e)).toList(),
+      answers: repostas,
       startDate: DateTime.tryParse(json['dt_inicio'] ?? ''),
       endDate: DateTime.tryParse(json['dt_fim'] ?? ''),
     );
   }
 
   Map<String, dynamic> toJson() {
-    final personsId = stakeHolders.map((p) => p.id).toList();
+    final usersId = stakeHolders.map((p) => p.id).toList();
     final clausesWithPractices = [...clauses, ...sexualPractices.map((e) => e.toClause())];
 
     final content = {
       'contrato_tipo_id': type.id,
-      'dt_inicio': startDate!.toString(),
-      'dt_fim': endDate!.toString(),
-      'participantes': personsId,
+      'status': status.description,
+      'dt_inicio': (startDate ?? DateTime.now()).toString(),
+      'dt_fim': (endDate ?? DateTime.now()).toString(),
+      'participantes': usersId,
       'clausulas': clausesWithPractices.map((e) => e.id).toList(),
     };
 
@@ -79,6 +95,8 @@ class ContractModel extends Contract {
       sexualPractices: sexualPractices,
       type: type,
       stakeHolders: stakeHolders,
+      signatures: signatures,
+      answers: answers,
       startDate: startDate,
       endDate: endDate,
     );

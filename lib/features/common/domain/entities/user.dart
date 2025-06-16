@@ -3,20 +3,20 @@ import 'package:flutter/material.dart';
 
 import 'seal.dart';
 import '../../../../core/utils/custom_colors.dart';
-import '../../presentation/widgets/components/person_summary_card.dart';
+import '../../presentation/widgets/components/user_summary_card.dart';
 
-void setLoggedInUser (Person user){
+void setLoggedInUser (User user){
   _userLoggedIn = user;
 }
 
-Person get userLoggedIn {
+User get userLoggedIn {
   return _userLoggedIn;
 }
 
-late Person _userLoggedIn;
+late User _userLoggedIn;
 
 
-class Person extends Equatable {
+class User extends Equatable {
   final int id;
   final String fullName;
   final String cpf;
@@ -40,7 +40,7 @@ class Person extends Equatable {
   @override
   List<Object?> get props => [id, fullName];
 
-  const Person({
+  const User({
     required this.id,
     required this.fullName,
     required this.cpf,
@@ -57,15 +57,15 @@ class Person extends Equatable {
 
   @override
   String toString() {
-    return 'Person{id: $id, fullName: $fullName, cpf: $cpf, '
+    return 'User{id: $id, fullName: $fullName, cpf: $cpf, '
         'profession: $profession, birthDate: $birthDate, '
         'country: $country, state: $state, sealsObtained: $sealsObtained, '
         'photoPath: $photoPath, memberSince: $memberSince, '
         'connectionCode: $connectionCode, authToken: $authToken}';
   }
 
-  PersonSummaryCard buildSummaryCard() {
-    return PersonSummaryCard(this);
+  UserSummaryCard buildSummaryCard() {
+    return UserSummaryCard(this);
   }
 
   Widget buildAvatar([double? radius, bool? showBorder = false]) {

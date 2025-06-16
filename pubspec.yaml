@@ -47,6 +47,7 @@ dependencies:
   brasil_fields: ^1.17.0
   flutter_launcher_icons: ^0.14.3
   package_info_plus: ^8.3.0
+  collection: ^1.18.0
 
 dev_dependencies:
   flutter_test:

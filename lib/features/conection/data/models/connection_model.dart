@@ -1,11 +1,11 @@
-import '../../../common/data/models/person_model.dart';
+import '../../../common/data/models/user_model.dart';
 import '../../domain/entities/connection.dart';
 
 class ConnectionModel extends Connection {
   ConnectionModel.fromJson(Map<String, dynamic> json)
       : super(
           id: json['id'],
-          user: PersonModel.fromJson(json['conectado_com']).toEntity(),
+          user: UserModel.fromJson(json['conectado_com']).toEntity(),
           status: ConnectionStatus.fromString(json['status']),
           since: DateTime.parse(json['created_at']),
         );

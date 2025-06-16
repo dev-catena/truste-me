@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import '../../../../core/api_provider.dart';
-import '../../../common/domain/entities/person.dart';
+import '../../../common/domain/entities/user.dart';
 import '../../domain/entities/clause.dart';
 import '../../domain/entities/contract.dart';
 import '../../domain/entities/contract_type.dart';
@@ -20,7 +20,15 @@ class ContractDataSource {
     return contract;
   }
 
-  Future<List<Contract>> getContractsForUser(final Person user) async {
+  Future<Contract> updateContract(Contract cont) async {
+    final content = cont.toModel().toJson();
+    final rawData = await _apiProvider.patch('contrato/atualizar/${cont.id}', jsonEncode(content));
+    final converted = ContractModel.fromJson(rawData).toEntity();
+
+    return converted;
+  }
+
+  Future<List<Contract>> getContractsForUser(final User user) async {
     final rawData = await _apiProvider.get('usuario/${user.id}/contratos');
     final List<Contract> convertedData = [];
 
@@ -36,7 +44,7 @@ class ContractDataSource {
   }
 
   Future<ClauseAndPractice> getClausesForContractType(ContractType type) async {
-    final rawData = await _apiProvider.get('contrato-tipos/${type.id}/clausulas');
+    final rawData = await _apiProvider.get('contrato-tipos/${type.id}/clausulas-perguntas');
 
     final List<Clause> clau = [];
     final List<SexualPractice> pract = [];
@@ -88,8 +96,21 @@ class ContractDataSource {
         'aceito': hasAccepted ? 1 : 0,
       }
     ];
-    
+
     await _apiProvider.post('contrato/clausula/aceitar', jsonEncode(content));
+  }
+
+  Future<void> signContract(Contract contract) async {
+    await _apiProvider.post('contrato/${contract.id}/responder', jsonEncode({'aceito': true}));
+  }
+
+  Future<void> answerQuestion(Contract contract, List<ContractAnswer> answers) async {
+    final Map<String, dynamic> content = {
+      'contrato_id': contract.id,
+      'respostas': answers.map((e) => e.toJson()).toList(),
+    };
+
+    await _apiProvider.post('contrato/pergunta/responder', jsonEncode(content));
   }
 }
 

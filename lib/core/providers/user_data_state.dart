@@ -6,7 +6,7 @@ sealed class UserDataState {}
 final class UserDataInitial extends UserDataState {}
 
 final class UserDataReady extends UserDataState {
-  final Person user;
+  final User user;
   final List<Contract> contracts;
   final List<Connection> connections;
   final GeneralUserInfo userInfo;
@@ -33,7 +33,7 @@ final class UserDataReady extends UserDataState {
     Object? requestMessage = _sentinel,
   }) {
     return UserDataReady(
-      user: identical(user, _sentinel) ? this.user : user as Person,
+      user: identical(user, _sentinel) ? this.user : user as User,
       userInfo: identical(userInfo, _sentinel) ? this.userInfo : userInfo as GeneralUserInfo,
       contracts: identical(contracts, _sentinel) ? this.contracts : contracts as List<Contract>,
       connections: identical(connections, _sentinel) ? this.connections : connections as List<Connection>,

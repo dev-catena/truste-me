@@ -33,12 +33,23 @@ class ContractDetailSummaryCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Text('Contratante: ${contract.contractor?.fullName}'),
-          Text('CPF: ${contract.contractor?.cpf}'),
-          const SizedBox(height: 20),
-          Text('Parte interessada: ${contract.stakeHolders[0].fullName}'),
-          Text('CPF: ${contract.stakeHolders[0].cpf}'),
-          const SizedBox(height: 20),
+          Text('Tipo de contrato:\n${contract.type.description}', textAlign: TextAlign.center),
+          const SizedBox(height: 12),
+          Text('Contratante: ${contract.contractor?.fullName}', textAlign: TextAlign.center),
+          Text('CPF: ${contract.contractor?.cpf}', textAlign: TextAlign.center),
+          const SizedBox(height: 12),
+          ...List.generate(
+            contract.stakeHolders.length,
+            (index) {
+              return Column(
+                children: [
+                  Text('Parte interessada: ${contract.stakeHolders[index].fullName}', textAlign: TextAlign.center),
+                  Text('CPF: ${contract.stakeHolders[index].cpf}', textAlign: TextAlign.center),
+                ],
+              );
+            },
+          ),
+          const SizedBox(height: 12),
           const Text('Período de vigência'),
           Text(parsedData()),
         ],

@@ -1,6 +1,6 @@
 part of '../register_screen.dart';
 
-class _PersonalInfo extends StatefulWidget {
+class _UserInfo extends StatefulWidget {
   final String? currentName;
   final String? currentCpf;
   final String? currentEmail;
@@ -10,7 +10,7 @@ class _PersonalInfo extends StatefulWidget {
   final ValueChanged<String> onEmailSet;
   final ValueChanged<DateTime?> onBirthDateChanged;
 
-  const _PersonalInfo({
+  const _UserInfo({
     required this.currentName,
     required this.currentCpf,
     required this.currentEmail,
@@ -22,10 +22,10 @@ class _PersonalInfo extends StatefulWidget {
   });
 
   @override
-  State<_PersonalInfo> createState() => _PersonalInfoState();
+  State<_UserInfo> createState() => _UserInfoState();
 }
 
-class _PersonalInfoState extends State<_PersonalInfo> {
+class _UserInfoState extends State<_UserInfo> {
   late final _nameController = TextEditingController(text: widget.currentName);
   late final _cpfController = TextEditingController(text: widget.currentCpf);
   late final _emailController = TextEditingController(text: widget.currentEmail);
@@ -41,9 +41,11 @@ class _PersonalInfoState extends State<_PersonalInfo> {
   late final VoidCallback _emailListener;
 
   bool isValidEmail(String email) {
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    final emailRegex = RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$');
     return emailRegex.hasMatch(email.trim());
   }
+
+  bool get isCpfValid => CPFValidator.isValid(_cpfController.text);
 
   @override
   void initState() {
@@ -154,7 +156,7 @@ class _PersonalInfoState extends State<_PersonalInfo> {
             },
             controller: _cpfController,
             maxLength: 14,
-            decoration: getDecoration('CPF', _isCpfEmpty),
+            decoration: getDecoration('CPF', !isCpfValid),
             keyboardType: TextInputType.number,
             inputFormatters: [
               FilteringTextInputFormatter.digitsOnly,
@@ -167,10 +169,7 @@ class _PersonalInfoState extends State<_PersonalInfo> {
             focusNode: _emailFocus,
             onTapOutside: (_) => _emailFocus.unfocus(),
             keyboardType: TextInputType.emailAddress,
-            onSubmitted: (_) {
-              _emailFocus.unfocus();
-            },
-
+            onSubmitted: (_) => _emailFocus.unfocus(),
             onChanged: widget.onEmailSet,
             decoration: getDecoration('Email', !isValidEmail(_emailController.text)),
           ),

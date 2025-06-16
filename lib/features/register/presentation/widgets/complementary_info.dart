@@ -58,6 +58,7 @@ class _ComplementaryInfoState extends State<_ComplementaryInfo> {
                   return SingleSelectDialog<IncomeRange>(
                     title: 'Faixa de renda',
                     options: IncomeRange.values,
+                    showSearchBar: false,
                     getName: (option) => '${option.description} - ${option.range}',
                     onChoose: (value) {
                       incomeSelected = value;

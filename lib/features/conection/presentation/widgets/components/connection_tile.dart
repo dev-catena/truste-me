@@ -3,14 +3,14 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../../core/routes.dart';
 import '../../../../../core/utils/date_parser.dart';
-import '../../../../common/domain/entities/person.dart';
+import '../../../../common/domain/entities/user.dart';
 import '../../../domain/entities/connection.dart';
 
 class ConnectionTile extends StatelessWidget {
   ConnectionTile(this.connection, {super.key});
 
   final Connection connection;
-  late final Person user = connection.user;
+  late final User user = connection.user;
 
   @override
   Widget build(BuildContext context) {

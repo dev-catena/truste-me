@@ -2,7 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../features/common/data/data_source/user_data_source.dart';
-import '../../features/common/domain/entities/person.dart';
+import '../../features/common/domain/entities/user.dart';
 import '../../features/conection/data/data_source/connection_datasource.dart';
 import '../../features/conection/domain/entities/connection.dart';
 import '../../features/contracts/data/data_source/contract_datasource.dart';
@@ -28,7 +28,7 @@ class UserDataCubit extends Cubit<UserDataState> {
     this.connectionDataSource,
   ) : super(UserDataInitial());
 
-  Person get getUser => (state as UserDataReady).user;
+  User get getUser => (state as UserDataReady).user;
 
   GeneralUserInfo get getUserInfo => (state as UserDataReady).userInfo;
 
@@ -36,7 +36,7 @@ class UserDataCubit extends Cubit<UserDataState> {
 
   List<Connection> get getConnections => (state as UserDataReady).connections;
 
-  Future<void> initialize(Person user) async {
+  Future<void> initialize(User user) async {
     final List<Contract> contracts = [];
     final List<Connection> connections = [];
 
@@ -124,7 +124,7 @@ class UserDataCubit extends Cubit<UserDataState> {
     emit(internState.copyWith(connections: updatedConnections));
   }
 
-  // Future<void> createContract(Person user, ContractType type, List<Clause> clauses, List<SexualPractice> practicesTaken) async {
+  // Future<void> createContract(User user, ContractType type, List<Clause> clauses, List<SexualPractice> practicesTaken) async {
   //   final internState = state as UserDataReady;
   //
   //   final clausesId = clauses.map((e) => e.id).toList();
@@ -159,7 +159,7 @@ class UserDataCubit extends Cubit<UserDataState> {
     emit(internState.copyWith(contracts: newContracts));
   }
 
-  Future<void> refreshConnections(Person user) async {
+  Future<void> refreshConnections(User user) async {
     final internState = state as UserDataReady;
 
     final updatedConnections = await connectionDataSource.getConnectionsForUser(user);

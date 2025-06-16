@@ -6,12 +6,14 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/api_provider.dart';
-import '../../../core/utils/consts.dart';
+import '../../../core/cep_api.dart';
+import '../../../core/extensions/context_extensions.dart';
 import '../../../core/utils/custom_colors.dart';
+import '../../common/domain/entities/location.dart';
 import '../../common/presentation/widgets/components/custom_selectable_tile.dart';
 import '../../common/presentation/widgets/dialogs/single_select_dialog.dart';
 
-part 'widgets/personal_info.dart';
+part 'widgets/user_info.dart';
 
 part 'widgets/address_info.dart';
 
@@ -34,9 +36,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String userEmail = '';
   DateTime? birthDate;
 
-  String userState = '';
-  String userCity = '';
-  String userStreet = '';
+  Location? userLocation;
   String userNumber = '';
   String userComplement = '';
   String userProfession = '';
@@ -123,10 +123,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ? const CircularProgressIndicator()
                     : FilledButton(
                         onPressed: _currentStep == totalSteps - 1 ? _registerUser : _nextStep,
-                        style: ButtonStyle(
-                          backgroundColor:
-                              WidgetStatePropertyAll(!validateInfo() ? CustomColor.activeColor.withAlpha(100) : null),
-                        ),
+                        // style: ButtonStyle(
+                        //   backgroundColor:
+                        //       WidgetStatePropertyAll(!validateInfo() ? CustomColor.activeColor.withAlpha(100) : null),
+                        // ),
                         child: Text(_currentStep == totalSteps - 1 ? 'Cadastrar' : 'Próximo'),
                       ),
               ],
@@ -148,9 +148,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       canProceed = true;
     }
     if (_currentStep == 1) {
-      canProceed = userName != '' && userCpf != '' && birthDate != null && isValidEmail(userEmail);
+      canProceed = userName != '' && CPFValidator.isValid(userCpf) && birthDate != null && isValidEmail(userEmail);
     } else if (_currentStep == 2) {
-      canProceed = userState != '' && userCity != '';
+      canProceed = userLocation != null;
     } else if (_currentStep == 3) {
       canProceed = true;
     } else if (_currentStep == 4) {
@@ -169,10 +169,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       'nome_completo': userName,
       'CPF': userCpf,
       'pais': 'Brasil',
-      'estado': userState,
-      'cidade': userCity,
-      'endereco':
-          '$userStreet$userNumber${userNumber != '' ? ', $userNumber' : ''}${userComplement != '' ? ' - $userComplement' : ''}',
+      ...userLocation!.toModel().toJson(),
       'profissao': userProfession,
       'dt_nascimento': birthDate.toString(),
     };
@@ -180,7 +177,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       final resp = await ApiProvider(false).post('usuario/gravar', jsonEncode(content));
       isRegistering = false;
       setState(() {});
-      debugPrint('$runtimeType - resp $resp');
+
       if (resp['user'] != null) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text('Usuário cadastrado com sucesso!'),
@@ -203,7 +200,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (step == 1) {
       return const _AgeConfirmation();
     } else if (step == 2) {
-      return _PersonalInfo(
+      return _UserInfo(
         onNameSet: (value) => userName = value,
         onCpfSet: (value) => userCpf = value,
         onEmailSet: (value) => userEmail = value,
@@ -215,11 +212,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
     } else if (step == 3) {
       return _AddressInfo(
-        onCitySet: (value) => userCity = value,
-        onStateSet: (value) => userState = value,
-        onStreetSet: (value) => userStreet = value,
-        onNumberSet: (value) => userNumber = value,
-        onComplementSet: (value) => userComplement = value,
+        onLocationChanged: (value) => userLocation = value,
       );
     } else if (step == 4) {
       return _ComplementaryInfo(

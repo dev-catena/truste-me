@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/utils/date_parser.dart';
-import '../../../domain/entities/person.dart';
+import '../../../domain/entities/user.dart';
 
-class PersonSummaryCard extends StatelessWidget {
-  const PersonSummaryCard(this.user, {super.key});
+class UserSummaryCard extends StatelessWidget {
+  const UserSummaryCard(this.user, {super.key});
 
-  final Person user;
+  final User user;
 
   @override
   Widget build(BuildContext context) {

@@ -8,12 +8,14 @@ class StatefulSegmentedButton<T> extends StatefulWidget {
     required this.onChanged,
     this.multiSelect = false,
     this.initialSelection,
+    this.enabled = true,
     super.key,
   });
 
   final List<T> options;
   final Set<T>? initialSelection;
   final bool multiSelect;
+  final bool enabled;
   final String Function(T value) getLabel;
   final T Function(T value) getValue;
   final void Function(Set<T> value) onChanged;
@@ -45,6 +47,7 @@ class _StatefulSegmentedButtonState<T> extends State<StatefulSegmentedButton<T>>
         .map((ele) => ButtonSegment<T>(
               value: widget.getValue(ele),
               label: Text(widget.getLabel(ele)),
+              enabled: widget.enabled,
             ))
         .toList();
 

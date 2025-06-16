@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../../core/providers/user_data_cubit.dart';
 import '../../../../../core/routes.dart';
 import '../../../../../core/utils/custom_colors.dart';
-import '../../../domain/entities/person.dart';
+import '../../../domain/entities/user.dart';
 
 class CustomScaffold extends StatelessWidget {
   const CustomScaffold({

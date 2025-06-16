@@ -26,11 +26,13 @@ class SingleSelectDialog<T> extends StatefulWidget {
     required this.getName,
     required this.onChoose,
     required this.optionSelected,
+    this.showSearchBar = true,
     this.trailingWidget,
   });
 
   final String title;
   final List<T> options;
+  final bool showSearchBar;
   final String Function(T option) getName; // Function to extract name from option
   final T? optionSelected;
   final void Function(T value) onChoose;
@@ -59,21 +61,23 @@ class _SingleSelectDialogState<T> extends State<SingleSelectDialog<T>> {
 
   @override
   Widget build(BuildContext context) {
-
     return SimpleDialog(
       title: Text(widget.title),
       children: [
-        Padding(
-          padding: const EdgeInsets.all(15),
-          child: SearchBar(
-            hintText: 'Pesquise pelo nome',
-            onChanged: _filterOptionsBySearchText,
+        if (widget.showSearchBar) ...[
+          Padding(
+            padding: const EdgeInsets.all(15),
+            child: SearchBar(
+              leading: const Icon(Icons.search),
+              hintText: 'Pesquise pelo nome',
+              onChanged: _filterOptionsBySearchText,
+            ),
           ),
-        ),
-        const Divider(
-          endIndent: 15,
-          indent: 15,
-        ),
+          const Divider(
+            endIndent: 15,
+            indent: 15,
+          ),
+        ],
         widget.options.isEmpty
             ? const Center(child: Text('Nenhuma opção disponível', textAlign: TextAlign.center))
             : SingleChildScrollView(

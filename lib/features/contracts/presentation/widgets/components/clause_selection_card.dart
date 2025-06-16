@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 
-import '../../../../common/domain/entities/person.dart';
+import '../../../../common/domain/entities/user.dart';
 import '../../../../common/presentation/widgets/dialogs/single_select_dialog.dart';
 import '../../../domain/entities/clause.dart';
 
 class ClauseSelectionCard extends StatelessWidget {
   const ClauseSelectionCard({
     super.key,
+    required this.canEdit,
     required this.contractor,
     required this.stakeHolders,
     required this.possibleClauses,
@@ -16,8 +17,9 @@ class ClauseSelectionCard extends StatelessWidget {
     required this.onRemove,
   });
 
-  final Person contractor;
-  final List<Person> stakeHolders;
+  final bool canEdit;
+  final User contractor;
+  final List<User> stakeHolders;
   final List<Clause> possibleClauses;
   final List<Clause> clausesChosen;
   final void Function(Clause clause) onClausePicked;
@@ -53,40 +55,53 @@ class ClauseSelectionCard extends StatelessWidget {
             (index) {
               final clause = clausesChosen[index];
 
-              return clause.buildTile(
-                titlePrefix: '${clause.code} - ',
-                participants: [contractor, ...stakeHolders],
-                onAcceptOrDeny: onAcceptOrDeny,
-                onRemove: onRemove,
+              return Column(
+                children: [
+                  clause.buildTile(
+                    titlePrefix: '${clause.code} - ',
+                    participants: [contractor, ...stakeHolders],
+                    onAcceptOrDeny: canEdit ? onAcceptOrDeny : null,
+                    onRemove: canEdit ? onRemove : null,
+                  ),
+                  if(index < clausesChosen.length -1)
+                    const Divider(endIndent: 20, indent: 20),
+                ],
               );
             },
           ),
-          Center(
-            child: TextButton(
-              onPressed: () {
-                showDialog(
-                    context: context,
-                    builder: (_) {
-                      return SingleSelectDialog<Clause>(
-                        title: 'Selecione uma clásula',
-                        getName: (option) => option.name,
-                        onChoose: onClausePicked,
-                        options: possibleClauses,
-                        optionSelected: null,
-                      );
-                    });
-              },
-              child: const IntrinsicWidth(
-                child: Row(
-                  children: [
-                    Icon(Icons.add),
-                    SizedBox(width: 12),
-                    Text('Adicionar cláusula'),
-                  ],
-                ),
-              ),
-            ),
-          ),
+          // if (canEdit)
+          //   Center(
+          //     child: TextButton(
+          //       onPressed: () {
+          //         final filteredClauses = List.of(possibleClauses);
+          //
+          //         for (final ele in clausesChosen) {
+          //           filteredClauses.remove(ele);
+          //         }
+          //
+          //         showDialog(
+          //             context: context,
+          //             builder: (_) {
+          //               return SingleSelectDialog<Clause>(
+          //                 title: 'Selecione uma clásula',
+          //                 getName: (option) => option.name,
+          //                 onChoose: onClausePicked,
+          //                 options: filteredClauses,
+          //                 optionSelected: null,
+          //               );
+          //             });
+          //       },
+          //       child: const IntrinsicWidth(
+          //         child: Row(
+          //           children: [
+          //             Icon(Icons.add),
+          //             SizedBox(width: 12),
+          //             Text('Adicionar cláusula'),
+          //           ],
+          //         ),
+          //       ),
+          //     ),
+          //   ),
         ],
       ),
     );

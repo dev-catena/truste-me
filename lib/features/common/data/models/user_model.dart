@@ -1,8 +1,8 @@
-import '../../domain/entities/person.dart';
+import '../../domain/entities/user.dart';
 import 'seal_model.dart';
 
-class PersonModel extends Person {
-  const PersonModel({
+class UserModel extends User {
+  const UserModel({
     required super.id,
     required super.fullName,
     required super.birthDate,
@@ -17,7 +17,7 @@ class PersonModel extends Person {
     super.sealsObtained,
   });
 
-  PersonModel.fromJson(Map<String, dynamic> json)
+  UserModel.fromJson(Map<String, dynamic> json)
       : super(
           id: json['id'] ?? json['user']?['id'] ?? json['usuario']?['id'],
           fullName: json['nome_completo'] ?? json['user']?['nome_completo'] ?? json['usuario']?['nome_completo'],
@@ -37,8 +37,8 @@ class PersonModel extends Person {
           authToken: json['token'] ?? '',
         );
 
-  Person toEntity() {
-    return Person(
+  User toEntity() {
+    return User(
       id: id,
       fullName: fullName,
       cpf: cpf,

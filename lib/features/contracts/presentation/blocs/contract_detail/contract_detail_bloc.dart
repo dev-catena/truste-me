@@ -212,13 +212,24 @@ class ContractDetailBloc extends Bloc<ContractDetailEvent, ContractDetailState> 
   Future<void> _onContractSigned(ContractDetailContractSigned event, Emitter<ContractDetailState> emit) async {
     if (state is! ContractDetailReady) return;
     final internState = state as ContractDetailReady;
-    final refreshedContract = await datasource.getContractFullInfo(internState.contract);
-    final updatedContract = refreshedContract.copyWith(status: ContractStatus.active);
 
-    await datasource.updateContract(updatedContract);
-    final evenNewer = await datasource.signContract(internState.contract);
+    await datasource.signContract(internState.contract);
+    final newSignature = ContractSignature(userId: userLoggedIn.id, dateTime: DateTime.now(), hasAccepted: true);
+    final signaturesList = List.of(internState.contract.signatures)
+      ..removeWhere((element) => element.userId == userLoggedIn.id)
+      ..add(newSignature);
 
-    // emit(internState.copyWith(contract: evenNewer));
+    Contract updatedContract = internState.contract.copyWith(signatures: signaturesList);
+    // final refreshedContract = await datasource.getContractFullInfo(internState.contract);
+    // final updatedContract = refreshedContract.copyWith(status: ContractStatus.active);
+    //
+    // await datasource.updateContract(updatedContract);
+    // final evenNewer = await datasource.signContract(internState.contract);
+    if (_isFullSigned(updatedContract)) {
+      updatedContract = updatedContract.copyWith(status: ContractStatus.active);
+      await datasource.finishContract(updatedContract);
+    }
+    emit(internState.copyWith(contract: updatedContract));
   }
 
   Future<void> _onQuestionAnswered(
@@ -235,15 +246,22 @@ class ContractDetailBloc extends Bloc<ContractDetailEvent, ContractDetailState> 
     );
 
     final updatedAnswers = List.of(internState.contract.answers);
-    for(final ele in updatedAnswers){
+    for (final ele in updatedAnswers) {
       debugPrint('updatedAnswers question id ${ele.questionId} - ${ele.answer}');
     }
-    updatedAnswers.removeWhere((element) => element.questionId == event.question.id && element.userId == userLoggedIn.id);
+    updatedAnswers
+        .removeWhere((element) => element.questionId == event.question.id && element.userId == userLoggedIn.id);
     updatedAnswers.add(newAnswer);
 
     await datasource.answerQuestion(internState.contract, [newAnswer]);
     final updatedContract = internState.contract.copyWith(answers: updatedAnswers);
 
     emit(internState.copyWith(contract: updatedContract));
+  }
+
+  bool _isFullSigned(Contract contract) {
+    final isSigned = contract.signatures.every((element) => element.hasAccepted);
+
+    return isSigned;
   }
 }

@@ -252,7 +252,7 @@ class _ContractReady extends StatelessWidget {
                                 const Icon(Icons.check_circle_outline, color: CustomColor.successGreen),
                                 const SizedBox(width: 10),
                                 Text(
-                                    '${user.fullName} às ${DateFormat('hh:mm, dd/MM/yyyy').format(acceptance.dateTime!)}.'),
+                                    '${user.fullName} às ${DateFormat('HH:mm, dd/MM/yyyy', 'pt_BR').format(acceptance.dateTime!)}.'),
                               ],
                             ),
                           );

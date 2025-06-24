@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-
 import '../../../common/data/models/user_model.dart';
 import '../../domain/entities/clause.dart';
 import '../../domain/entities/contract.dart';
@@ -19,8 +17,7 @@ class ContractModel extends Contract {
     required super.sexualPractices,
     required super.signatures,
     required super.answers,
-    super.startDate,
-    super.endDate,
+    required super.validity,
   });
 
   factory ContractModel.fromJson(Map<String, dynamic> json) {
@@ -43,8 +40,10 @@ class ContractModel extends Contract {
 
     if (json['participantes'] != null) {
       for (final ele in json['participantes']) {
-        for (final resp in ele['respostas']) {
-          repostas.add(ContractAnswer.fromJson(resp..['usuario_id'] = ele['id']));
+        if (ele['respostas'] != null) {
+          for (final resp in ele['respostas']) {
+            repostas.add(ContractAnswer.fromJson(resp..['usuario_id'] = ele['id']));
+          }
         }
       }
     }
@@ -64,8 +63,7 @@ class ContractModel extends Contract {
       //     : null,
       signatures: (json['assinaturas'] as List? ?? []).map((e) => ContractSignature.fromJson(e)).toList(),
       answers: repostas,
-      startDate: DateTime.tryParse(json['dt_inicio'] ?? ''),
-      endDate: DateTime.tryParse(json['dt_fim'] ?? ''),
+      validity: json['duracao'],
     );
   }
 
@@ -76,10 +74,10 @@ class ContractModel extends Contract {
     final content = {
       'contrato_tipo_id': type.id,
       'status': status.description,
-      'dt_inicio': (startDate ?? DateTime.now()).toString(),
-      'dt_fim': (endDate ?? DateTime.now()).toString(),
+      'validade': validity,
       'participantes': usersId,
       'clausulas': clausesWithPractices.map((e) => e.id).toList(),
+      'duracao': validity
     };
 
     return content;
@@ -97,8 +95,7 @@ class ContractModel extends Contract {
       stakeHolders: stakeHolders,
       signatures: signatures,
       answers: answers,
-      startDate: startDate,
-      endDate: endDate,
+      validity: validity,
     );
   }
 }

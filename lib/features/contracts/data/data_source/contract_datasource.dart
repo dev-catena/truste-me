@@ -112,6 +112,11 @@ class ContractDataSource {
 
     await _apiProvider.post('contrato/pergunta/responder', jsonEncode(content));
   }
+
+  Future<void> finishContract (Contract contract) async {
+    final content = {'status': 'Ativo'};
+    final rawData = await _apiProvider.patch('contrato/atualizar/${contract.id}', jsonEncode(content));
+  }
 }
 
 class _MockData {

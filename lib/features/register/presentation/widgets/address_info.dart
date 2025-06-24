@@ -41,20 +41,51 @@ class _AddressInfoState extends State<_AddressInfo> {
   void locationUpdate(_InputType type) {
     final Location updated;
     if (type == _InputType.number) {
-      updated = location!.copyWith(complement: numberController.text);
+      updated = location!.copyWith(number: numberController.text);
     } else {
       updated = location!.copyWith(complement: complementController.text);
     }
     widget.onLocationChanged(updated);
   }
 
+  InputDecoration getDecoration({String? label, bool isValid = false}) {
+    return InputDecoration(
+      labelText: label,
+      border: OutlineInputBorder(
+        borderSide: BorderSide(
+          color: isValid ? Colors.black87 : Colors.red,
+        ),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderSide: BorderSide(
+          color: isValid ? Colors.black87 : Colors.red,
+        ),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderSide: BorderSide(
+          color: isValid ? CustomColor.activeColor : Colors.red,
+          width: 2,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final titleLarge = Theme.of(context).textTheme.titleLarge!;
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
       children: [
+        Text('Endereço', style: titleLarge),
+        const SizedBox(height: 6),
+        const Text(
+          'Endereço completo obrigatório. Fique tranquilo: ele não será exibido para ninguém, '
+          'apenas usado para validar as informações e gerar selos de verificação.',
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 12),
         Row(
           children: [
             Expanded(
@@ -117,14 +148,26 @@ class _AddressInfoState extends State<_AddressInfo> {
             Expanded(
               flex: 2,
               child: TextField(
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Número',
+                decoration: getDecoration(
+                  label: 'Número',
+                  isValid: numberController.text.isNotEmpty,
                 ),
+                enabled: location != null,
                 controller: numberController,
+                keyboardType: TextInputType.number,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                ],
                 onSubmitted: (_) => locationUpdate(_InputType.number),
-                onTapOutside: (_) => locationUpdate(_InputType.number),
+                onTapOutside: (_) {
+                  locationUpdate(_InputType.number);
+                  FocusScope.of(context).unfocus();
+                },
                 onEditingComplete: () => locationUpdate(_InputType.number),
+                onChanged: (value) {
+                  locationUpdate(_InputType.number);
+                  setState(() {});
+                },
               ),
             ),
             const SizedBox(width: 20),
@@ -135,9 +178,13 @@ class _AddressInfoState extends State<_AddressInfo> {
                   border: OutlineInputBorder(),
                   labelText: 'Complemento',
                 ),
+                enabled: location != null,
                 controller: complementController,
                 onSubmitted: (_) => locationUpdate(_InputType.complement),
-                onTapOutside: (_) => locationUpdate(_InputType.complement),
+                onTapOutside: (_) {
+                  locationUpdate(_InputType.complement);
+                  FocusScope.of(context).unfocus();
+                },
                 onEditingComplete: () => locationUpdate(_InputType.complement),
               ),
             ),

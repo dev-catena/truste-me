@@ -104,8 +104,6 @@ class SexualPractice extends Equatable {
       }
     }
 
-    debugPrint('$runtimeType - onAcceptOrDeny ${onAcceptOrDeny == null}');
-
     return Column(
       children: [
         ListTile(

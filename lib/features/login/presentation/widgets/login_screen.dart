@@ -99,6 +99,13 @@ class LoginScreen extends StatelessWidget {
                               },
                               obscureText: state.isPwdObscure,
                             ),
+                            Align(
+                              alignment: AlignmentDirectional.centerStart,
+                              child: TextButton(
+                                onPressed: () => context.pushNamed(AppRoutes.newPasswordScreen),
+                                child: const Text('Esqueci minha senha'),
+                              ),
+                            ),
                             const SizedBox(height: 20),
                             state.isSubmitting
                                 ? const CircularProgressIndicator()

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../../common/domain/entities/user.dart';
-import '../../../../common/presentation/widgets/dialogs/single_select_dialog.dart';
 import '../../../domain/entities/clause.dart';
 
 class ClauseSelectionCard extends StatelessWidget {

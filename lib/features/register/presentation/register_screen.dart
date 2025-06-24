@@ -79,6 +79,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final displayMedium = Theme.of(context).textTheme.displayMedium!;
+
     return Scaffold(
       backgroundColor: CustomColor.backgroundPrimaryColor,
       body: Padding(
@@ -86,13 +88,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Text('TrustMe', style: displayMedium),
             Image.asset('assets/imgs/trustme-logo.png', height: 100),
             const SizedBox(height: 20),
             Flexible(
               fit: FlexFit.loose,
               child: ConstrainedBox(
                 constraints: const BoxConstraints(
-                  maxHeight: 360,
+                  maxHeight: 460,
                 ),
                 child: PageView.builder(
                   controller: _pageController,
@@ -150,7 +153,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (_currentStep == 1) {
       canProceed = userName != '' && CPFValidator.isValid(userCpf) && birthDate != null && isValidEmail(userEmail);
     } else if (_currentStep == 2) {
-      canProceed = userLocation != null;
+      canProceed = userLocation != null && userLocation?.number.isNotEmpty == true;
     } else if (_currentStep == 3) {
       canProceed = true;
     } else if (_currentStep == 4) {

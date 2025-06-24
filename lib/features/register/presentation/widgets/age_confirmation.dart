@@ -5,12 +5,16 @@ class _AgeConfirmation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    final title = Theme.of(context).textTheme.bodyLarge!;
+
+    return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          'Este aplicativo é destinado a pessoas maiores de 18 anos. Ao continuar você confirma que possui idade igual ou superior a 18 anos.',
+          'Este aplicativo é destinado a pessoas maiores de 18 anos. '
+          'Ao continuar você confirma que possui idade igual ou superior a 18 anos.',
           textAlign: TextAlign.center,
+          style: title,
         ),
       ],
     );

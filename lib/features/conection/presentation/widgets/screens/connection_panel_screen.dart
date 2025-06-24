@@ -13,6 +13,7 @@ import '../dialogs/request_connection_dialog.dart';
 
 class ConnectionPanelScreen extends StatefulWidget {
   const ConnectionPanelScreen({super.key, this.initialFilter});
+
   final String? initialFilter;
 
   @override
@@ -57,7 +58,6 @@ class _ConnectionPanelScreenState extends State<ConnectionPanelScreen> {
           if (state is UserDataReady) {
             if (state.connectionRequestStatus == ConnectionRequestStatus.failure) {
               context.showSnack(state.requestMessage);
-
             } else if (state.connectionRequestStatus == ConnectionRequestStatus.success) {
               context.showSnack('Conexão solicitada!');
             }
@@ -103,8 +103,17 @@ class _ConnectionPanelScreenState extends State<ConnectionPanelScreen> {
                             separatorBuilder: (_, __) {
                               return const SizedBox(height: 10);
                             },
-                            itemCount: filteredConnections.length,
+                            itemCount: filteredConnections.length + 1,
                             itemBuilder: (context, index) {
+                              if (index == filteredConnections.length) {
+                                return IconButton(
+                                  onPressed: () {
+                                    userData.refreshConnections(userData.getUser);
+                                  },
+                                  icon: const Icon(Icons.refresh_outlined),
+                                );
+                              }
+
                               final connection = filteredConnections[index];
 
                               return connection.buildTile();

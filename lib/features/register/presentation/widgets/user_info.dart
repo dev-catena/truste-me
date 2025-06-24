@@ -187,6 +187,8 @@ class _UserInfoState extends State<_UserInfo> {
                 context: context,
                 firstDate: DateTime(1900),
                 lastDate: DateTime.now().subtract(const Duration(days: 6570)),
+                onDatePickerModeChange: null,
+                // locale: Locale('pt')
               ).then((value) {
                 datePicked = value;
                 widget.onBirthDateChanged(value);

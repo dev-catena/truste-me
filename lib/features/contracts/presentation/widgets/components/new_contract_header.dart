@@ -4,8 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../../core/providers/app_data_cubit.dart';
 import '../../../../common/domain/entities/user.dart';
 import '../../../../common/presentation/widgets/components/custom_selectable_tile.dart';
-import '../../../../common/presentation/widgets/components/start_end_datepicker.dart';
-import '../../../../common/presentation/widgets/components/stateful_filter_chips.dart';
 import '../../../../common/presentation/widgets/components/stateful_segmented_button.dart';
 import '../../../../common/presentation/widgets/dialogs/single_select_dialog.dart';
 import '../../../../conection/domain/entities/connection.dart';
@@ -20,6 +18,8 @@ class NewContractHeader extends StatelessWidget {
     required this.onTypeSelected,
     required this.onStartSet,
     required this.onEndSet,
+    required this.currentValidity,
+    required this.onValiditySet,
     super.key,
   });
 
@@ -31,6 +31,8 @@ class NewContractHeader extends StatelessWidget {
 
   final User? currentStakeHolder;
   final ContractType? currentType;
+  final int? currentValidity;
+  final Function(int value) onValiditySet;
 
   @override
   Widget build(BuildContext context) {
@@ -97,11 +99,12 @@ class NewContractHeader extends StatelessWidget {
           const SizedBox(height: 12),
           Text('Duração do contrato (horas)', style: titleMedium),
           const SizedBox(height: 6),
-          StatefulSegmentedButton<String>(
-            options: const ['2', '4', '8', '12', '24'],
-            getLabel: (value) => value,
+          StatefulSegmentedButton<int>(
+            options: const [1, 2, 6, 24],
+            initialSelection: {currentValidity ?? 24},
+            getLabel: (value) => value.toString(),
             getValue: (value) => value,
-            onChanged: (value) {},
+            onChanged: (value) => onValiditySet(value.first),
           ),
           // StatefulFilterChips(
           //   filtersLabel: const ['2', '4', '8', '12', '24'],

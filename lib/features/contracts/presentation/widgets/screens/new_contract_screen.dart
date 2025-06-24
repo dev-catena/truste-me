@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
-import '../../../../../core/providers/app_data_cubit.dart';
 import '../../../../../core/providers/user_data_cubit.dart';
 import '../../../../common/domain/entities/user.dart';
 import '../../../../common/presentation/widgets/components/custom_scaffold.dart';
@@ -32,6 +31,7 @@ class _NewContractScreenState extends State<NewContractScreen> {
   bool sharesNeedle = false;
   DateTime? startDate;
   DateTime? endDate;
+  int validity = 24;
 
   List<Clause> allClauses = [];
   List<SexualPractice> allPractices = [];
@@ -95,7 +95,6 @@ class _NewContractScreenState extends State<NewContractScreen> {
   @override
   Widget build(BuildContext context) {
     final userData = context.read<UserDataCubit>();
-    final appData = context.read<AppDataCubit>();
 
     return CustomScaffold(
       child: BlocBuilder<UserDataCubit, UserDataState>(
@@ -113,8 +112,10 @@ class _NewContractScreenState extends State<NewContractScreen> {
                     onTypeSelected: (value) async => await _setType(value),
                     currentStakeHolder: stakeHolderSelected,
                     currentType: typeSelected,
+                    currentValidity: validity,
                     onStartSet: (value) => startDate = value,
                     onEndSet: (value) => endDate = value,
+                    onValiditySet: (value) => validity = value,
                   ),
                   const SizedBox(height: 16),
                   if (allClauses.isNotEmpty)
@@ -155,18 +156,18 @@ class _NewContractScreenState extends State<NewContractScreen> {
                     FilledButton(
                       onPressed: () async {
                         final newContract = Contract(
-                            id: 0,
-                            contractNumber: '',
-                            status: ContractStatus.pending,
-                            contractor: userLoggedIn,
-                            type: typeSelected!,
-                            stakeHolders: [stakeHolderSelected!],
-                            clauses: currentClauses,
-                            sexualPractices: practicesTaken,
-                            startDate: startDate,
-                            endDate: endDate,
-                            signatures: const [],
-                            answers: []);
+                          id: 0,
+                          contractNumber: '',
+                          status: ContractStatus.pending,
+                          contractor: userLoggedIn,
+                          type: typeSelected!,
+                          stakeHolders: [stakeHolderSelected!],
+                          clauses: currentClauses,
+                          sexualPractices: practicesTaken,
+                          validity: validity,
+                          signatures: const [],
+                          answers: [],
+                        );
 
                         await userData.createContract(newContract);
 

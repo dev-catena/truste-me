@@ -10,6 +10,7 @@ class ContractCard extends StatelessWidget {
     final size = MediaQuery.of(context).size;
     final titleMedium = Theme.of(context).textTheme.titleMedium!;
     // final formatedDate = DateParser.formatDate(contract.status.since, true, true);
+    final List<User> contWithStakeholders = [contract.contractor!, ...contract.stakeHolders];
 
     return InkWell(
       onTap: () => context.pushNamed(AppRoutes.contractDetailScreen, extra: contract),
@@ -31,11 +32,25 @@ class ContractCard extends StatelessWidget {
         padding: const EdgeInsets.all(8),
         child: Column(
           children: [
-            Text('Contrato ${contract.contractNumber}', style: titleMedium, textAlign: TextAlign.center),
+            Stack(
+              children: [
+                Text('Contrato ${contract.contractNumber}', style: titleMedium, textAlign: TextAlign.center),
+
+              ],
+            ),
             // Text(contract.stakeHolder!.fullName, textAlign: TextAlign.center),
             Text(contract.type.description, textAlign: TextAlign.center),
             const Spacer(),
-            const Text('Última atualização:', textAlign: TextAlign.center),
+            ...List.generate(
+              contWithStakeholders.length,
+              (index) {
+                final user = contWithStakeholders[index];
+
+                return Text(user.fullName);
+              },
+            ),
+            const Spacer(),
+            const Text('Status:', textAlign: TextAlign.center),
             // Text('$formatedDate.', textAlign: TextAlign.center),
             Text(
               contract.status.description,

@@ -11,6 +11,7 @@ import '../features/contracts/presentation/widgets/screens/contracts_panel_scree
 import '../features/contracts/presentation/widgets/screens/new_contract_screen.dart';
 import '../features/home/presentation/widgets/screens/home_screen.dart';
 import '../features/login/presentation/widgets/login_screen.dart';
+import '../features/new_password/new_password_screen.dart';
 import '../features/profile/presentation/widgets/profile_screen.dart';
 import '../features/register/presentation/register_screen.dart';
 import 'providers/user_data_cubit.dart';
@@ -24,6 +25,8 @@ final _shellNavigatorCKey = GlobalKey<NavigatorState>(debugLabel: 'shellC');
 class AppRoutes {
   static const loginScreen = '/login';
   static const splashScreen = '/splash';
+
+  static const newPasswordScreen = 'nova-senha';
 
   static const homeScreen = '/';
   static const contractsScreen = '/contratos';
@@ -137,7 +140,14 @@ final GoRouter _routes = GoRouter(
     GoRoute(
       path: AppRoutes.loginScreen,
       name: AppRoutes.loginScreen,
-      builder: (_, __) => LoginScreen(),
+      builder: (_, __) => const LoginScreen(),
+      routes: [
+        GoRoute(
+          path: AppRoutes.newPasswordScreen,
+          name: AppRoutes.newPasswordScreen,
+          builder: (_, __) => const NewPasswordScreen(),
+        ),
+      ],
     ),
     GoRoute(
       path: AppRoutes.registerScreen,
@@ -148,7 +158,7 @@ final GoRouter _routes = GoRouter(
       path: AppRoutes.profileScreen,
       name: AppRoutes.profileScreen,
       builder: (context, __) {
-        return ProfileScreen();
+        return const ProfileScreen();
       },
     ),
   ],

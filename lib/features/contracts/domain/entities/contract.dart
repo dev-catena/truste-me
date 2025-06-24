@@ -24,9 +24,8 @@ class Contract extends Equatable {
   final User? contractor;
   final List<User> stakeHolders;
   final List<ContractSignature> signatures;
-  final DateTime? startDate;
-  final DateTime? endDate;
   final List<ContractAnswer> answers;
+  final int validity;
 
   ContractCard buildCard() {
     return ContractCard(this);
@@ -47,8 +46,7 @@ class Contract extends Equatable {
     required this.sexualPractices,
     required this.signatures,
     required this.answers,
-    this.startDate,
-    this.endDate,
+    required this.validity,
   });
 
   ContractModel toModel() {
@@ -60,11 +58,10 @@ class Contract extends Equatable {
       stakeHolders: stakeHolders,
       clauses: clauses,
       sexualPractices: sexualPractices,
-      startDate: startDate,
-      endDate: endDate,
       signatures: signatures,
       answers: answers,
       contractor: contractor,
+      validity: validity,
     );
   }
 
@@ -79,8 +76,7 @@ class Contract extends Equatable {
     List<User>? stakeHolders,
     List<ContractSignature>? signatures,
     List<ContractAnswer>? answers,
-    DateTime? startDate,
-    DateTime? endDate,
+    int? validity,
   }) {
     return Contract(
       id: id ?? this.id,
@@ -93,8 +89,7 @@ class Contract extends Equatable {
       sexualPractices: sexualPractices ?? this.sexualPractices,
       signatures: signatures ?? this.signatures,
       answers: answers ?? this.answers,
-      startDate: startDate ?? this.startDate,
-      endDate: endDate ?? this.endDate,
+      validity: validity ?? this.validity,
     );
   }
 
@@ -105,8 +100,8 @@ class Contract extends Equatable {
 enum ContractStatus {
   pending(0, 'Pendente', CustomColor.pendingYellow),
   active(1, 'Ativo', CustomColor.activeColor),
-  completed(3, 'Concluido', CustomColor.successGreen),
-  suspended(4, 'Cancelado', CustomColor.vividRed);
+  completed(3, 'Concluido', CustomColor.successGreen);
+  // suspended(4, 'Cancelado', CustomColor.vividRed);
 
   final int code;
   final String description;

@@ -19,7 +19,7 @@ class SealInspectionDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SimpleDialog(
-      title: Text('Selo de ${seal.type}', textAlign: TextAlign.center),
+      title: Text('Selo de ${seal.type.description}', textAlign: TextAlign.center),
       children: [
         Text('Status: ${seal.status.description}', textAlign: TextAlign.center),
         seal.status.buildIcon(),

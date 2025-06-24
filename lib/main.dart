@@ -63,6 +63,15 @@ class TrustMeApp extends StatelessWidget {
       child: MaterialApp.router(
         scaffoldMessengerKey: Globals.scaffoldMessengerKey,
         title: 'TrustMe',
+        // supportedLocales: const [
+        //   Locale('en', 'US'),
+        //   Locale('pt', 'BR'),
+        // ],
+        // localizationsDelegates: const [
+        //   // GlobalMaterialLocalizations.delegate,
+        //   // GlobalWidgetsLocalizations.delegate,
+        //   // GlobalCupertinoLocalizations.delegate,
+        // ],
         theme: AppTheme().getAppTheme(context),
         routeInformationParser: _routes.routeInformationParser,
         routeInformationProvider: _routes.routeInformationProvider,

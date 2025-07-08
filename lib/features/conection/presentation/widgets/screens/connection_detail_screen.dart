@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../../core/providers/user_data_cubit.dart';
-import '../../../../../core/utils/custom_colors.dart';
 import '../../../../../core/utils/date_parser.dart';
+import '../../../../common/domain/entities/seal.dart';
 import '../../../../common/presentation/widgets/components/custom_scaffold.dart';
 import '../../../domain/entities/connection.dart';
 import '../components/seals_board.dart';
@@ -20,7 +20,9 @@ class ConnectionDetailScreen extends StatefulWidget {
 
 class _ConnectionDetailScreenState extends State<ConnectionDetailScreen> {
   bool acceptInProgress = false;
-  late final userData = context.read<UserDataCubit>();
+  late final UserDataCubit userData;
+  final List<Seal> seals = [];
+  bool loadingSeals = true;
 
   Future<void> acceptConnection(bool hasAccepted) async {
     acceptInProgress = true;
@@ -43,22 +45,22 @@ class _ConnectionDetailScreenState extends State<ConnectionDetailScreen> {
           acceptInProgress
               ? const CircularProgressIndicator()
               : Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    OutlinedButton(
-                      onPressed: () {
-                        acceptConnection(false);
-                      },
-                      child: const Text('Recusar'),
-                    ),
-                    FilledButton(
-                      onPressed: () {
-                        acceptConnection(true);
-                      },
-                      child: const Text('Aceitar'),
-                    ),
-                  ],
-                ),
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              OutlinedButton(
+                onPressed: () {
+                  acceptConnection(false);
+                },
+                child: const Text('Recusar'),
+              ),
+              FilledButton(
+                onPressed: () {
+                  acceptConnection(true);
+                },
+                child: const Text('Aceitar'),
+              ),
+            ],
+          ),
           // TextButton(
           //   onPressed: () {},
           //   child: const Row(
@@ -80,11 +82,22 @@ class _ConnectionDetailScreenState extends State<ConnectionDetailScreen> {
         onPressed: () async {
           await userData.deleteConnection(widget.connection);
 
-          if(context.mounted) {
+          if (context.mounted) {
             context.pop();
           }
         },
         child: const Text('Desfazer conexão'),
+      );
+    } else if (widget.connection.status == ConnectionStatus.cancelled) {
+      return OutlinedButton(
+        onPressed: () async {
+          await userData.deleteConnection(widget.connection);
+
+          if (context.mounted) {
+            context.pop();
+          }
+        },
+        child: const Text('Cancelar solicitação'),
       );
     } else {
       return const SizedBox();
@@ -100,6 +113,21 @@ class _ConnectionDetailScreenState extends State<ConnectionDetailScreen> {
   }
 
   @override
+  void initState() {
+    userData = context.read<UserDataCubit>();
+    if (showSeals()) {
+      userData.userDataSource.getSeals(widget.connection.user).then(
+            (value) =>
+            setState(() {
+              seals.addAll(value);
+              loadingSeals = false;
+            }),
+      );
+    }
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return CustomScaffold(
       child: SingleChildScrollView(
@@ -109,16 +137,20 @@ class _ConnectionDetailScreenState extends State<ConnectionDetailScreen> {
             widget.connection.user.buildSummaryCard(),
             const SizedBox(height: 10),
             SizedBox(
-              width: MediaQuery.of(context).size.width * 0.6,
+              width: MediaQuery
+                  .of(context)
+                  .size
+                  .width * 0.6,
               child: Text(
-                'Conexão ${widget.connection.status.description.toLowerCase()}(a) desde ${DateParser.formatDate(widget.connection.since, true)}.',
+                'Conexão ${widget.connection.status.description.toLowerCase()}(a) desde ${DateParser.formatDate(
+                    widget.connection.since, true)}.',
                 textAlign: TextAlign.center,
               ),
             ),
             const SizedBox(height: 4),
             getAcceptButton(),
             const SizedBox(height: 8),
-            showSeals() ? SealsBoard(widget.connection.user.sealsObtained ?? []) : const SizedBox(),
+            if (showSeals()) loadingSeals ? const CircularProgressIndicator() : SealsBoard(seals, canGetSeal: false),
           ],
         ),
       ),

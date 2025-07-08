@@ -20,7 +20,7 @@ class ConnectionPanelBloc extends Bloc<ConnectionPanelEvent, ConnectionPanelStat
 
   Future<void> _onStarted(ConnectionPanelStarted event, Emitter<ConnectionPanelState> emit) async {
     try {
-      List<Connection> connections = [];
+      final List<Connection> connections = [];
 
       // await Future.wait([
       //   dataSource.getConnectionsForUser().then((value) => connections = value),

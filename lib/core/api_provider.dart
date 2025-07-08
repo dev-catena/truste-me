@@ -41,7 +41,7 @@ class ApiProvider {
 
     try {
       final http.Response response = await http.get(url, headers: _header).timeout(const Duration(seconds: 10));
-      debugPrint('$runtimeType - GET response ${response.body}');
+      // debugPrint('$runtimeType - GET response ${response.body}');
 
       if (response.statusCode == 200) {
         //O IF abaixo é necessário pois nem todos os endpoints retornam um Map, alguns retornam apenas uma List de itens
@@ -91,12 +91,12 @@ class ApiProvider {
     url = Uri.https(_host, endPoint);
     final http.Response response;
 
-    debugPrint('$runtimeType - POST url $url - content $content');
+    debugPrint('$runtimeType - PATCH url $url - content $content');
 
     try {
       response = await http.patch(url, body: content, headers: _header).timeout(const Duration(seconds: 7));
 
-      debugPrint('$runtimeType - POST response ${response.body}');
+      // debugPrint('$runtimeType - PATCH response ${response.body}');
 
       if (jsonDecode(response.body) is List<dynamic>) {
         final Map<String, dynamic> mapData = {'data': jsonDecode(response.body)};

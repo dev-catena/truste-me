@@ -1,12 +1,10 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 
 import '../../../../core/api_provider.dart';
 import '../../../../core/providers/app_data_cubit.dart';
 import '../../../../core/providers/user_data_cubit.dart';
 import '../../../common/data/models/user_model.dart';
-import '../../../common/domain/entities/user.dart';
 
 class LoginDataSource {
   final bool useToken;

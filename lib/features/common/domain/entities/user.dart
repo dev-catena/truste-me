@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
@@ -5,7 +7,7 @@ import 'seal.dart';
 import '../../../../core/utils/custom_colors.dart';
 import '../../presentation/widgets/components/user_summary_card.dart';
 
-void setLoggedInUser (User user){
+void setLoggedInUser(User user) {
   _userLoggedIn = user;
 }
 
@@ -15,7 +17,6 @@ User get userLoggedIn {
 
 late User _userLoggedIn;
 
-
 class User extends Equatable {
   final int id;
   final String fullName;
@@ -24,17 +25,17 @@ class User extends Equatable {
   final DateTime birthDate;
   final String? country;
   final String? state;
-  final List<Seal>? sealsObtained;
+  final List<Seal> sealsObtained;
   final String? photoPath;
   final DateTime memberSince;
   final String connectionCode;
   final String authToken;
 
-  int get age{
+  int get age {
     final today = DateTime.now();
 
     final time = today.difference(birthDate).inDays;
-    return (time/365).floor();
+    return (time / 365).floor();
   }
 
   @override
@@ -48,12 +49,26 @@ class User extends Equatable {
     required this.birthDate,
     this.country,
     this.state,
-    this.sealsObtained,
+    required this.sealsObtained,
     this.photoPath,
     required this.memberSince,
     required this.connectionCode,
     this.authToken = '',
   });
+
+  String obfuscateName() {
+    final asteriskQt = Random().nextInt(8) + 3;
+    final space = Random().nextInt(asteriskQt) + 1;
+    final asterisks = '*' * asteriskQt;
+    final obfuscated = asterisks.replaceRange(space, space, ' ');
+
+    // return '${fullName.substring(0, 3)}$obfuscated';
+    return '${fullName.substring(0, 3)}** *****';
+  }
+
+  String obfuscateCpf() {
+    return '${cpf.substring(0, 3)}.***.***-**';
+  }
 
   @override
   String toString() {

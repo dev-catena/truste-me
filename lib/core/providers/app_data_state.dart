@@ -7,6 +7,10 @@ final class AppDataInitial extends AppDataState {}
 
 final class AppDataReady extends AppDataState {
   final List<ContractType> contractTypes;
+  final List<Seal> seals;
 
-  AppDataReady({required this.contractTypes});
+  AppDataReady({
+    required this.contractTypes,
+    required this.seals,
+  });
 }

@@ -6,11 +6,7 @@ import '../../features/common/domain/entities/user.dart';
 import '../../features/conection/data/data_source/connection_datasource.dart';
 import '../../features/conection/domain/entities/connection.dart';
 import '../../features/contracts/data/data_source/contract_datasource.dart';
-import '../../features/contracts/domain/entities/clause.dart';
 import '../../features/contracts/domain/entities/contract.dart';
-import '../../features/contracts/domain/entities/contract_type.dart';
-import '../../features/contracts/domain/entities/sexual_practice.dart';
-import '../../features/home/data/data_source/home_datasource.dart';
 import '../enums/connection_status.dart';
 
 part 'user_data_state.dart';
@@ -20,7 +16,7 @@ class UserDataCubit extends Cubit<UserDataState> {
   final ContractDataSource contractDataSource;
   final ConnectionDataSource connectionDataSource;
 
-  late GeneralUserInfo _userInfo;
+  // late GeneralUserInfo _userInfo;
 
   UserDataCubit(
     this.userDataSource,
@@ -29,8 +25,6 @@ class UserDataCubit extends Cubit<UserDataState> {
   ) : super(UserDataInitial());
 
   User get getUser => (state as UserDataReady).user;
-
-  GeneralUserInfo get getUserInfo => (state as UserDataReady).userInfo;
 
   List<Contract> get getContracts => (state as UserDataReady).contracts;
 
@@ -43,27 +37,14 @@ class UserDataCubit extends Cubit<UserDataState> {
     setLoggedInUser(user);
 
     await Future.wait([
-      userDataSource.getGeneralInfo().then((value) => _userInfo = value),
+      // userDataSource.getGeneralInfo().then((value) => _userInfo = value),
+      userDataSource.getSeals(user).then((value) => user.sealsObtained.addAll(value)),
       contractDataSource.getContractsForUser(user).then((value) => contracts.addAll(value)),
       connectionDataSource.getConnectionsForUser(user).then((value) => connections.addAll(value)),
     ]);
 
-    final activeContracts = contracts.where((element) => element.status == ContractStatus.active).length;
-    final pendingContracts = contracts.where((element) => element.status == ContractStatus.pending).length;
-    const pendingSeals = 0;
-    final activeConnections = connections.where((element) => element.status == ConnectionStatus.accepted).length;
-    final pendingConnections = connections.where((element) => element.status == ConnectionStatus.pending).length;
-
-    final info = GeneralUserInfo(
-      activeContracts: activeContracts,
-      pendingContracts: pendingContracts,
-      pendingSeals: pendingSeals,
-      activeConnections: activeConnections,
-      pendingConnections: pendingConnections,
-    );
     emit(UserDataReady(
       user: user,
-      userInfo: info,
       contracts: contracts,
       connections: connections,
     ));
@@ -146,10 +127,8 @@ class UserDataCubit extends Cubit<UserDataState> {
 
     final newContract = await contractDataSource.createContract(model);
     final updatedContracts = List<Contract>.of(internState.contracts)..insert(0, newContract);
-    final updatedQuantity = internState.userInfo.pendingContracts + 1;
-    final updatedInfo = internState.userInfo.copyWith(pendingContracts: updatedQuantity);
 
-    emit(internState.copyWith(contracts: updatedContracts, userInfo: updatedInfo));
+    emit(internState.copyWith(contracts: updatedContracts));
   }
 
   Future<void> refreshContracts() async {
@@ -163,7 +142,6 @@ class UserDataCubit extends Cubit<UserDataState> {
     final internState = state as UserDataReady;
 
     final updatedConnections = await connectionDataSource.getConnectionsForUser(user);
-    debugPrint('$runtimeType - connections refreshed');
 
     emit(internState.copyWith(connections: updatedConnections));
   }

@@ -3,12 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
+import '../../../../../core/enums/contract_status.dart';
 import '../../../../../core/providers/user_data_cubit.dart';
 import '../../../../../core/routes.dart';
 import '../../../../common/presentation/widgets/components/custom_scaffold.dart';
 import '../../../../common/presentation/widgets/components/header_line.dart';
 import '../../../../common/presentation/widgets/components/stateful_filter_chips.dart';
-import '../../../domain/entities/contract.dart';
 
 class ContractsScreen extends StatefulWidget {
   const ContractsScreen({this.initialFilter, super.key});
@@ -52,7 +52,7 @@ class _ContractsScreenState extends State<ContractsScreen> {
             final allContracts = state.contracts;
 
             final filteredContracts = activeFilter == 'Todos'
-                ? allContracts
+                ? allContracts.where((element) => element.status != ContractStatus.expired).toList()
                 : allContracts.where((c) => c.status.description == activeFilter).toList();
 
             return RefreshIndicator(
@@ -89,7 +89,23 @@ class _ContractsScreenState extends State<ContractsScreen> {
                             itemBuilder: (_, index) {
                               final contract = filteredContracts[index];
 
-                              return contract.buildCard();
+                              return contract.buildCard(
+                                onExpire: (contract) {
+                                  final allContractIndex = allContracts.indexOf(contract);
+
+                                  // if(contract.status == ContractStatus.pending){
+                                  if(contract.status == ContractStatus.expired){
+                                    allContracts[allContractIndex] = contract.copyWith(status: ContractStatus.expired);
+                                  // } else if (contract.status == ContractStatus.active){
+                                  } else if (contract.status == ContractStatus.pending){
+                                    allContracts[allContractIndex] = contract.copyWith(status: ContractStatus.completed);
+                                  }
+                                  debugPrint('$runtimeType - onExpire called');
+                                  if(context.mounted) {
+                                    setState(() {});
+                                  }
+                                },
+                              );
                             },
                           ),
                   ],

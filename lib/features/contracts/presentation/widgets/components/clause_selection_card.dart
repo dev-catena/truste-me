@@ -53,11 +53,12 @@ class ClauseSelectionCard extends StatelessWidget {
             clausesChosen.length,
             (index) {
               final clause = clausesChosen[index];
-
+              final number = (index + 1).toString().padLeft(4, '0');
+              final titlePrefix = 'CLA-$number - ';
               return Column(
                 children: [
                   clause.buildTile(
-                    titlePrefix: '${clause.code} - ',
+                    titlePrefix: titlePrefix,
                     participants: [contractor, ...stakeHolders],
                     onAcceptOrDeny: canEdit ? onAcceptOrDeny : null,
                     onRemove: canEdit ? onRemove : null,

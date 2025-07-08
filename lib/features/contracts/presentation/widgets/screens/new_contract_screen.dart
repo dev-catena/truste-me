@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
+import '../../../../../core/enums/contract_status.dart';
 import '../../../../../core/providers/user_data_cubit.dart';
 import '../../../../common/domain/entities/user.dart';
 import '../../../../common/presentation/widgets/components/custom_scaffold.dart';
@@ -148,7 +149,7 @@ class _NewContractScreenState extends State<NewContractScreen> {
                       onRemove: null,
                       showStatusPerUser: false,
                       onAcceptOrDeny: null,
-                      answers: [],
+                      answers: const [],
                       onQuestionAnswered: (question, answer) {},
                     ),
                   const SizedBox(height: 12),
@@ -164,9 +165,11 @@ class _NewContractScreenState extends State<NewContractScreen> {
                           stakeHolders: [stakeHolderSelected!],
                           clauses: currentClauses,
                           sexualPractices: practicesTaken,
-                          validity: validity,
+                          duration: validity,
                           signatures: const [],
-                          answers: [],
+                          answers: const [],
+                          startDt: DateTime.now(),
+                          endDt: DateTime.now(),
                         );
 
                         await userData.createContract(newContract);

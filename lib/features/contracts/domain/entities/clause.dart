@@ -7,7 +7,7 @@ import '../../../../core/utils/custom_colors.dart';
 import '../../../common/domain/entities/user.dart';
 import '../../../common/presentation/widgets/components/stateful_segmented_button.dart';
 import '../../presentation/widgets/components/clause_tile.dart';
-import 'contract.dart';
+import 'contract_answer.dart';
 
 class Clause extends Equatable {
   final int id;

@@ -10,11 +10,11 @@ class UserModel extends User {
     required super.memberSince,
     required super.connectionCode,
     required super.authToken,
+    required super.sealsObtained,
     super.country,
     super.state,
     super.photoPath,
     super.profession,
-    super.sealsObtained,
   });
 
   UserModel.fromJson(Map<String, dynamic> json)
@@ -31,9 +31,7 @@ class UserModel extends User {
           state: json['estado'] ?? json['user']?['estado'] ?? 'Sem estado',
           profession: json['profissao'] ?? json['user']?['profissao'] ?? 'Sem profissão',
           photoPath: json['caminho_foto'] ?? json['user']?['caminho_foto'],
-          sealsObtained: (json['selos'] as List<dynamic>?) != null
-              ? (json['selos'] as List<dynamic>).map((e) => SealModel.fromJson(e).toEntity()).toList()
-              : null,
+          sealsObtained: (json['selos'] as List<dynamic>? ?? []).map((e) => SealModel.fromJson(e).toEntity()).toList(),
           authToken: json['token'] ?? '',
         );
 

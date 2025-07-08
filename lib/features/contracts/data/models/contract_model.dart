@@ -1,6 +1,9 @@
+import '../../../../core/enums/contract_status.dart';
 import '../../../common/data/models/user_model.dart';
 import '../../domain/entities/clause.dart';
 import '../../domain/entities/contract.dart';
+import '../../domain/entities/contract_answer.dart';
+import '../../domain/entities/contract_signature.dart';
 import '../../domain/entities/contract_type.dart';
 import '../../domain/entities/sexual_practice.dart';
 import 'clause_model.dart';
@@ -11,17 +14,20 @@ class ContractModel extends Contract {
     required super.contractNumber,
     required super.status,
     required super.type,
-    super.contractor,
+    required super.contractor,
     required super.stakeHolders,
     required super.clauses,
     required super.sexualPractices,
     required super.signatures,
     required super.answers,
-    required super.validity,
+    required super.duration,
+    required super.startDt,
+    required super.endDt,
   });
 
   factory ContractModel.fromJson(Map<String, dynamic> json) {
-    final cont = json['contratante'] != null ? UserModel.fromJson(json['contratante']).toEntity() : null;
+    // final cont = json['contratante'] != null ? UserModel.fromJson(json['contratante']).toEntity() : null;
+    final cont = UserModel.fromJson(json['contratante']).toEntity();
     final stakeHold = (json['participantes'] as List? ?? []).map((e) => UserModel.fromJson(e).toEntity()).toList()
       ..remove(cont);
     final List<Clause> clau = [];
@@ -63,7 +69,9 @@ class ContractModel extends Contract {
       //     : null,
       signatures: (json['assinaturas'] as List? ?? []).map((e) => ContractSignature.fromJson(e)).toList(),
       answers: repostas,
-      validity: json['duracao'],
+      duration: json['duracao'],
+      startDt: DateTime.parse(json['dt_inicio']),
+      endDt: DateTime.parse(json['dt_fim']),
     );
   }
 
@@ -74,10 +82,10 @@ class ContractModel extends Contract {
     final content = {
       'contrato_tipo_id': type.id,
       'status': status.description,
-      'validade': validity,
+      'validade': duration,
       'participantes': usersId,
       'clausulas': clausesWithPractices.map((e) => e.id).toList(),
-      'duracao': validity
+      'duracao': duration
     };
 
     return content;
@@ -95,7 +103,9 @@ class ContractModel extends Contract {
       stakeHolders: stakeHolders,
       signatures: signatures,
       answers: answers,
-      validity: validity,
+      duration: duration,
+      startDt: startDt,
+      endDt: endDt,
     );
   }
 }

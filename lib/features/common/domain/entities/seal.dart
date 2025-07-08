@@ -6,49 +6,36 @@ import '../../../../core/utils/custom_colors.dart';
 import '../../presentation/widgets/components/seal_card.dart';
 
 class Seal extends Equatable {
-  final SealType type;
+  final int id;
+  final String description;
+  final bool available;
+  // final SealType type;
   final SealStatus status;
   final DateTime? obtainedAt;
   final DateTime? expiresAt;
 
   @override
-  List<Object?> get props => [type, status];
+  List<Object?> get props => [id, description, status];
 
-  SealCard buildCard([bool canGet = false]) {
-    return SealCard(this, showButton: canGet,);
+  SealCard buildCard(bool canGet) {
+    return SealCard(this, canGetSeal: canGet);
   }
 
   const Seal({
-    required this.type,
+    required this.id,
+    required this.description,
+    required this.available,
     required this.status,
-    this.obtainedAt,
-    this.expiresAt,
+    required this.obtainedAt,
+    required this.expiresAt,
   });
-}
-
-enum SealType {
-
-  identity('Identidade'),
-  income('Renda'),
-  antecedents('Antecedentes'),
-  maritalStatus('Estado cívil'),
-  address('Endereço'),
-  education('Escolaridade'),
-  occupation('Ocupação');
-
-  final String description;
-
-  factory SealType.fromString(String value){
-    return SealType.values.firstWhere((element) => element.description == value);
-  }
-
-  const SealType(this.description);
 }
 
 enum SealStatus {
   absent('Ausente', CustomColor.activeGreyed, Icons.cancel_outlined),
   pending('Em validação', CustomColor.pendingYellow, Icons.pending_outlined),
   active('Ativo', CustomColor.activeColor, Icons.check_circle_outline),
+  upComing('Indisponível', CustomColor.activeColor, Icons.upcoming_outlined),
   expired('Expirado', CustomColor.activeGreyed, Symbols.running_with_errors);
 
   final String description;

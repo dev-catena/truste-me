@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/conection/domain/entities/connection.dart';
@@ -14,7 +13,7 @@ import '../features/login/presentation/widgets/login_screen.dart';
 import '../features/new_password/new_password_screen.dart';
 import '../features/profile/presentation/widgets/profile_screen.dart';
 import '../features/register/presentation/register_screen.dart';
-import 'providers/user_data_cubit.dart';
+import 'enums/contract_status.dart';
 import 'scaffold_with_nested_navigation.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();

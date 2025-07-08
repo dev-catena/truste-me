@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../common/domain/entities/user.dart';
 import '../../../domain/entities/clause.dart';
-import '../../../domain/entities/contract.dart';
+import '../../../domain/entities/contract_answer.dart';
 import '../../../domain/entities/contract_type.dart';
 import '../../../domain/entities/sexual_practice.dart';
 

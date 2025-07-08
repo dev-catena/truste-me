@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import '../../../../../core/providers/user_data_cubit.dart';
 import '../../../../../core/routes.dart';
 import '../../../../../core/utils/custom_colors.dart';
-import '../../../domain/entities/user.dart';
 
 class CustomScaffold extends StatelessWidget {
   const CustomScaffold({
@@ -50,7 +49,7 @@ class CustomScaffold extends StatelessWidget {
                 context.push(AppRoutes.profileScreen);
               }
             },
-            child: CircleAvatar(
+            child: const CircleAvatar(
               // backgroundImage: userData.getUser.photoPath != null ? NetworkImage(userData.getUser.photoPath!) : null,
             ),
           ),

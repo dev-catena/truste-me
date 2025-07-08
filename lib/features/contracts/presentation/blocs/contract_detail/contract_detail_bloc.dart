@@ -2,12 +2,14 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:flutter/foundation.dart';
-import 'package:meta/meta.dart';
 
+import '../../../../../core/enums/contract_status.dart';
 import '../../../../common/domain/entities/user.dart';
 import '../../../data/data_source/contract_datasource.dart';
 import '../../../domain/entities/clause.dart';
 import '../../../domain/entities/contract.dart';
+import '../../../domain/entities/contract_answer.dart';
+import '../../../domain/entities/contract_signature.dart';
 import '../../../domain/entities/sexual_practice.dart';
 
 part 'contract_detail_event.dart';
@@ -17,6 +19,9 @@ part 'contract_detail_state.dart';
 class ContractDetailBloc extends Bloc<ContractDetailEvent, ContractDetailState> {
   final ContractDataSource datasource;
   final Contract preliminaryContract;
+
+  final Set<int> _clausesBeingProcessed = {};
+
 
   ContractDetailBloc(this.datasource, this.preliminaryContract) : super(ContractDetailInitial()) {
     on<ContractDetailStarted>(_onStarted);
@@ -29,6 +34,8 @@ class ContractDetailBloc extends Bloc<ContractDetailEvent, ContractDetailState> 
     on<ContractDetailContractSigned>(_onContractSigned);
     on<ContractDetailContractQuestionAnswered>(_onQuestionAnswered);
   }
+
+
 
   void _validateModification(ContractDetailReady internState) {
     if (internState.contract.signatures.isNotEmpty) {
@@ -72,7 +79,7 @@ class ContractDetailBloc extends Bloc<ContractDetailEvent, ContractDetailState> 
     final updatedContract = internState.contract
       ..clauses.add(
         event.selectedClause.copyWith(
-          acceptedBy: [internState.contract.contractor!.id],
+          acceptedBy: [internState.contract.contractor.id],
           pendingFor: internState.contract.stakeHolders.map((e) => e.id).toList(),
         ),
       );
@@ -102,42 +109,51 @@ class ContractDetailBloc extends Bloc<ContractDetailEvent, ContractDetailState> 
     if (state is! ContractDetailReady) return;
     final internState = state as ContractDetailReady;
 
-    await datasource.acceptOrDenyClause(internState.contract, event.selectedClause, event.hasAccepted);
-    final updatedClause = internState.contract.clauses.firstWhere((element) => element == event.selectedClause);
 
-    // late final Clause updatedClause;
-    // late final int clauseIndex;
-    //
-    // if (isSexual) {
-    //   updatedClause =
-    //       internState.contract.sexualPractices.firstWhere((element) => element == event.selectedClause).toClause();
-    //   clauseIndex = internState.contract.sexualPractices.indexOf(updatedClause);
-    // } else {
-    //   updatedClause = internState.contract.clauses.firstWhere((element) => element == event.selectedClause);
-    //   clauseIndex = internState.contract.clauses.indexOf(event.selectedClause);
-    // }
+    final clauseId = event.selectedClause.id; // Assuming it has an ID
+    if (_clausesBeingProcessed.contains(clauseId)) return;
 
-    updatedClause.pendingFor.remove(userLoggedIn.id);
+    _clausesBeingProcessed.add(clauseId);
+    try {
+      await datasource.acceptOrDenyClause(internState.contract, event.selectedClause, event.hasAccepted);
+      final updatedClause = internState.contract.clauses.firstWhere((element) => element == event.selectedClause);
 
-    if (event.hasAccepted) {
-      updatedClause.deniedBy.remove(userLoggedIn.id);
-      updatedClause.acceptedBy.add(userLoggedIn.id);
-    } else {
-      updatedClause.acceptedBy.remove(userLoggedIn.id);
-      updatedClause.deniedBy.add(userLoggedIn.id);
+      // late final Clause updatedClause;
+      // late final int clauseIndex;
+      //
+      // if (isSexual) {
+      //   updatedClause =
+      //       internState.contract.sexualPractices.firstWhere((element) => element == event.selectedClause).toClause();
+      //   clauseIndex = internState.contract.sexualPractices.indexOf(updatedClause);
+      // } else {
+      //   updatedClause = internState.contract.clauses.firstWhere((element) => element == event.selectedClause);
+      //   clauseIndex = internState.contract.clauses.indexOf(event.selectedClause);
+      // }
+
+      updatedClause.pendingFor.remove(userLoggedIn.id);
+
+      if (event.hasAccepted) {
+        updatedClause.deniedBy.remove(userLoggedIn.id);
+        updatedClause.acceptedBy.add(userLoggedIn.id);
+      } else {
+        updatedClause.acceptedBy.remove(userLoggedIn.id);
+        updatedClause.deniedBy.add(userLoggedIn.id);
+      }
+
+      final index = internState.contract.clauses.indexOf(event.selectedClause);
+      final updatedClauseList = List.of(internState.contract.clauses);
+
+      updatedClauseList.removeAt(index);
+      updatedClauseList.insert(index, updatedClause);
+
+      final updatedContract = internState.contract;
+      updatedContract.clauses.clear();
+      updatedContract.clauses.addAll(updatedClauseList);
+
+      emit(internState.copyWith(contract: updatedContract));
+    } finally {
+      _clausesBeingProcessed.remove(clauseId);
     }
-
-    final index = internState.contract.clauses.indexOf(event.selectedClause);
-    final updatedClauseList = List.of(internState.contract.clauses);
-
-    updatedClauseList.removeAt(index);
-    updatedClauseList.insert(index, updatedClause);
-
-    final updatedContract = internState.contract;
-    updatedContract.clauses.clear();
-    updatedContract.clauses.addAll(updatedClauseList);
-
-    emit(internState.copyWith(contract: updatedContract));
   }
 
   Future<void> _onPracticeAdded(ContractDetailPracticeAdded event, Emitter<ContractDetailState> emit) async {
@@ -146,7 +162,7 @@ class ContractDetailBloc extends Bloc<ContractDetailEvent, ContractDetailState> 
     final updatedContract = internState.contract
       ..sexualPractices.add(
         event.selectedPractice.copyWith(
-          acceptedBy: [internState.contract.contractor!.id],
+          acceptedBy: [internState.contract.contractor.id],
           pendingFor: internState.contract.stakeHolders.map((e) => e.id).toList(),
         ),
       );
@@ -162,31 +178,43 @@ class ContractDetailBloc extends Bloc<ContractDetailEvent, ContractDetailState> 
     if (state is! ContractDetailReady) return;
     final internState = state as ContractDetailReady;
 
-    await datasource.acceptOrDenyClause(internState.contract, event.selectedPractice.toClause(), event.hasAccepted);
-    final updatedPractice =
-        internState.contract.sexualPractices.firstWhere((element) => element == event.selectedPractice);
+    final clauseId = event.selectedPractice.id; // Assuming it has an ID
+    if (_clausesBeingProcessed.contains(clauseId)) return;
 
-    updatedPractice.pendingFor!.remove(userLoggedIn.id);
+    _clausesBeingProcessed.add(clauseId);
+    try {
+      await datasource.acceptOrDenyClause(
+        internState.contract,
+        event.selectedPractice.toClause(),
+        event.hasAccepted,
+      );
 
-    if (event.hasAccepted) {
-      updatedPractice.deniedBy!.remove(userLoggedIn.id);
-      updatedPractice.acceptedBy!.add(userLoggedIn.id);
-    } else {
-      updatedPractice.acceptedBy!.remove(userLoggedIn.id);
-      updatedPractice.deniedBy!.add(userLoggedIn.id);
+      final updatedPractice = internState.contract.sexualPractices
+          .firstWhere((element) => element == event.selectedPractice);
+
+      updatedPractice.pendingFor!.remove(userLoggedIn.id);
+
+      if (event.hasAccepted) {
+        updatedPractice.deniedBy!.remove(userLoggedIn.id);
+        updatedPractice.acceptedBy!.add(userLoggedIn.id);
+      } else {
+        updatedPractice.acceptedBy!.remove(userLoggedIn.id);
+        updatedPractice.deniedBy!.add(userLoggedIn.id);
+      }
+
+      final index = internState.contract.sexualPractices.indexOf(event.selectedPractice);
+      final updatedClauseList = List.of(internState.contract.sexualPractices);
+      updatedClauseList[index] = updatedPractice;
+
+      final updatedContract = internState.contract;
+      updatedContract.sexualPractices
+        ..clear()
+        ..addAll(updatedClauseList);
+
+      emit(internState.copyWith(contract: updatedContract));
+    } finally {
+      _clausesBeingProcessed.remove(clauseId);
     }
-
-    final index = internState.contract.sexualPractices.indexOf(event.selectedPractice);
-    final updatedClauseList = List.of(internState.contract.sexualPractices);
-
-    updatedClauseList.removeAt(index);
-    updatedClauseList.insert(index, updatedPractice);
-
-    final updatedContract = internState.contract;
-    updatedContract.sexualPractices.clear();
-    updatedContract.sexualPractices.addAll(updatedClauseList);
-
-    emit(internState.copyWith(contract: updatedContract));
   }
 
   List<Clause> _removeCurrentClausesFromAll(List<Clause> allClauses, List<Clause> currentClauses) {

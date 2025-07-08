@@ -3,9 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
+import '../../../../../core/enums/contract_status.dart';
 import '../../../../../core/extensions/context_extensions.dart';
 import '../../../../../core/utils/custom_colors.dart';
-import '../../../../common/domain/entities/user.dart';
 import '../../../../common/presentation/widgets/components/custom_scaffold.dart';
 import '../../../../common/presentation/widgets/components/generic_error_component.dart';
 import '../../../../common/presentation/widgets/components/header_line.dart';
@@ -81,7 +81,7 @@ class _ContractReady extends StatelessWidget {
   bool canProceed() {
     final participantsId = [
       ...state.contract.stakeHolders.map((e) => e.id),
-      state.contract.contractor!.id,
+      state.contract.contractor.id,
     ];
 
     final isMainClausesOk = _getPendingClauses(state.contract.clauses, participantsId);
@@ -153,7 +153,7 @@ class _ContractReady extends StatelessWidget {
                     onPressed: () {
                       final participantsId = [
                         ...state.contract.stakeHolders.map((e) => e.id),
-                        state.contract.contractor!.id,
+                        state.contract.contractor.id,
                       ];
 
                       final pendingClauses = _getPendingClauses(state.contract.clauses, participantsId);
@@ -185,10 +185,11 @@ class _ContractReady extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             // if (state.possibleClauses.isNotEmpty || state.contract.clauses.isNotEmpty)
+            // TODO: trocar comparação por ID
             if (state.contract.type.id != 2)
               ClauseSelectionCard(
                 canEdit: state.contract.status == ContractStatus.pending,
-                contractor: state.contract.contractor!,
+                contractor: state.contract.contractor,
                 stakeHolders: state.contract.stakeHolders,
                 possibleClauses: state.possibleClauses,
                 clausesChosen: state.contract.clauses,
@@ -203,7 +204,7 @@ class _ContractReady extends StatelessWidget {
                 type: state.contract.type,
                 practicesAvailable: state.possiblePractices,
                 initialPractices: state.contract.sexualPractices,
-                participants: [state.contract.contractor!, ...state.contract.stakeHolders],
+                participants: [state.contract.contractor, ...state.contract.stakeHolders],
                 showStatusPerUser: true,
                 onPick: (value) => bloc.add(ContractDetailPracticeAdded(value)),
                 onRemove: null,
@@ -240,7 +241,7 @@ class _ContractReady extends StatelessWidget {
                       state.contract.signatures.length,
                       (index) {
                         final acceptance = state.contract.signatures[index];
-                        final allParticipants = [...state.contract.stakeHolders, state.contract.contractor!];
+                        final allParticipants = [...state.contract.stakeHolders, state.contract.contractor];
 
                         final user = allParticipants.firstWhere((element) => element.id == acceptance.userId);
 

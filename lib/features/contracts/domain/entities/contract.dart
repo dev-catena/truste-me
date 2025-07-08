@@ -2,11 +2,16 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+
+import '../../../../core/enums/contract_status.dart';
 import '../../../../core/routes.dart';
 import '../../../../core/utils/custom_colors.dart';
 import '../../../common/domain/entities/user.dart';
 import '../../data/models/contract_model.dart';
+import '../../presentation/widgets/components/time_left_ticker.dart';
 import 'clause.dart';
+import 'contract_answer.dart';
+import 'contract_signature.dart';
 import 'contract_type.dart';
 import 'sexual_practice.dart';
 
@@ -21,14 +26,16 @@ class Contract extends Equatable {
   final ContractType type;
   final List<Clause> clauses;
   final List<SexualPractice> sexualPractices;
-  final User? contractor;
+  final User contractor;
   final List<User> stakeHolders;
   final List<ContractSignature> signatures;
   final List<ContractAnswer> answers;
-  final int validity;
+  final int duration;
+  final DateTime startDt;
+  final DateTime endDt;
 
-  ContractCard buildCard() {
-    return ContractCard(this);
+  ContractCard buildCard({required final void Function(Contract contract) onExpire}) {
+    return ContractCard(this, onExpire: onExpire);
   }
 
   ContractDetailSummaryCard buildDetailCard() {
@@ -40,13 +47,15 @@ class Contract extends Equatable {
     required this.contractNumber,
     required this.status,
     required this.type,
-    this.contractor,
+    required this.contractor,
     required this.stakeHolders,
     required this.clauses,
     required this.sexualPractices,
     required this.signatures,
     required this.answers,
-    required this.validity,
+    required this.duration,
+    required this.startDt,
+    required this.endDt,
   });
 
   ContractModel toModel() {
@@ -61,7 +70,9 @@ class Contract extends Equatable {
       signatures: signatures,
       answers: answers,
       contractor: contractor,
-      validity: validity,
+      duration: duration,
+      startDt: startDt,
+      endDt: endDt,
     );
   }
 
@@ -76,7 +87,9 @@ class Contract extends Equatable {
     List<User>? stakeHolders,
     List<ContractSignature>? signatures,
     List<ContractAnswer>? answers,
-    int? validity,
+    int? duration,
+    DateTime? startDt,
+    DateTime? endDt,
   }) {
     return Contract(
       id: id ?? this.id,
@@ -89,7 +102,9 @@ class Contract extends Equatable {
       sexualPractices: sexualPractices ?? this.sexualPractices,
       signatures: signatures ?? this.signatures,
       answers: answers ?? this.answers,
-      validity: validity ?? this.validity,
+      duration: duration ?? this.duration,
+      startDt: startDt ?? this.startDt,
+      endDt: endDt ?? this.endDt,
     );
   }
 
@@ -97,78 +112,4 @@ class Contract extends Equatable {
   List<Object?> get props => [id, contractNumber, status, type];
 }
 
-enum ContractStatus {
-  pending(0, 'Pendente', CustomColor.pendingYellow),
-  active(1, 'Ativo', CustomColor.activeColor),
-  completed(3, 'Concluido', CustomColor.successGreen);
-  // suspended(4, 'Cancelado', CustomColor.vividRed);
 
-  final int code;
-  final String description;
-
-  final Color color;
-
-  factory ContractStatus.fromString(String json) {
-    return ContractStatus.values.firstWhere((element) => element.description == json);
-  }
-
-  const ContractStatus(this.code, this.description, this.color);
-}
-
-class ContractSignature {
-  final int userId;
-  final DateTime? dateTime;
-  final bool hasAccepted;
-
-  ContractSignature({
-    required this.userId,
-    required this.dateTime,
-    required this.hasAccepted,
-  });
-
-  ContractSignature.fromJson(Map<String, dynamic> json)
-      : this(
-          userId: json['usuario_id'],
-          dateTime: DateTime.tryParse(json['dt_aceito'] ?? ''),
-          hasAccepted: json['aceito'] == 1 ? true : false,
-        );
-
-  ContractSignature copyWith(
-    int? userId,
-    DateTime? dateTime,
-    bool? hasAccepted,
-  ) {
-    return ContractSignature(
-      userId: userId ?? this.userId,
-      dateTime: dateTime ?? this.dateTime,
-      hasAccepted: hasAccepted ?? this.hasAccepted,
-    );
-  }
-}
-
-class ContractAnswer extends Equatable {
-  final int questionId;
-  final int userId;
-  final String answer;
-
-  const ContractAnswer({required this.questionId, required this.userId, required this.answer});
-
-  @override
-  List<Object?> get props => [userId, questionId, answer];
-
-  ContractAnswer.fromJson(Map<String, dynamic> json)
-      : this(
-          questionId: json['pergunta_id'],
-          userId: json['usuario_id'],
-          answer: json['resposta'] ?? '',
-        );
-
-  Map<String, dynamic> toJson() {
-    final content = {
-      'pergunta_id': questionId,
-      'resposta': answer,
-    };
-
-    return content;
-  }
-}

@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../../core/enums/contract_status.dart';
 import '../../../../../core/providers/user_data_cubit.dart';
 import '../../../../../core/routes.dart';
 import '../../../../conection/domain/entities/connection.dart';
-import '../../../../contracts/domain/entities/contract.dart';
 import 'summary_card.dart';
 
-class UserInfoComponent extends StatelessWidget {
-  const UserInfoComponent({super.key});
+class UserHomeInfoComponent extends StatelessWidget {
+  const UserHomeInfoComponent({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,11 +19,10 @@ class UserInfoComponent extends StatelessWidget {
       bloc: userData,
       builder: (_, state) {
         if (state is UserDataReady) {
-          final info = userData.getUserInfo;
           final summaries = [
             SummaryData(
               'Contratos ativos',
-              info.activeContracts,
+              state.contracts.where((element) => element.status == ContractStatus.active).length,
               onTap: () => context.go(
                 AppRoutes.contractsScreen,
                 extra: {'initialFilter': ContractStatus.active},
@@ -31,7 +30,7 @@ class UserInfoComponent extends StatelessWidget {
             ),
             SummaryData(
               'Contratos pendentes',
-              info.pendingContracts,
+              state.contracts.where((element) => element.status == ContractStatus.pending).length,
               onTap: () => context.go(
                 AppRoutes.contractsScreen,
                 extra: {'initialFilter': ContractStatus.pending},
@@ -39,12 +38,12 @@ class UserInfoComponent extends StatelessWidget {
             ),
             SummaryData(
               'Selos pendentes',
-              info.pendingSeals,
+              0,
               onTap: () => context.push(AppRoutes.profileScreen),
             ),
             SummaryData(
               'Conexões ativas',
-              info.activeConnections,
+              state.connections.where((element) => element.status == ConnectionStatus.accepted).length,
               onTap: () => context.pushNamed(
                 AppRoutes.connectionPanelScreen,
                 extra: {'initialFilter': ConnectionStatus.accepted},
@@ -52,7 +51,7 @@ class UserInfoComponent extends StatelessWidget {
             ),
             SummaryData(
               'Conexões pendentes',
-              info.pendingConnections,
+              state.connections.where((element) => element.status == ConnectionStatus.pending).length,
               onTap: () => context.pushNamed(
                 AppRoutes.connectionPanelScreen,
                 extra: {'initialFilter': ConnectionStatus.pending},

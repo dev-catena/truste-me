@@ -88,6 +88,9 @@ class AppTheme {
         }),
         checkmarkColor: Colors.white,
       ),
+      progressIndicatorTheme: const ProgressIndicatorThemeData(
+        color: CustomColor.activeColor,
+      )
     );
   }
 }

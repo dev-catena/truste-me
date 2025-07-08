@@ -7,7 +7,8 @@ class ConnectionModel extends Connection {
           id: json['id'],
           user: UserModel.fromJson(json['conectado_com']).toEntity(),
           status: ConnectionStatus.fromString(json['status']),
-          since: DateTime.parse(json['created_at'])..subtract(const Duration(hours: 3)),
+          // since: DateTime.parse(json['created_at'])..subtract(const Duration(hours: 3)),
+          since: DateTime.parse(json['created_at']),
         );
 
   const ConnectionModel({required super.id, required super.user, required super.status, required super.since});

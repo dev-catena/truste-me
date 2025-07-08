@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'core/app_theme.dart';
 import 'core/providers/app_data_cubit.dart';
@@ -25,20 +26,6 @@ import 'features/contracts/data/data_source/contract_datasource.dart';
 // mkdir profile\presentation\widgets
 
 void main() {
-  // setLoggedInUser(Person(
-  //   id: 1,
-  //   fullName: 'Artur Dias',
-  //   cpf: '14080264658',
-  //   birthDate: 26,
-  //   memberSince: DateTime(2025, 2, 20),
-  //   connectionCode: 'artur#123456',
-  //   photoPath: 'https://thispersondoesnotexist.com/',
-  //   country: 'Brasil',
-  //   state: 'Belo Horizonte',
-  //   sealsObtained: [],
-  //   profession: 'Desenvolvedor',
-// ));
-
   initializeDateFormatting('pt_BR', null).then((_) {
     runApp(const TrustMeApp());
   });
@@ -63,15 +50,14 @@ class TrustMeApp extends StatelessWidget {
       child: MaterialApp.router(
         scaffoldMessengerKey: Globals.scaffoldMessengerKey,
         title: 'TrustMe',
-        // supportedLocales: const [
-        //   Locale('en', 'US'),
-        //   Locale('pt', 'BR'),
-        // ],
-        // localizationsDelegates: const [
-        //   // GlobalMaterialLocalizations.delegate,
-        //   // GlobalWidgetsLocalizations.delegate,
-        //   // GlobalCupertinoLocalizations.delegate,
-        // ],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('pt', 'BR'),
+        ],
         theme: AppTheme().getAppTheme(context),
         routeInformationParser: _routes.routeInformationParser,
         routeInformationProvider: _routes.routeInformationProvider,

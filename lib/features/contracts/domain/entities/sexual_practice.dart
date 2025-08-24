@@ -81,6 +81,7 @@ class SexualPractice extends Equatable {
   Widget buildTile(
     List<User> connections, {
     required bool showStatusPerUser,
+        required String titlePrefix,
     required ValueChanged<SexualPractice>? onRemove,
     required void Function(SexualPractice clause, bool value)? onAcceptOrDeny,
   }) {
@@ -107,7 +108,7 @@ class SexualPractice extends Equatable {
     return Column(
       children: [
         ListTile(
-          title: Text('$code - $name'),
+          title: Text('$titlePrefix - $name'),
           leading: !isPracticeOk(connections.map((e) => e.id).toList())
               ? const Icon(Icons.warning_amber_outlined, color: CustomColor.vividRed)
               : null,

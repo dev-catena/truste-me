@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:brasil_fields/brasil_fields.dart';
@@ -12,8 +13,7 @@ import '../../../core/utils/custom_colors.dart';
 import '../../common/domain/entities/location.dart';
 import '../../common/presentation/widgets/components/custom_selectable_tile.dart';
 import '../../common/presentation/widgets/dialogs/single_select_dialog.dart';
-
-part 'widgets/user_info.dart';
+import '../domain/entities/user_info_data.dart';
 
 part 'widgets/address_info.dart';
 
@@ -31,10 +31,10 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  String userName = '';
-  String userCpf = '';
-  String userEmail = '';
-  DateTime? birthDate;
+  UserInfoData personalData = UserInfoData.empty();
+
+  bool emailExists = false;
+  bool cpfExists = false;
 
   Location? userLocation;
   String userNumber = '';
@@ -49,21 +49,74 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final PageController _pageController = PageController();
   int _currentStep = 0;
 
-  // your form variables here...
-
   final int totalSteps = 5;
 
+  // void _nextStep() {
+  //   if (_currentStep < totalSteps - 1 && validateInfo()) {
+  //     setState(() {
+  //       _currentStep++;
+  //     });
+  //     _pageController.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
+  //   }
+  // }
+
   void _nextStep() {
-    if (_currentStep < totalSteps - 1 && validateInfo()) {
-      setState(() {
-        _currentStep++;
-      });
-      _pageController.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Preencha todos os campos')),
-      );
+    if (_currentStep < totalSteps - 1) {
+      // Pass step-specific validations + additional validations for email/CPF
+      if (validateInfo()) {
+        setState(() => _currentStep++);
+        _pageController.nextPage(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      }
     }
+  }
+
+  bool validateInfo() {
+    bool canProceed;
+
+    switch (_currentStep) {
+      case 0:
+      // Age confirmation step
+        canProceed = true;
+        break;
+      case 1:
+      // Personal data step
+        canProceed = personalData.isValid && !emailExists && !cpfExists;
+        if (!canProceed) {
+          context.showSnack(
+            emailExists
+                ? 'Já existe um login com este email!'
+                : cpfExists
+                ? 'Já existe um cadastro com este CPF!'
+                : personalData.getWarningMessage(),
+          );
+        }
+        break;
+      case 2:
+      // Address step
+        canProceed = userLocation != null && (userLocation?.number.isNotEmpty ?? false);
+        if (!canProceed) {
+          context.showSnack(
+            userLocation == null ? 'Preencha o CEP corretamente' : 'Preencha o número da residência',
+          );
+        }
+        break;
+      case 3:
+      // Complementary info step
+        canProceed = true;
+        break;
+      case 4:
+      // Password step
+        canProceed = userPwd == userPwdConfirmation;
+        if (!canProceed) context.showSnack('Senhas não são iguais!');
+        break;
+      default:
+        canProceed = false;
+    }
+
+    return canProceed;
   }
 
   void _previousStep() {
@@ -95,7 +148,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               fit: FlexFit.loose,
               child: ConstrainedBox(
                 constraints: const BoxConstraints(
-                  maxHeight: 460,
+                  maxHeight: 400,
                 ),
                 child: PageView.builder(
                   controller: _pageController,
@@ -140,41 +193,62 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  bool isValidEmail(String email) {
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    return emailRegex.hasMatch(email.trim());
-  }
-
-  bool validateInfo() {
-    bool canProceed = false;
-    if (_currentStep == 0) {
-      canProceed = true;
-    }
-    if (_currentStep == 1) {
-      canProceed = userName != '' && CPFValidator.isValid(userCpf) && birthDate != null && isValidEmail(userEmail);
-    } else if (_currentStep == 2) {
-      canProceed = userLocation != null && userLocation?.number.isNotEmpty == true;
-    } else if (_currentStep == 3) {
-      canProceed = true;
-    } else if (_currentStep == 4) {
-      canProceed = userPwd == userPwdConfirmation;
-    }
-
-    return canProceed;
-  }
+  // bool validateInfo([List<bool> additionalValidations = const []]) {
+  //   bool canProceed = false;
+  //
+  //   if (_currentStep == 0) {
+  //     canProceed = true;
+  //   }
+  //   if (_currentStep == 1) {
+  //     canProceed = personalData.isValid;
+  //     if(!canProceed){
+  //       context.showSnack(personalData.getWarningMessage());
+  //     }
+  //
+  //   } else if (_currentStep == 2) {
+  //     canProceed = userLocation != null && userLocation?.number.isNotEmpty == true;
+  //
+  //     if(!canProceed){
+  //       if(userLocation == null) {
+  //         context.showSnack('Preencha o CEP corretamente');
+  //       } else if (userLocation?.number.isEmpty ?? true) {
+  //         context.showSnack('Preencha o número da residência');
+  //       }
+  //     }
+  //   } else if (_currentStep == 3) {
+  //     canProceed = true;
+  //   } else if (_currentStep == 4) {
+  //     canProceed = userPwd == userPwdConfirmation;
+  //     if(!canProceed){
+  //       context.showSnack('Senhas não são iguais!');
+  //     }
+  //   }
+  //
+  //   if (additionalValidations.isNotEmpty) {
+  //     canProceed = canProceed && !additionalValidations.any((element) => !element);
+  //   }
+  //
+  //   return canProceed;
+  // }
 
   void _registerUser() async {
+    if (!personalData.isValid) {
+      context.showSnack(personalData.getWarningMessage());
+      return;
+    }
+
     isRegistering = true;
     setState(() {});
+
     final content = {
-      'email': userEmail,
+      'email': personalData.email,
       'password': userPwd,
-      'nome_completo': userName,
-      'CPF': userCpf,
+      'nome_completo': personalData.name,
+      'CPF': personalData.cpf,
       'pais': 'Brasil',
       ...userLocation!.toModel().toJson(),
       'profissao': userProfession,
-      'dt_nascimento': birthDate.toString(),
+      'dt_nascimento': personalData.birthDate.toString(),
     };
     try {
       final resp = await ApiProvider(false).post('usuario/gravar', jsonEncode(content));
@@ -203,15 +277,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (step == 1) {
       return const _AgeConfirmation();
     } else if (step == 2) {
-      return _UserInfo(
-        onNameSet: (value) => userName = value,
-        onCpfSet: (value) => userCpf = value,
-        onEmailSet: (value) => userEmail = value,
-        onBirthDateChanged: (value) => birthDate = value,
-        currentName: userName,
-        currentBirthDate: birthDate,
-        currentCpf: userCpf,
-        currentEmail: userEmail,
+      return personalData.buildForm(
+        onPersonalDataSet: (value, email, cpf) {
+          personalData = value;
+          emailExists = email;
+          cpfExists = cpf;
+          setState(() {});
+        },
       );
     } else if (step == 3) {
       return _AddressInfo(

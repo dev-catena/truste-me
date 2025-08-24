@@ -73,6 +73,7 @@ class _AddressInfoState extends State<_AddressInfo> {
   @override
   Widget build(BuildContext context) {
     final titleLarge = Theme.of(context).textTheme.titleLarge!;
+    final bodySmall = Theme.of(context).textTheme.bodySmall!;
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -80,10 +81,11 @@ class _AddressInfoState extends State<_AddressInfo> {
       children: [
         Text('Endereço', style: titleLarge),
         const SizedBox(height: 6),
-        const Text(
+        Text(
           'Endereço completo obrigatório. Fique tranquilo: ele não será exibido para ninguém, '
           'apenas usado para validar as informações e gerar selos de verificação.',
           textAlign: TextAlign.center,
+          style: bodySmall,
         ),
         const SizedBox(height: 12),
         Row(

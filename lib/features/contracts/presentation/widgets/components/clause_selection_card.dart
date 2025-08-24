@@ -54,7 +54,7 @@ class ClauseSelectionCard extends StatelessWidget {
             (index) {
               final clause = clausesChosen[index];
               final number = (index + 1).toString().padLeft(4, '0');
-              final titlePrefix = 'CLA-$number - ';
+              final titlePrefix = 'CLA$number - ';
               return Column(
                 children: [
                   clause.buildTile(

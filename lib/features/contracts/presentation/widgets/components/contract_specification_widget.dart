@@ -61,12 +61,15 @@ class ContractSpecificationWidget extends StatelessWidget {
             initialPractices.length,
             (index) {
               final practice = initialPractices[index];
+              final number = (index + 1).toString().padLeft(4, '0');
+              final titlePrefix = 'PSX$number - ';
 
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   practice.buildTile(
                     participants,
+                    titlePrefix: titlePrefix,
                     onRemove: canEdit ? onRemove : null,
                     showStatusPerUser: showStatusPerUser,
                     onAcceptOrDeny: canEdit ? onAcceptOrDeny : null,

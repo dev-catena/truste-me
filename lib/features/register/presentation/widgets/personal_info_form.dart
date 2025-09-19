@@ -175,6 +175,7 @@ class _PersonalInfoFormState extends State<_PersonalInfoForm> {
           TextField(
             controller: _nameController,
             focusNode: _nameFocus,
+            textCapitalization: TextCapitalization.words,
             onTapOutside: (_) => _nameFocus.unfocus(),
             onSubmitted: (_) => FocusScope.of(context).requestFocus(_cpfFocus),
             decoration: getDecoration('Nome completo', _nameController.text.trim().isEmpty),
@@ -237,6 +238,8 @@ class _PersonalInfoFormState extends State<_PersonalInfoForm> {
             leadingWidget: const Icon(Icons.calendar_month_outlined),
             onTap: () {
               showDatePicker(
+                initialEntryMode: DatePickerEntryMode.calendar,
+                keyboardType: TextInputType.datetime,
                 context: context,
                 firstDate: DateTime(1900),
                 lastDate: DateTime.now().subtract(const Duration(days: 6570)),

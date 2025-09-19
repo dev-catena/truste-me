@@ -35,8 +35,7 @@ final class LoginReady extends LoginState {
   }) {
     return LoginReady(
       version: identical(version, _sentinel) ? this.version : version as String,
-      emailController:
-          identical(emailController, _sentinel) ? this.emailController : emailController as TextEditingController,
+      emailController: identical(emailController, _sentinel) ? this.emailController : emailController as TextEditingController,
       pwdController: identical(pwdController, _sentinel) ? this.pwdController : pwdController as TextEditingController,
       emailFocusNode: identical(emailFocusNode, _sentinel) ? this.emailFocusNode : emailFocusNode as FocusNode,
       pwdFocusNode: identical(pwdFocusNode, _sentinel) ? this.pwdFocusNode : pwdFocusNode as FocusNode,

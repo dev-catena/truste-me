@@ -6,11 +6,12 @@ enum _InputType {
 }
 
 class _AddressInfo extends StatefulWidget {
-  const _AddressInfo({
-    required this.onLocationChanged,
-  });
-
+  final Location? userLocation;
   final ValueChanged<Location> onLocationChanged;
+
+  const _AddressInfo({
+    required this.onLocationChanged, this.userLocation,
+  });
 
   @override
   State<_AddressInfo> createState() => _AddressInfoState();
@@ -23,6 +24,24 @@ class _AddressInfoState extends State<_AddressInfo> {
   Map<String, dynamic>? stateSelected;
   String? citySelected;
   Location? location;
+
+  @override
+  void initState() {
+    _loadData();
+    super.initState();
+  }
+
+  void _loadData() {
+
+    var loc = widget.userLocation;
+
+    if(loc != null) {
+      cepController.text = loc.cep;
+      numberController.text = loc.number;
+      complementController.text = loc.complement;
+      location = loc;
+    }
+  }
 
   Future<void> searchCep(String cep) async {
     if (cep.length <= 9) return;
@@ -43,7 +62,7 @@ class _AddressInfoState extends State<_AddressInfo> {
     if (type == _InputType.number) {
       updated = location!.copyWith(number: numberController.text);
     } else {
-      updated = location!.copyWith(complement: complementController.text);
+      updated = location!.copyWith(number: numberController.text, complement: complementController.text);
     }
     widget.onLocationChanged(updated);
   }
@@ -96,6 +115,7 @@ class _AddressInfoState extends State<_AddressInfo> {
                   border: OutlineInputBorder(),
                   labelText: 'CEP',
                 ),
+                keyboardType: TextInputType.number,
                 inputFormatters: [
                   FilteringTextInputFormatter.digitsOnly,
                   CepInputFormatter(),

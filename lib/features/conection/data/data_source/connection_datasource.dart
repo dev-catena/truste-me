@@ -16,7 +16,7 @@ class ConnectionDataSource {
     final List<Connection> connectionList = [];
 
     for (final ele in rawData['pendentes']) {
-      connectionList.add(ConnectionModel.fromJson(ele..['status'] = 'Pendente').toEntity());
+      connectionList.add(ConnectionModel.fromJson(ele..['status'] = 'Solicitação Recebida').toEntity());
     }
 
     for (final ele in rawData['ativas']) {
@@ -25,7 +25,7 @@ class ConnectionDataSource {
 
 
     for (final ele in rawData['aguardando_resposta']) {
-      connectionList.add(ConnectionModel.fromJson(ele..['status'] = 'Aguardando resposta').toEntity());
+      connectionList.add(ConnectionModel.fromJson(ele..['status'] = 'Solicitação Enviada').toEntity());
     }
 
     return connectionList;

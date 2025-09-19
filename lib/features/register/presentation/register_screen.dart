@@ -287,6 +287,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
     } else if (step == 3) {
       return _AddressInfo(
+        userLocation: userLocation,
         onLocationChanged: (value) => userLocation = value,
       );
     } else if (step == 4) {

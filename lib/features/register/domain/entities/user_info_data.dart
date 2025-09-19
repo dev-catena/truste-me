@@ -51,7 +51,7 @@ class UserInfoData {
     final List<String> errors = [];
 
     if (name.isEmpty || !name.contains(' ')) {
-      errors.add('nome');
+      errors.add('Nome');
     }
     if (!CPFValidator.isValid(cpf)) {
       errors.add('CPF');
@@ -60,7 +60,7 @@ class UserInfoData {
       errors.add('e-mail');
     }
     if (!birthDate.isLegalAge()) {
-      errors.add('idade mínima de 18 anos');
+      errors.add('Idade mínima de 18 anos');
     }
 
     if (errors.isNotEmpty) {

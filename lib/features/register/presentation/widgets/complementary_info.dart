@@ -41,6 +41,7 @@ class _ComplementaryInfoState extends State<_ComplementaryInfo> {
           const SizedBox(height: 16),
           TextField(
             onChanged: widget.onProfessionSet,
+            textCapitalization: TextCapitalization.sentences,
             decoration: const InputDecoration(
               labelText: 'Profissão',
               border: OutlineInputBorder(),

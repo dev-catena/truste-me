@@ -7,6 +7,7 @@ import '../../../../core/providers/app_data_cubit.dart';
 import '../../../../core/providers/user_data_cubit.dart';
 import '../../../../core/routes.dart';
 import '../../../../core/utils/custom_colors.dart';
+import '../../../../main.dart';
 import '../../data/data_source/login_datasource.dart';
 import '../blocs/login_cubit.dart';
 
@@ -41,6 +42,12 @@ class LoginScreen extends StatelessWidget {
               if (state is LoginInitial) {
                 return const Center(child: CircularProgressIndicator());
               } else if (state is LoginReady) {
+
+                if(DEF_TEST) {
+                  state.emailController.text = "069.091.440-74";
+                  state.pwdController.text = "1231234";
+                }
+
                 return SingleChildScrollView(
                   child: Column(
                     children: [

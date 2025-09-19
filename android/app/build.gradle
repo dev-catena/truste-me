@@ -23,7 +23,7 @@ if (keystorePropertiesFile.exists()) {
 android {
     namespace = "com.episteme.trustme"
     compileSdk = 35
-    ndkVersion = "26.1.10909125"
+    ndkVersion = "27.0.12077973"
 
 
     compileOptions {
@@ -62,7 +62,7 @@ android {
             // Signing with the debug keys for now, so `flutter run --release` works.
 
             signingConfig = signingConfigs.getByName("debug")
-            signingConfig = signingConfigs.getByName("release")
+            //signingConfig = signingConfigs.getByName("release")
         }
     }
 }

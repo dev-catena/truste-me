@@ -7,6 +7,7 @@ class UserModel extends User {
     required super.fullName,
     required super.birthDate,
     required super.cpf,
+    required super.email,
     required super.memberSince,
     required super.connectionCode,
     required super.authToken,
@@ -22,6 +23,7 @@ class UserModel extends User {
           id: json['id'] ?? json['user']?['id'] ?? json['usuario']?['id'],
           fullName: json['nome_completo'] ?? json['user']?['nome_completo'] ?? json['usuario']?['nome_completo'],
           cpf: json['CPF'] ?? json['user']?['CPF'] ?? 'Sem CPF',
+          email: json['email'] ?? json['user']?['email'] ?? 'Sem email',
           birthDate: DateTime.tryParse(json['dt_nascimento'] ?? '') ??
               DateTime.tryParse(json['user']?['dt_nascimento'] ?? '') ??
               DateTime.now(),
@@ -40,6 +42,7 @@ class UserModel extends User {
       id: id,
       fullName: fullName,
       cpf: cpf,
+      email: email,
       birthDate: birthDate,
       state: state,
       profession: profession,

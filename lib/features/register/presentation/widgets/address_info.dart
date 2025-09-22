@@ -160,6 +160,14 @@ class _AddressInfoState extends State<_AddressInfo> {
         TextField(
           decoration: InputDecoration(
             border: const OutlineInputBorder(),
+            labelText: location?.neighborhood ?? 'Bairro',
+          ),
+          enabled: false,
+        ),
+        const SizedBox(height: 12),
+        TextField(
+          decoration: InputDecoration(
+            border: const OutlineInputBorder(),
             labelText: location?.street ?? 'Rua',
           ),
           enabled: false,

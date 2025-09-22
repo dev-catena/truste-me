@@ -11,7 +11,8 @@ import '../features/contracts/presentation/widgets/screens/new_contract_screen.d
 import '../features/home/presentation/widgets/screens/home_screen.dart';
 import '../features/login/presentation/widgets/login_screen.dart';
 import '../features/new_password/new_password_screen.dart';
-import '../features/profile/presentation/widgets/profile_screen.dart';
+import '../features/profile/presentation/widgets/screens/profile_detail_screen.dart';
+import '../features/profile/presentation/widgets/screens/profile_screen.dart';
 import '../features/register/presentation/register_screen.dart';
 import 'enums/contract_status.dart';
 import 'scaffold_with_nested_navigation.dart';
@@ -39,6 +40,8 @@ class AppRoutes {
   static const connectionDetailScreen = 'conexao-detalhes';
 
   static const profileScreen = '/perfil';
+
+  static const profileDetailScreen = '/perfil-detalhes';
 
   GoRouter get routes {
     return _routes;
@@ -158,6 +161,13 @@ final GoRouter _routes = GoRouter(
       name: AppRoutes.profileScreen,
       builder: (context, __) {
         return const ProfileScreen();
+      },
+    ),
+    GoRoute(
+      path: AppRoutes.profileDetailScreen,
+      name: AppRoutes.profileDetailScreen,
+      builder: (context, __) {
+        return const ProfileDetailScreen();
       },
     ),
   ],

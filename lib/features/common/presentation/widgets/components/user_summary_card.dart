@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../../core/routes.dart';
 import '../../../../../core/utils/date_parser.dart';
 import '../../../domain/entities/user.dart';
 
@@ -45,13 +47,25 @@ class UserSummaryCard extends StatelessWidget {
                     const Spacer(),
                     Align(
                       alignment: AlignmentDirectional.bottomEnd,
-                      child: SizedBox(
-                        width: 200,
-                        child: Text(
-                          'Perfil criado em ${DateParser.formatDate(user.memberSince, true)}.',
-                          textAlign: TextAlign.end,
-                          style: const TextStyle(color: Colors.black54),
-                        ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          FilledButton(
+                            onPressed: () {
+                              context.pushNamed(AppRoutes.profileDetailScreen);
+                            },
+                            // style: ButtonStyle(
+                            //   backgroundColor:
+                            //       WidgetStatePropertyAll(!validateInfo() ? CustomColor.activeColor.withAlpha(100) : null),
+                            // ),
+                            child: Text('Editar'),
+                          ),
+                          Text(
+                            'Perfil criado em ${DateParser.formatDate(user.memberSince, true)}.',
+                            textAlign: TextAlign.end,
+                            style: const TextStyle(color: Colors.black54),
+                          ),
+                        ],
                       ),
                     ),
                   ],

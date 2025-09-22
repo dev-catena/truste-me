@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/providers/app_data_cubit.dart';
-import '../../../../core/providers/user_data_cubit.dart';
-import '../../../../core/routes.dart';
-import '../../../../core/utils/custom_colors.dart';
-import '../../../common/domain/entities/user.dart';
-import '../../../common/presentation/widgets/components/custom_scaffold.dart';
-import '../../../conection/presentation/widgets/components/seals_board.dart';
-import '../../../login/data/data_source/login_datasource.dart';
+import '../../../../../core/providers/app_data_cubit.dart';
+import '../../../../../core/providers/user_data_cubit.dart';
+import '../../../../../core/routes.dart';
+import '../../../../../core/utils/custom_colors.dart';
+import '../../../../common/domain/entities/user.dart';
+import '../../../../common/presentation/widgets/components/custom_scaffold.dart';
+import '../../../../conection/presentation/widgets/components/seals_board.dart';
+import '../../../../login/data/data_source/login_datasource.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});

@@ -27,6 +27,7 @@ class User extends Equatable {
   final String? state;
   final List<Seal> sealsObtained;
   final String? photoPath;
+  final String email;
   final DateTime memberSince;
   final String connectionCode;
   final String authToken;
@@ -51,6 +52,7 @@ class User extends Equatable {
     this.state,
     required this.sealsObtained,
     this.photoPath,
+    required this.email,
     required this.memberSince,
     required this.connectionCode,
     this.authToken = '',
@@ -72,7 +74,7 @@ class User extends Equatable {
 
   @override
   String toString() {
-    return 'User{id: $id, fullName: $fullName, cpf: $cpf, '
+    return 'User{id: $id, fullName: $fullName, cpf: $cpf, email: $email, '
         'profession: $profession, birthDate: $birthDate, '
         'country: $country, state: $state, sealsObtained: $sealsObtained, '
         'photoPath: $photoPath, memberSince: $memberSince, '

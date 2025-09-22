@@ -136,7 +136,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     return Scaffold(
       backgroundColor: CustomColor.backgroundPrimaryColor,
-      body: Padding(
+      body: Container(
+        //color: Colors.red,
+        width: double.infinity,
         padding: const EdgeInsets.all(28.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -146,9 +148,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
             const SizedBox(height: 20),
             Flexible(
               fit: FlexFit.loose,
-              child: ConstrainedBox(
+              child: Container(
                 constraints: const BoxConstraints(
-                  maxHeight: 400,
+                  maxHeight: 475,
                 ),
                 child: PageView.builder(
                   controller: _pageController,

@@ -6,7 +6,7 @@ class LocationModel extends Location {
     required super.street,
     required super.number,
     required super.complement,
-    required super.district,
+    required super.neighborhood,
     required super.city,
     required super.state,
   });
@@ -17,7 +17,7 @@ class LocationModel extends Location {
       street: json['logradouro'],
       number: json['numero'] ?? '',
       complement: json['complemento'],
-      district: json['bairro'],
+      neighborhood: json['bairro'],
       city: json['localidade'],
       state: json['estado'],
     );
@@ -28,7 +28,7 @@ class LocationModel extends Location {
       cep: cep,
       state: state,
       city: city,
-      district: district,
+      neighborhood: neighborhood,
       street: street,
       number: number,
       complement: complement,
@@ -40,6 +40,7 @@ class LocationModel extends Location {
       'cep': cep,
       'cidade': city,
       'estado': state,
+      'bairro': neighborhood,
       'endereco': '$street$number${number != '' ? ', $number' : ''}${complement != '' ? ' - $complement' : ''}',
     };
   }

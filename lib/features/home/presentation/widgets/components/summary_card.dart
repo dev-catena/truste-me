@@ -26,9 +26,9 @@ class SummaryCard extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 8),
-                child: Text(data.description, style: const TextStyle(color: Colors.black54)),
+              Container(
+                //padding: const EdgeInsets.only(left: 8),
+                child: Text(data.description, style: const TextStyle(color: Colors.black54), textAlign: TextAlign.center,),
               ),
               Text('${data.quantity}', style: headlineMedium),
             ],

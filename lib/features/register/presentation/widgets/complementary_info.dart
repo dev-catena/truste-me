@@ -13,20 +13,41 @@ enum IncomeRange {
 }
 
 class _ComplementaryInfo extends StatefulWidget {
+  final String? userProfession;
+  final IncomeRange? userIncome;
+  final ValueChanged<String> onProfessionSet;
+  final ValueChanged<IncomeRange> onIncomeSet;
+
   const _ComplementaryInfo({
+    this.userProfession, this.userIncome,
     required this.onProfessionSet,
     required this.onIncomeSet,
   });
-
-  final ValueChanged<String> onProfessionSet;
-  final ValueChanged<IncomeRange> onIncomeSet;
 
   @override
   State<_ComplementaryInfo> createState() => _ComplementaryInfoState();
 }
 
 class _ComplementaryInfoState extends State<_ComplementaryInfo> {
+  final professionController = TextEditingController();
   IncomeRange? incomeSelected;
+
+  @override
+  void initState() {
+    _loadData();
+    super.initState();
+  }
+
+  void _loadData() {
+    professionController.text = widget.userProfession ?? '';
+    incomeSelected = widget.userIncome;
+  }
+
+  @override
+  void dispose() {
+    professionController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +61,7 @@ class _ComplementaryInfoState extends State<_ComplementaryInfo> {
           Text('Dados complementares', style: titleLarge),
           const SizedBox(height: 16),
           TextField(
+            controller: professionController,
             onChanged: widget.onProfessionSet,
             textCapitalization: TextCapitalization.sentences,
             decoration: const InputDecoration(

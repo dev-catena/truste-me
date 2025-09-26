@@ -42,7 +42,9 @@ class _ContractsScreenState extends State<ContractsScreen> {
     return CustomScaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          context.pushNamed(AppRoutes.newContractScreen);
+          context.pushNamed(AppRoutes.newContractScreen).then((value) {
+            userData.refreshContracts();
+          });
         },
         child: const Icon(Icons.add),
       ),
@@ -105,6 +107,9 @@ class _ContractsScreenState extends State<ContractsScreen> {
                                     setState(() {});
                                   }
                                 },
+                                onReloadList: (){
+                                  userData.refreshContracts();
+                                }
                               );
                             },
                           ),

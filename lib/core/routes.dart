@@ -107,12 +107,11 @@ final GoRouter _routes = GoRouter(
                   path: AppRoutes.connectionPanelScreen,
                   name: AppRoutes.connectionPanelScreen,
                   builder: (_, state) {
-                    final initialFilter =
-                        (state.extra as Map<String, dynamic>? ?? {})['initialFilter'] as ConnectionStatus?;
+                    final initialFilter = (state.extra as Map<String, dynamic>? ?? {})['initialFilter'] as ConnectionStatus?;
 
                     return ConnectionPanelScreen(
                       key: ValueKey(initialFilter),
-                      initialFilter: initialFilter?.description,
+                      initialFilter: initialFilter?.name,
                     );
                   },
                   routes: [
@@ -159,8 +158,14 @@ final GoRouter _routes = GoRouter(
     GoRoute(
       path: AppRoutes.profileScreen,
       name: AppRoutes.profileScreen,
-      builder: (context, __) {
-        return const ProfileScreen();
+      builder: (context, state) {
+        Map<String, dynamic>? params;
+
+        if(state.extra != null) {
+          params = state.extra as Map<String, dynamic>;
+        }
+
+        return ProfileScreen(showEditButton: params?['showEditButton'] ?? true, showSealsInfo: params?['showSealsInfo'] ?? true);
       },
     ),
     GoRoute(

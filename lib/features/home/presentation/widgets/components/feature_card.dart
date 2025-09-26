@@ -24,8 +24,9 @@ class FeatureCard extends StatelessWidget {
         },
         borderRadius: BorderRadius.circular(12),
         child: Container(
-          width: size.width * 0.29,
-          height: 80,
+          padding: EdgeInsets.all(8),
+          width: size.width * 0.30,
+          height: 100,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
             color: Colors.white,

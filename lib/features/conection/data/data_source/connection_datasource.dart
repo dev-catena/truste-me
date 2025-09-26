@@ -10,8 +10,8 @@ import '../models/connection_model.dart';
 class ConnectionDataSource {
   final _apiProvider = ApiProvider();
 
-  Future<List<Connection>> getConnectionsForUser(User user) async {
-    final rawData = await _apiProvider.get('usuario/${user.id}/conexoes');
+  Future<List<Connection>> getConnectionsForUser(User user) async {  // TODO: Remove user parameter
+    final rawData = await _apiProvider.get('usuario/conexoes');
     // final rawData = _MockData().connections;
     final List<Connection> connectionList = [];
 
@@ -20,7 +20,7 @@ class ConnectionDataSource {
     }
 
     for (final ele in rawData['ativas']) {
-      connectionList.add(ConnectionModel.fromJson(ele..['status'] = 'Aceito').toEntity());
+      connectionList.add(ConnectionModel.fromJson(ele..['status'] = 'Aceita').toEntity());
     }
 
 

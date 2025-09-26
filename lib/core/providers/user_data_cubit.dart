@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../features/common/data/data_source/user_data_source.dart';
+import '../../features/common/domain/entities/seal.dart';
 import '../../features/common/domain/entities/user.dart';
 import '../../features/conection/data/data_source/connection_datasource.dart';
 import '../../features/conection/domain/entities/connection.dart';
@@ -33,15 +34,21 @@ class UserDataCubit extends Cubit<UserDataState> {
   Future<void> initialize(User user) async {
     final List<Contract> contracts = [];
     final List<Connection> connections = [];
+    final List<Seal> seals = [];
 
     setLoggedInUser(user);
 
+    //await refreshUserInfo();
+
     await Future.wait([
       // userDataSource.getGeneralInfo().then((value) => _userInfo = value),
-      userDataSource.getSeals(user).then((value) => user.sealsObtained.addAll(value)),
+      userDataSource.getSeals(user).then((value) => seals.addAll(value)),
       contractDataSource.getContractsForUser(user).then((value) => contracts.addAll(value)),
       connectionDataSource.getConnectionsForUser(user).then((value) => connections.addAll(value)),
     ]);
+
+    user.sealsObtained.clear();
+    user.sealsObtained.addAll(seals);
 
     emit(UserDataReady(
       user: user,
@@ -80,7 +87,7 @@ class UserDataCubit extends Cubit<UserDataState> {
       final resp = await connectionDataSource.requestConnection(userCode);
 
       if (resp.containsKey('error')) {
-        emit(internState.copyWith(connectionRequestStatus: ConnectionRequestStatus.failure, requestMessage: (resp['error'] as String).toLowerCase()));
+        emit(internState.copyWith(connectionRequestStatus: ConnectionRequestStatus.failure, requestMessage: (resp['error'] as String)));
       } else {
         emit(internState.copyWith(connectionRequestStatus: ConnectionRequestStatus.success));
       }

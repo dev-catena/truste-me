@@ -44,17 +44,18 @@ class Connection extends Equatable {
 }
 
 enum ConnectionStatus {
-  pending('Solicitação Recebida', CustomColor.pendingYellow),
-  accepted('Aceito', CustomColor.activeColor),
-  // cancelled('Aguardando aceitação', CustomColor.activeGreyed);
-  cancelled('Solicitação Enviada', CustomColor.activeGreyed);
+  pending('Solicitação Recebida', 'Solicitação recebida', CustomColor.pendingYellow),
+  accepted('Aceita', 'Solicitação aceita', CustomColor.activeColor),
+  // cancelled('Aguardando aceitação', 'Aguardando aceitação', CustomColor.activeGreyed);
+  cancelled('Solicitação Enviada', 'Solicitação enviada', CustomColor.activeGreyed);
 
+  final String name;
   final String description;
   final Color color;
 
   factory ConnectionStatus.fromString(final String value) {
-    return ConnectionStatus.values.firstWhere((element) => element.description == value);
+    return ConnectionStatus.values.firstWhere((element) => element.name == value);
   }
 
-  const ConnectionStatus(this.description, this.color);
+  const ConnectionStatus(this.name, this.description, this.color);
 }

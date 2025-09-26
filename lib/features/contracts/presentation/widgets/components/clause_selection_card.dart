@@ -30,6 +30,7 @@ class ClauseSelectionCard extends StatelessWidget {
     final titleMedium = Theme.of(context).textTheme.titleMedium!;
 
     return Container(
+      width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),

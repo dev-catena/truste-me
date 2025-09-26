@@ -14,15 +14,56 @@ class NewPasswordScreen extends StatefulWidget {
 }
 
 class _NewPasswordScreenState extends State<NewPasswordScreen> {
+  static const DEF_PASSWORD_LENGTH = 8;
+
   final _emailController = TextEditingController();
   final _codeController = TextEditingController();
+
+  final FocusNode _emailFocus = FocusNode();
+  final FocusNode _codeFocus = FocusNode();
   final _firstPwdController = TextEditingController();
   final _secondPwdController = TextEditingController();
-  final FocusNode _emailFocusNode = FocusNode();
-  final FocusNode _pwdFocusNode = FocusNode();
+
+  final FocusNode _firstPwdFocus = FocusNode();
+  final FocusNode _SecondPwdFocus = FocusNode();
+
   int currentStep = 1;
   final newPwdDt = NewPasswordDataSource();
   bool isLoading = false;
+
+  bool wasEmailTouched = false;
+  bool wasCodeTouched = false;
+  bool wasFirstPwdTouched = false;
+  bool wasSecondPwdTouched = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _emailFocus.addListener(() {
+      if (!_emailFocus.hasFocus) {
+        setState(() => wasEmailTouched = true);
+      }
+    });
+
+    _codeFocus.addListener(() {
+      if (!_codeFocus.hasFocus) {
+        setState(() => wasCodeTouched = true);
+      }
+    });
+
+    _firstPwdFocus.addListener(() {
+      if (!_firstPwdFocus.hasFocus) {
+        setState(() => wasFirstPwdTouched = true);
+      }
+    });
+
+    _SecondPwdFocus.addListener(() {
+      if (!_SecondPwdFocus.hasFocus) {
+        setState(() => wasSecondPwdTouched = true);
+      }
+    });
+  }
 
   bool _isValidEmail(String email) {
     final emailRegex = RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$');
@@ -34,12 +75,12 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
       labelText: label,
       border: OutlineInputBorder(
         borderSide: BorderSide(
-          color: isValid ? Colors.black87 : Colors.red,
+          color: isValid ? Colors.black26 : Colors.red,
         ),
       ),
       enabledBorder: OutlineInputBorder(
         borderSide: BorderSide(
-          color: isValid ? Colors.black87 : Colors.red,
+          color: isValid ? Colors.black26 : Colors.red,
         ),
       ),
       focusedBorder: OutlineInputBorder(
@@ -57,7 +98,7 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
     } else if (currentStep == 2) {
       return 'Digite o código recebido no email.\nO código tem validade de 10 minutos.';
     } else if (currentStep == 3) {
-      return 'Digite a nova senha.\nA senha deve contar pelo menos 8 caracteres.';
+      return 'Digite a nova senha.\nA senha deve contar pelo menos $DEF_PASSWORD_LENGTH caracteres.';
     } else {
       return 'Fora dos steps';
     }
@@ -69,23 +110,35 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
     if (currentStep == 1) {
       child = TextField(
         controller: _emailController,
-        onChanged: (_) => setState(() {}),
+        focusNode: _emailFocus,
+        onChanged: (_) {
+          if(!wasEmailTouched) {
+            wasEmailTouched = true;
+          }
+          setState(() {});
+        },
         decoration: getDecoration(
           label: 'Email',
-          isValid: _isValidEmail(_emailController.text),
+          isValid: !wasEmailTouched || _isValidEmail(_emailController.text),
         ),
         textInputAction: TextInputAction.done,
         keyboardType: TextInputType.emailAddress,
-        onTapOutside: (_) => FocusScope.of(context).unfocus(),
+        onTapOutside: (_) => _emailFocus.unfocus(),
         onSubmitted: sendEmail,
       );
     } else if (currentStep == 2) {
       child = TextField(
         controller: _codeController,
-        onChanged: (_) => setState(() {}),
+        focusNode: _codeFocus,
+        onChanged: (_) {
+          if(!wasCodeTouched) {
+            wasCodeTouched = true;
+          }
+          setState(() {});
+        },
         decoration: getDecoration(
           label: 'Código',
-          isValid: _codeController.text.length == 6,
+          isValid: !wasCodeTouched || _codeController.text.length == 6,
         ),
         maxLength: 6,
         keyboardType: TextInputType.number,
@@ -93,7 +146,7 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
           FilteringTextInputFormatter.digitsOnly,
         ],
         textInputAction: TextInputAction.done,
-        onTapOutside: (_) => FocusScope.of(context).unfocus(),
+        onTapOutside: (_) => _codeFocus.unfocus(),
         onSubmitted: sendCode,
       );
     } else if (currentStep == 3) {
@@ -101,24 +154,40 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
         children: [
           TextField(
             controller: _firstPwdController,
+            focusNode: _firstPwdFocus,
             decoration: getDecoration(
               label: 'Senha',
-              isValid: _firstPwdController.text.length >= 8,
+              isValid: !wasFirstPwdTouched || _firstPwdController.text.length >= DEF_PASSWORD_LENGTH,
             ),
-            onTapOutside: (_) => FocusScope.of(context).unfocus(),
+            onTapOutside: (_) {
+              _firstPwdFocus.unfocus();
+              //FocusScope.of(context).unfocus();
+            },
+            onChanged: (value){
+              if(!wasFirstPwdTouched) {
+                setState(() => wasFirstPwdTouched = true);
+              }
+            },
             textInputAction: TextInputAction.next,
-            focusNode: _emailFocusNode,
           ),
           const SizedBox(height: 20),
           TextField(
             controller: _secondPwdController,
+            focusNode: _SecondPwdFocus,
             decoration: getDecoration(
               label: 'Repita a senha',
               isValid: _firstPwdController.text == _secondPwdController.text,
             ),
-            onTapOutside: (_) => FocusScope.of(context).unfocus(),
+            onTapOutside: (_) {
+              _SecondPwdFocus.unfocus();
+              //FocusScope.of(context).unfocus();
+            },
+            onChanged: (value){
+              if(!wasSecondPwdTouched) {
+                setState(() => wasSecondPwdTouched = true);
+              }
+            },
             textInputAction: TextInputAction.done,
-            focusNode: _pwdFocusNode,
             onSubmitted: (value) => changePwd(_secondPwdController.text),
           ),
           const SizedBox(height: 15),
@@ -169,7 +238,7 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
   }
 
   Future<void> changePwd(String pwd) async {
-    if(pwd.length < 8 || _firstPwdController.text != _secondPwdController.text) return;
+    if(pwd.length < DEF_PASSWORD_LENGTH || _firstPwdController.text != _secondPwdController.text) return;
 
     isLoading = true;
     setState(() {});
@@ -197,6 +266,8 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
   void dispose() {
     _emailController.dispose();
     _codeController.dispose();
+    _emailFocus.dispose();
+    _codeFocus.dispose();
     super.dispose();
   }
 
@@ -211,7 +282,7 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
         title: const Text('TrustMe', style: TextStyle(color: Colors.white)),
         backgroundColor: CustomColor.activeColor,
       ),
-      body: Center(
+      body: SingleChildScrollView(
         child: Column(
           children: [
             const SizedBox(height: 60),

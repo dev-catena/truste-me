@@ -1,7 +1,15 @@
 import '../../../../core/api_provider.dart';
+import '../../../common/data/models/user_model.dart';
+import '../../../common/domain/entities/user.dart';
 
 class HomeDataSource {
   final ApiProvider _apiProvider = ApiProvider();
+
+  Future<UserModel> getUserData() async {
+    final rawData = await _apiProvider.get('usuario/dados');
+
+    return UserModel.fromJson(rawData);
+  }
 
   Future<GeneralUserInfo> getGeneralInfo() async {
     final rawData = await _apiProvider.get('usuario/info');

@@ -1,10 +1,11 @@
 part of '../../../domain/entities/contract.dart';
 
 class ContractCard extends StatelessWidget {
-  const ContractCard(this.contract, {super.key, required this.onExpire});
+  const ContractCard(this.contract, {super.key, required this.onExpire, required this.onReloadList});
 
   final Contract contract;
   final void Function(Contract contract) onExpire;
+  final void Function() onReloadList;
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +17,9 @@ class ContractCard extends StatelessWidget {
     final stakeholders = [contract.contractor, ...contract.stakeHolders];
 
     return InkWell(
-      onTap: () => context.pushNamed(AppRoutes.contractDetailScreen, extra: contract),
+      onTap: () => context.pushNamed(AppRoutes.contractDetailScreen, extra: contract).then((value) {
+        onReloadList();
+      }),
       child: Container(
         width: size.width * 0.4,
         height: 190,

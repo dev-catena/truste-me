@@ -6,9 +6,11 @@ import '../../../../../core/utils/date_parser.dart';
 import '../../../domain/entities/user.dart';
 
 class UserSummaryCard extends StatelessWidget {
-  const UserSummaryCard(this.user, {super.key});
-
   final User user;
+  final bool isLoggedUser;
+  final bool showEditButton;
+
+  const UserSummaryCard(this.user, {super.key, required this.isLoggedUser, this.showEditButton = true});
 
   @override
   Widget build(BuildContext context) {
@@ -50,18 +52,21 @@ class UserSummaryCard extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          FilledButton(
-                            onPressed: () {
-                              context.pushNamed(AppRoutes.profileDetailScreen);
-                            },
-                            // style: ButtonStyle(
-                            //   backgroundColor:
-                            //       WidgetStatePropertyAll(!validateInfo() ? CustomColor.activeColor.withAlpha(100) : null),
-                            // ),
-                            child: Text('Editar'),
+                          Visibility(
+                            visible: isLoggedUser && showEditButton,
+                            child: FilledButton(
+                              onPressed: () {
+                                context.pushNamed(AppRoutes.profileDetailScreen);
+                              },
+                              // style: ButtonStyle(
+                              //   backgroundColor:
+                              //       WidgetStatePropertyAll(!validateInfo() ? CustomColor.activeColor.withAlpha(100) : null),
+                              // ),
+                              child: Text('Editar'),
+                            ),
                           ),
                           Text(
-                            'Perfil criado em ${DateParser.formatDate(user.memberSince, true)}.',
+                            'Perfil criado ${DateParser.formatDate(user.memberSince.toLocal(), showYear: true, prefix: "em")}',
                             textAlign: TextAlign.end,
                             style: const TextStyle(color: Colors.black54),
                           ),

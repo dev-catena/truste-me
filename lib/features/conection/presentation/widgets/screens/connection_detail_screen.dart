@@ -80,11 +80,39 @@ class _ConnectionDetailScreenState extends State<ConnectionDetailScreen> {
     } else if (widget.connection.status == ConnectionStatus.accepted) {
       return OutlinedButton(
         onPressed: () async {
-          await userData.deleteConnection(widget.connection);
 
-          if (context.mounted) {
-            context.pop();
-          }
+          showDialog(context: context, builder: (BuildContext dialogContext) {
+            return AlertDialog(
+                title: Text('Desfazer conexão'),
+                content: SingleChildScrollView(
+                  child: ListBody(
+                    children: <Widget>[
+                      Text('Você deseja mesmo desfazer a conexão?'),
+                    ],
+                  ),
+                ),
+                actions: <Widget>[
+                  TextButton(
+                    child: Text('Cancelar'),
+                    onPressed: () {
+                      Navigator.of(dialogContext).pop(); // Dismiss the dialog
+                    },
+                  ),
+                  TextButton(
+                    child: Text('Sim'),
+                    onPressed: () async {
+                      Navigator.of(dialogContext).pop(); // Dismiss the dialog
+
+                      await userData.deleteConnection(widget.connection);
+
+                      if (context.mounted) {
+                        context.pop();
+                      }
+                    },
+                  ),
+                ],
+            );
+          });
         },
         child: const Text('Desfazer conexão'),
       );
@@ -130,28 +158,25 @@ class _ConnectionDetailScreenState extends State<ConnectionDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return CustomScaffold(
+      showAvatar: false,
       child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            widget.connection.user.buildSummaryCard(),
-            const SizedBox(height: 10),
-            SizedBox(
-              width: MediaQuery
-                  .of(context)
-                  .size
-                  .width * 0.6,
-              child: Text(
-                'Conexão ${widget.connection.status.description.toLowerCase()}(a) desde ${DateParser.formatDate(
-                    widget.connection.since, true)}.',
+        child: Container(
+          width: double.infinity,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              widget.connection.user.buildSummaryCard(isLoggedUser: false, showEditButton: false),
+              const SizedBox(height: 16),
+              Text(
+                'Conexão: ${widget.connection.status.description} desde ${DateParser.formatDate(widget.connection.since.toLocal(), showYear: true)}',
                 textAlign: TextAlign.center,
               ),
-            ),
-            const SizedBox(height: 4),
-            getAcceptButton(),
-            const SizedBox(height: 8),
-            if (showSeals()) loadingSeals ? const CircularProgressIndicator() : SealsBoard(seals, canGetSeal: false),
-          ],
+              const SizedBox(height: 8),
+              getAcceptButton(),
+              const SizedBox(height: 16),
+              if (showSeals()) loadingSeals ? const CircularProgressIndicator() : SealsBoard(seals, canGetSeal: false),
+            ],
+          ),
         ),
       ),
     );

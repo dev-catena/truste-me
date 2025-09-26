@@ -14,12 +14,14 @@ import '../../../common/presentation/widgets/components/custom_selectable_tile.d
 part '../../presentation/widgets/personal_info_form.dart';
 
 class UserInfoData {
+  final int id;
   final String name;
   final String cpf;
   final String email;
   final DateTime birthDate;
 
   UserInfoData({
+    required this.id,
     required this.name,
     required this.cpf,
     required this.email,
@@ -28,8 +30,9 @@ class UserInfoData {
 
   final _emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
 
-  UserInfoData copyWith({String? name, String? cpf, String? email, DateTime? birthDate}) {
+  UserInfoData copyWith({int? id, String? name, String? cpf, String? email, DateTime? birthDate}) {
     return UserInfoData(
+      id: id ?? this.id,
       name: name ?? this.name,
       cpf: cpf ?? this.cpf,
       email: email ?? this.email,
@@ -87,5 +90,5 @@ class UserInfoData {
     return _PersonalInfoForm(currentData: this, onPersonalDataSet: onPersonalDataSet);
   }
 
-  UserInfoData.empty() : this(name: '', email: '', cpf: '', birthDate: DateTime.now());
+  UserInfoData.empty() : this(id: -1, name: '', email: '', cpf: '', birthDate: DateTime.now());
 }

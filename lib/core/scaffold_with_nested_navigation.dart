@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
+import 'extensions/context_extensions.dart';
 import 'utils/custom_colors.dart';
 
 final scaffoldKey = GlobalKey<ScaffoldState>();
@@ -40,7 +41,14 @@ class _ScaffoldWithNestedNavigationState extends State<ScaffoldWithNestedNavigat
           NavigationDestination(label: 'Home', icon: Icon(Icons.home_outlined)),
           NavigationDestination(label: 'Notificações', icon: Icon(Icons.notifications_active_outlined)),
         ],
-        onDestinationSelected: _goBranch,
+        onDestinationSelected: (index) {
+          if(index == 2) {
+            context.showSnack("Em construção...");
+          } else {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+            _goBranch(index);
+          }
+        },
       ),
     );
   }

@@ -13,10 +13,9 @@ class UserHomeInfoComponent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userData = context.read<UserDataCubit>();
 
     return BlocBuilder<UserDataCubit, UserDataState>(
-      bloc: userData,
+      bloc: context.read<UserDataCubit>(),
       builder: (_, state) {
         if (state is UserDataReady) {
           final summaries = [

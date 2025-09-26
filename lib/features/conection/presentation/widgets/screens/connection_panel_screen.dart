@@ -48,7 +48,7 @@ class _ConnectionPanelScreenState extends State<ConnectionPanelScreen> {
               context: context,
               builder: (_) {
                 return RequestConnectionDialog(onRequested: userData.requestConnection);
-              });
+              }).then((value) { userData.refreshConnections(userData.getUser); });
         },
         child: const Icon(Icons.add),
       ),
@@ -69,7 +69,7 @@ class _ConnectionPanelScreenState extends State<ConnectionPanelScreen> {
 
             final filteredConnections = activeFilter == 'Todos'
                 ? allConnections
-                : allConnections.where((c) => c.status.description == activeFilter).toList();
+                : allConnections.where((c) => c.status.name == activeFilter).toList();
 
             return Column(
               children: [
@@ -79,7 +79,7 @@ class _ConnectionPanelScreenState extends State<ConnectionPanelScreen> {
                   height: 50,
                   width: size.width * 0.95,
                   child: StatefulFilterChips(
-                    filtersLabel: ConnectionStatus.values.map((e) => e.description).toList()..insert(0, 'Todos'),
+                    filtersLabel: ConnectionStatus.values.map((e) => e.name).toList()..insert(0, 'Todos'),
                     initialFilter: activeFilter,
                     onSelected: (value) => setFilter(value),
                   ),

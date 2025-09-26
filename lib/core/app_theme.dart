@@ -5,6 +5,37 @@ import 'utils/custom_colors.dart';
 class AppTheme {
   ThemeData getAppTheme(BuildContext context) {
     return ThemeData(
+      useMaterial3: true,
+      //region ## COLOR SCHEME - FROM SEED COLOR
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: CustomColor.primaryColor,
+        brightness: Brightness.light,
+
+        primary: CustomColor.primaryColor,
+        onPrimary: Colors.white,
+
+        surface: CustomColor.colorLTSurface,
+        onSurface: CustomColor.colorLTOnSurface,
+        onSurfaceVariant: CustomColor.colorLTOnSurfaceVariant,
+
+        error: CustomColor.vividRed,
+
+        surfaceContainer: CustomColor.colorLTSurfaceContainer,
+
+        secondaryContainer: CustomColor.colorLTSecondaryContainer,
+        onSecondaryContainer: CustomColor.colorLTOnSecondaryContainer,
+
+        surfaceContainerHigh: CustomColor.colorLTSurfaceContainerHigh,
+        surfaceContainerHighest: CustomColor.colorLTSurfaceContainerHighest,
+
+        outline: CustomColor.colorLTOutline,
+        outlineVariant: CustomColor.colorLTOutlineVariant,
+      ),
+      //endregion
+
+      dialogTheme: DialogThemeData(
+        backgroundColor: Colors.white,
+      ),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
         backgroundColor: CustomColor.activeColor,
         foregroundColor: Colors.white,

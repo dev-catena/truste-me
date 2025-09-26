@@ -12,11 +12,13 @@ class CustomScaffold extends StatelessWidget {
     required this.child,
     this.floatingActionButton,
     this.tabBar,
+    this.showAvatar = true,
   });
 
   final Widget child;
   final Widget? floatingActionButton;
   final TabBar? tabBar;
+  final bool showAvatar;
 
   @override
   Widget build(BuildContext context) {
@@ -27,12 +29,13 @@ class CustomScaffold extends StatelessWidget {
       floatingActionButton: floatingActionButton,
       backgroundColor: CustomColor.backgroundPrimaryColor,
       appBar: AppBar(
+        //titleSpacing: 0,
         bottom: tabBar,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            const Padding(
-              padding: EdgeInsets.only(right: 20),
+            Container(
+              padding: EdgeInsets.only(right: 8),
               child: Icon(
                 Icons.shield_outlined,
                 color: Colors.white,
@@ -43,17 +46,22 @@ class CustomScaffold extends StatelessWidget {
           ],
         ),
         actions: [
-          InkWell(
-            onTap: () {
-              if (GoRouter.of(context).state.name != AppRoutes.profileScreen) {
-                context.push(AppRoutes.profileScreen);
-              }
-            },
-            child: const CircleAvatar(
-              // backgroundImage: userData.getUser.photoPath != null ? NetworkImage(userData.getUser.photoPath!) : null,
+          Visibility(
+            visible: showAvatar,
+            child: InkWell(
+              onTap: () {
+                if (GoRouter.of(context).state.name != AppRoutes.profileScreen) {
+                  context.pushNamed(AppRoutes.profileScreen, extra: { 'showEditButton': true, 'showSealsInfo': true });
+                }
+              },
+              child: const CircleAvatar(
+                backgroundColor: Colors.white,
+                child: Icon(Icons.person, color: CustomColor.activeColor, size: 30,),
+                // backgroundImage: userData.getUser.photoPath != null ? NetworkImage(userData.getUser.photoPath!) : null,
+              ),
             ),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 8),
         ],
         backgroundColor: CustomColor.activeColor,
       ),

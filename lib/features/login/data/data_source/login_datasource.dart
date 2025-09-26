@@ -23,6 +23,10 @@ class LoginDataSource {
       final user = UserModel.fromJson(rawData).toEntity();
       await userData.initialize(user);
       await appData.initialize();
+
+      //final rawDataUser = await _apiProvider.get('usuario/dados'); // TODO: Get User data on HOME SCREEN
+
+
       // setLoggedInUser(user);
       return true;
     } else {

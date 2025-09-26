@@ -17,8 +17,8 @@ class SummaryCard extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: Container(
-          width: size.width * 0.29,
-          height: 80,
+          width: size.width * 0.30,
+          height: 100,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
             color: Colors.white,
@@ -30,7 +30,10 @@ class SummaryCard extends StatelessWidget {
                 //padding: const EdgeInsets.only(left: 8),
                 child: Text(data.description, style: const TextStyle(color: Colors.black54), textAlign: TextAlign.center,),
               ),
-              Text('${data.quantity}', style: headlineMedium),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Text('${data.quantity}', style: headlineMedium),
+              ),
             ],
           ),
         ),

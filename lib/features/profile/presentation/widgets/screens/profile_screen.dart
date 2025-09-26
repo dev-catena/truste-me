@@ -12,7 +12,9 @@ import '../../../../conection/presentation/widgets/components/seals_board.dart';
 import '../../../../login/data/data_source/login_datasource.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  final bool showEditButton;
+  final bool showSealsInfo;
+  const ProfileScreen({super.key, this.showEditButton = true, this.showSealsInfo = true});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -25,6 +27,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final appData = context.read<AppDataCubit>();
 
     return CustomScaffold(
+      showAvatar: false,
       child: RefreshIndicator(
         onRefresh: () => userData.initialize(userLoggedIn).whenComplete(() => setState(() {})),
         child: SingleChildScrollView(
@@ -32,10 +35,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              userData.getUser.buildSummaryCard(),
-              const SizedBox(height: 10),
-              SealsBoard(userData.getUser.sealsObtained, canGetSeal: true),
-              const SizedBox(height: 10),
+              userData.getUser.buildSummaryCard(isLoggedUser: true, showEditButton: widget.showEditButton),
+              Visibility(
+                visible: widget.showSealsInfo,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 16),
+                  child: SealsBoard(userData.getUser.sealsObtained, canGetSeal: true),
+                ),
+              ),
+              const SizedBox(height: 16),
               ListTile(
                 title: const Text('Sair'),
                 leading: const Icon(Icons.logout_outlined, color: CustomColor.vividRed),

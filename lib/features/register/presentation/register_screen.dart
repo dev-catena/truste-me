@@ -14,10 +14,11 @@ import '../../common/domain/entities/location.dart';
 import '../../common/presentation/widgets/components/custom_selectable_tile.dart';
 import '../../common/presentation/widgets/dialogs/single_select_dialog.dart';
 import '../domain/entities/user_info_data.dart';
+import 'widgets/address_info_form.dart';
 
-part 'widgets/address_info.dart';
+//part 'widgets/address_info_form.dart';
 
-part 'widgets/complementary_info.dart';
+part 'widgets/complementary_info_form.dart';
 
 part 'widgets/password_creation.dart';
 
@@ -40,7 +41,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String userNumber = '';
   String userComplement = '';
   String userProfession = '';
-  late IncomeRange userIncome;
+  IncomeRange? userIncome;
 
   String userPwd = '';
   String userPwdConfirmation = '';
@@ -105,7 +106,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
         break;
       case 3:
       // Complementary info step
-        canProceed = true;
+        canProceed = userIncome != null && userProfession.isNotEmpty;
+        if (!canProceed) {
+          context.showSnack(
+              'Preencha o campo profissão e renda'
+          );
+        }
         break;
       case 4:
       // Password step
@@ -242,15 +248,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
     isRegistering = true;
     setState(() {});
 
+    String? professionValue;
+
+    if(userProfession.trim().isNotEmpty) {
+      professionValue = userProfession.trim();
+    }
+
     final content = {
       'email': personalData.email,
-      'password': userPwd,
-      'nome_completo': personalData.name,
       'CPF': personalData.cpf,
+      'nome_completo': personalData.name,
       'pais': 'Brasil',
       ...userLocation!.toModel().toJson(),
-      'profissao': userProfession,
+      'profissao': professionValue,
       'dt_nascimento': personalData.birthDate.toString(),
+      'renda_classe': userIncome?.description,
+
+      'password': userPwd,
+      'password_confirmation': userPwdConfirmation,
     };
     try {
       final resp = await ApiProvider(false).post('usuario/gravar', jsonEncode(content));
@@ -288,12 +303,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
         },
       );
     } else if (step == 3) {
-      return _AddressInfo(
+      return AddressInfoForm(
         userLocation: userLocation,
         onLocationChanged: (value) => userLocation = value,
       );
     } else if (step == 4) {
-      return _ComplementaryInfo(
+      return ComplementaryInfoForm(
+        userProfession: userProfession,
+        userIncome: userIncome,
         onProfessionSet: (value) => userProfession = value,
         onIncomeSet: (value) => userIncome = value,
       );

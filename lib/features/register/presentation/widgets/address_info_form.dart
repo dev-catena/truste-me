@@ -1,23 +1,31 @@
-part of '../register_screen.dart';
+//part of '../register_screen.dart';
+
+import 'package:brasil_fields/brasil_fields.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import '../../../../core/cep_api.dart';
+import '../../../../core/extensions/context_extensions.dart';
+import '../../../../core/utils/custom_colors.dart';
+import '../../../common/domain/entities/location.dart';
 
 enum _InputType {
   number,
   complement;
 }
 
-class _AddressInfo extends StatefulWidget {
+class AddressInfoForm extends StatefulWidget {
   final Location? userLocation;
   final ValueChanged<Location> onLocationChanged;
 
-  const _AddressInfo({
-    required this.onLocationChanged, this.userLocation,
-  });
+  const AddressInfoForm({super.key, required this.onLocationChanged, this.userLocation,});
 
   @override
-  State<_AddressInfo> createState() => _AddressInfoState();
+  State<AddressInfoForm> createState() => _AddressInfoFormState();
 }
 
-class _AddressInfoState extends State<_AddressInfo> {
+class _AddressInfoFormState extends State<AddressInfoForm> {
   final cepController = TextEditingController();
   final numberController = TextEditingController();
   final complementController = TextEditingController();
@@ -25,15 +33,32 @@ class _AddressInfoState extends State<_AddressInfo> {
   String? citySelected;
   Location? location;
 
+  final FocusNode _cepFocus = FocusNode();
+  final FocusNode _numberFocus = FocusNode();
+  final FocusNode _complementFocus = FocusNode();
+
   @override
   void initState() {
     _loadData();
     super.initState();
   }
 
+  @override
+  void dispose() {
+    _cepFocus.dispose();
+    _numberFocus.dispose();
+    _complementFocus.dispose();
+
+    cepController.dispose();
+    numberController.dispose();
+    complementController.dispose();
+
+    super.dispose();
+  }
+
   void _loadData() {
 
-    var loc = widget.userLocation;
+    final loc = widget.userLocation;
 
     if(loc != null) {
       cepController.text = loc.cep;
@@ -49,6 +74,10 @@ class _AddressInfoState extends State<_AddressInfo> {
       final cleanedCep = cep.replaceAll(RegExp(r'[^a-zA-Z0-9]+'), '');
       location = await CepAPI().getCep(cleanedCep);
       FocusScope.of(context).unfocus();
+
+      if(location != null && widget.userLocation != null) {
+        location = location!.copyWith(id: widget.userLocation!.id);
+      }
 
       widget.onLocationChanged(location!);
       setState(() {});
@@ -72,12 +101,12 @@ class _AddressInfoState extends State<_AddressInfo> {
       labelText: label,
       border: OutlineInputBorder(
         borderSide: BorderSide(
-          color: isValid ? Colors.black87 : Colors.red,
+          color: isValid ? Colors.black26 : Colors.red,
         ),
       ),
       enabledBorder: OutlineInputBorder(
         borderSide: BorderSide(
-          color: isValid ? Colors.black87 : Colors.red,
+          color: isValid ? Colors.black26 : Colors.red,
         ),
       ),
       focusedBorder: OutlineInputBorder(
@@ -98,19 +127,29 @@ class _AddressInfoState extends State<_AddressInfo> {
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text('Endereço', style: titleLarge),
-        const SizedBox(height: 6),
-        Text(
-          'Endereço completo obrigatório. Fique tranquilo: ele não será exibido para ninguém, '
-          'apenas usado para validar as informações e gerar selos de verificação.',
-          textAlign: TextAlign.center,
-          style: bodySmall,
+        SizedBox(
+          width: double.infinity,
+          child: Text('Endereço', style: titleLarge, textAlign: (location?.id ?? -1) > 0 ? TextAlign.left : TextAlign.center,),
         ),
-        const SizedBox(height: 12),
+        if((location?.id ?? -1) <= 0)
+          Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: Text(
+              'Endereço completo obrigatório. Fique tranquilo: ele não será exibido para ninguém, '
+              'apenas usado para validar as informações e gerar selos de verificação.',
+              textAlign: TextAlign.center,
+              style: bodySmall,
+            ),
+          ),
+        const SizedBox(height: 16),
         Row(
           children: [
             Expanded(
               child: TextField(
+                controller: cepController,
+                focusNode: _cepFocus,
+                onTapOutside: (_) => _cepFocus.unfocus(),
+                onSubmitted: (value) async { await searchCep(value); FocusScope.of(context).requestFocus(_numberFocus); },
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   labelText: 'CEP',
@@ -121,8 +160,6 @@ class _AddressInfoState extends State<_AddressInfo> {
                   CepInputFormatter(),
                 ],
                 onEditingComplete: () => searchCep(cepController.text),
-                onSubmitted: (value) => searchCep(value),
-                controller: cepController,
               ),
             ),
             const SizedBox(width: 20),
@@ -178,20 +215,21 @@ class _AddressInfoState extends State<_AddressInfo> {
             Expanded(
               flex: 2,
               child: TextField(
+                controller: numberController,
+                focusNode: _numberFocus,
                 decoration: getDecoration(
                   label: 'Número',
-                  isValid: numberController.text.isNotEmpty,
+                  isValid: numberController.text.isNotEmpty || cepController.text.isEmpty,
                 ),
                 enabled: location != null,
-                controller: numberController,
                 keyboardType: TextInputType.number,
                 inputFormatters: [
                   FilteringTextInputFormatter.digitsOnly,
                 ],
-                onSubmitted: (_) => locationUpdate(_InputType.number),
+                onSubmitted: (_) { locationUpdate(_InputType.number); _numberFocus.unfocus(); },
                 onTapOutside: (_) {
                   locationUpdate(_InputType.number);
-                  FocusScope.of(context).unfocus();
+                  _numberFocus.unfocus(); //FocusScope.of(context).unfocus();
                 },
                 onEditingComplete: () => locationUpdate(_InputType.number),
                 onChanged: (value) {
@@ -204,16 +242,18 @@ class _AddressInfoState extends State<_AddressInfo> {
             Expanded(
               flex: 3,
               child: TextField(
+                controller: complementController,
+                focusNode: _complementFocus,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   labelText: 'Complemento',
                 ),
                 enabled: location != null,
-                controller: complementController,
-                onSubmitted: (_) => locationUpdate(_InputType.complement),
+                onSubmitted: (_) { locationUpdate(_InputType.complement); _complementFocus.unfocus(); },
                 onTapOutside: (_) {
                   locationUpdate(_InputType.complement);
-                  FocusScope.of(context).unfocus();
+                  _complementFocus.unfocus();
+                  //FocusScope.of(context).unfocus();
                 },
                 onEditingComplete: () => locationUpdate(_InputType.complement),
               ),

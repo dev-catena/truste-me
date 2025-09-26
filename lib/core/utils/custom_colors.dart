@@ -10,4 +10,19 @@ abstract class CustomColor {
   static const Color bottomBarBg = Colors.white;
 
   static const Color backgroundPrimaryColor = Color.fromARGB(255, 245, 249, 255);
+
+  static const colorLTSurface = const Color(0xFFFFFFFF);
+  static const colorLTOnSurface = const Color(0xFF1a1b22);
+  static const colorLTOnSurfaceVariant = const Color(0xFF444653);
+
+  static const colorLTSurfaceContainer = const Color(0xFFebf0f6);
+  static const colorLTSecondaryContainer = const Color(0xFFd7e2ed);
+  static const colorLTOnSecondaryContainer = const Color(0xFF000000);
+
+  static const colorLTSurfaceContainerHigh = const Color(0xFFd7e2ed);
+  static const colorLTSurfaceContainerHighest = const Color(0xFFe2e1eb);
+  static const colorLTOutline = const Color(0xFFb9bac1);
+  static const colorLTOutlineVariant = const Color(0xFFe5e5e5);
+
+  static const Color primaryColor = Color.fromARGB(255, 16, 129, 203);
 }

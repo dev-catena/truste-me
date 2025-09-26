@@ -1,6 +1,10 @@
+import 'package:flutter/material.dart';
+
+import '../../../register/presentation/widgets/address_info_form.dart';
 import '../../data/models/location_model.dart';
 
 class Location {
+  final int id;
   final String cep;
   final String state;
   final String city;
@@ -10,6 +14,7 @@ class Location {
   final String complement;
 
   Location copyWith({
+    int? id,
     String? cep,
     String? street,
     String? neighborhood,
@@ -19,6 +24,7 @@ class Location {
     String? state,
   }) {
     return Location(
+      id: id ?? this.id,
       cep: cep ?? this.cep,
       neighborhood: neighborhood ?? this.neighborhood,
       street: street ?? this.street,
@@ -30,6 +36,7 @@ class Location {
   }
 
   const Location({
+    required this.id,
     required this.cep,
     required this.state,
     required this.city,
@@ -43,6 +50,7 @@ class Location {
 extension LocationEntityMapper on Location {
   LocationModel toModel() {
     return LocationModel(
+      id: id,
       cep: cep,
       street: street,
       complement: complement,

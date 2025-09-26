@@ -44,7 +44,7 @@ class ConnectionTile extends StatelessWidget {
                     Text(user.fullName, style: titleMedium),
                     const SizedBox(height: 4),
                     Text(
-                      '${connection.status.description} desde ${DateParser.formatDate(connection.since, true)}',
+                      '${connection.status.description} desde ${DateParser.formatDate(connection.since.toLocal(), showYear: true)}',
                       // connection.since.toLocal().toString(),
                       maxLines: 3,
                     ),

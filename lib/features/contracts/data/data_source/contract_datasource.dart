@@ -29,8 +29,8 @@ class ContractDataSource {
     return converted;
   }
 
-  Future<List<Contract>> getContractsForUser(final User user) async {
-    final rawData = await _apiProvider.get('usuario/${user.id}/contratos');
+  Future<List<Contract>> getContractsForUser(final User user) async {   // TODO: Remove user parameter
+    final rawData = await _apiProvider.get('usuario/contratos');
     final List<Contract> convertedData = [];
 
     for (final ele in rawData['contratos_como_contratante']) {

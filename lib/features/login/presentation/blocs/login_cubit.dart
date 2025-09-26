@@ -60,8 +60,7 @@ class LoginCubit extends Cubit<LoginState> {
       emit(internalState.copyWith(isSubmitting: true, error: false, errorMsg: null));
 
       try {
-        final bool isAuthenticated =
-            await dataSource.login(internalState.emailController.text, internalState.pwdController.text);
+        final bool isAuthenticated = await dataSource.login(internalState.emailController.text, internalState.pwdController.text);
         if (isAuthenticated) {
           emit(internalState.copyWith(
             loginSuccess: true,

@@ -25,10 +25,13 @@ import 'features/contracts/data/data_source/contract_datasource.dart';
 // mkdir profile\presentation\blocs
 // mkdir profile\presentation\widgets
 
-var DEF_TEST = true;
+var DEF_TEST = false;
 
 void main() {
   initializeDateFormatting('pt_BR', null).then((_) {
+
+    // TODO: Load local variables
+
     runApp(const TrustMeApp());
   });
 }

@@ -35,7 +35,7 @@ class ClauseTile extends StatelessWidget {
               if (!clause.isClauseOk(participants.map((e) => e.id).toList()))
                 const Icon(Icons.warning_amber_outlined, color: CustomColor.vividRed),
               // clause.status.buildIcon(),
-              const SizedBox(width: 8),
+              const SizedBox(width: 16),
               Expanded(
                 child: InkWell(
                   onTap: () => showDialog(context: context, builder: (_) => InspectClauseDialog(clause)),

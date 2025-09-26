@@ -2,6 +2,7 @@ import '../../domain/entities/location.dart';
 
 class LocationModel extends Location {
   LocationModel({
+    required super.id,
     required super.cep,
     required super.street,
     required super.number,
@@ -13,6 +14,7 @@ class LocationModel extends Location {
 
   factory LocationModel.fromJson(Map<String, dynamic> json) {
     return LocationModel(
+      id: json['id'] ?? -1,
       cep: json['cep'],
       street: json['logradouro'],
       number: json['numero'] ?? '',
@@ -25,6 +27,7 @@ class LocationModel extends Location {
 
   Location toEntity() {
     return Location(
+      id: id,
       cep: cep,
       state: state,
       city: city,
@@ -41,7 +44,9 @@ class LocationModel extends Location {
       'cidade': city,
       'estado': state,
       'bairro': neighborhood,
-      'endereco': '$street$number${number != '' ? ', $number' : ''}${complement != '' ? ' - $complement' : ''}',
+      'endereco': street,
+      'endereco_numero': number,
+      'complemento': complement
     };
   }
 }

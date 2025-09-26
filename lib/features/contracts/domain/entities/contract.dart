@@ -34,8 +34,8 @@ class Contract extends Equatable {
   final DateTime startDt;
   final DateTime endDt;
 
-  ContractCard buildCard({required final void Function(Contract contract) onExpire}) {
-    return ContractCard(this, onExpire: onExpire);
+  ContractCard buildCard({required final void Function(Contract contract) onExpire, required final void Function() onReloadList}) {
+    return ContractCard(this, onExpire: onExpire, onReloadList: onReloadList);
   }
 
   ContractDetailSummaryCard buildDetailCard() {

@@ -11,7 +11,7 @@ class DateParser<T> {
 
   DateParser({required this.data, required this.getDate});
 
-  static String formatDate(DateTime date, [bool showYear = false, bool showTime = false]) {
+  static String formatDate(DateTime date, {bool showYear = false, bool showTime = false, String prefix = ''}) {
     final now = DateTime.now();
     final yesterday = now.subtract(const Duration(days: 1));
     final tomorrow = now.add(const Duration(days: 1));
@@ -19,13 +19,13 @@ class DateParser<T> {
     String stringDate = '';
 
     if (isSameDay(date, tomorrow)) {
-      stringDate = 'Amanhã';
+      stringDate = 'amanhã';
     } else if (isSameDay(date, now)) {
-      stringDate = 'Hoje';
+      stringDate = 'hoje';
     } else if (isSameDay(date, yesterday)) {
-      stringDate = 'Ontem';
+      stringDate = 'ontem';
     } else {
-      stringDate = DateFormat("d 'de' MMMM${showYear ? " 'de' yyyy":''}", 'pt_BR').format(date);
+      stringDate = '$prefix ${DateFormat("d 'de' MMMM${showYear ? " 'de' yyyy":''}", 'pt_BR').format(date)}';
     }
 
     if(showTime){

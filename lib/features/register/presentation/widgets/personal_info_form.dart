@@ -24,18 +24,20 @@ class _PersonalInfoFormState extends State<_PersonalInfoForm> {
   bool _emailExists = false;
   bool _cpfExists = false;
 
-  late final FocusNode _nameFocus;
-  late final FocusNode _cpfFocus;
-  late final FocusNode _emailFocus;
+  final FocusNode _nameFocus = FocusNode();
+  final FocusNode _cpfFocus = FocusNode();
+  final FocusNode _emailFocus = FocusNode();
+
+  bool wasNameTouched = false;
+  bool wasCPFTouched = false;
+  bool wasEmailTouched = false;
+  bool wasBirthdayTouched = false;
 
   Timer? _debounce;
 
   @override
   void initState() {
     super.initState();
-    _nameFocus = FocusNode();
-    _cpfFocus = FocusNode();
-    _emailFocus = FocusNode();
 
     if (widget.currentData == null) {
       personalData = UserInfoData.empty();
@@ -48,6 +50,7 @@ class _PersonalInfoFormState extends State<_PersonalInfoForm> {
 
     if (personalData.birthDate.isLegalAge()) {
       datePicked = personalData.birthDate;
+      wasBirthdayTouched = true;
     } else {
       datePicked = null;
     }
@@ -106,7 +109,7 @@ class _PersonalInfoFormState extends State<_PersonalInfoForm> {
       _validatingEmail = true;
       _emailExists = false;
     });
-    final resp = await ApiProvider(false).post('cadastro/verificar-dados', jsonEncode({'email': email}));
+    final resp = await ApiProvider(personalData.id > 0).post('cadastro/verificar-dados', jsonEncode({'email': email}));
     setState(() {
       _validatingEmail = false;
       _emailExists = resp['email_exists'] == true;
@@ -122,7 +125,7 @@ class _PersonalInfoFormState extends State<_PersonalInfoForm> {
       _validatingCpf = true;
       _cpfExists = false;
     });
-    final resp = await ApiProvider(false).post('cadastro/verificar-dados', jsonEncode({'CPF': cpf}));
+    final resp = await ApiProvider(personalData.id > 0).post('cadastro/verificar-dados', jsonEncode({'CPF': cpf}));
     setState(() {
       _validatingCpf = false;
       _cpfExists = resp['cpf_exists'] == true;
@@ -144,60 +147,78 @@ class _PersonalInfoFormState extends State<_PersonalInfoForm> {
     widget.onPersonalDataSet(personalData, _emailExists, _cpfExists);
   }
 
+  InputDecoration getDecoration({String? label, bool isValid = false}) {
+    return InputDecoration(
+      labelText: label,
+      border: OutlineInputBorder(
+        borderSide: BorderSide(
+          color: isValid ? Colors.black26 : Colors.red,
+        ),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderSide: BorderSide(
+          color: isValid ? Colors.black26 : Colors.red,
+        ),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderSide: BorderSide(
+          color: isValid ? CustomColor.activeColor : Colors.red,
+          width: 2,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final titleLarge = Theme.of(context).textTheme.titleLarge!;
-
-    InputDecoration getDecoration(String label, bool hasError) {
-      return InputDecoration(
-        labelText: label,
-        border: OutlineInputBorder(
-          borderSide: BorderSide(color: hasError ? Colors.red : Colors.black87),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: hasError ? Colors.red : Colors.black87),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(
-            color: hasError ? Colors.red : CustomColor.activeColor,
-            width: 2,
-          ),
-        ),
-      );
-    }
 
     return FocusScope(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('Dados Básicos', style: titleLarge),
+          SizedBox(
+            width: double.infinity,
+              child: Text('Dados Básicos', style: titleLarge, textAlign: personalData.id > 0 ? TextAlign.left : TextAlign.center,),
+          ),
           const SizedBox(height: 16),
           TextField(
             controller: _nameController,
             focusNode: _nameFocus,
             textCapitalization: TextCapitalization.words,
             onTapOutside: (_) => _nameFocus.unfocus(),
+            onChanged: (value){
+              if(!wasNameTouched) {
+                setState(() => wasNameTouched = true);
+              }
+            },
             onSubmitted: (_) => FocusScope.of(context).requestFocus(_cpfFocus),
-            decoration: getDecoration('Nome completo', _nameController.text.trim().isEmpty),
+            decoration: getDecoration(label: 'Nome completo', isValid: !wasNameTouched || (_nameController.text.trim().isNotEmpty && _nameController.text.trim().contains(' '))),
           ),
           const SizedBox(height: 8),
           Row(
             children: [
               Expanded(
                 child: TextField(
+                  enabled: personalData.id <= 0,
                   controller: _cpfController,
                   focusNode: _cpfFocus,
                   onTapOutside: (_) => _cpfFocus.unfocus(),
                   onSubmitted: (_) => FocusScope.of(context).requestFocus(_emailFocus),
                   maxLength: 14,
-                  onChanged: _onCpfChanged,
+                  onChanged: (value){
+                    if(!wasCPFTouched) {
+                      setState(() => wasCPFTouched = true);
+                    }
+
+                    _onCpfChanged(value);
+                  },
                   keyboardType: TextInputType.number,
                   inputFormatters: [
                     FilteringTextInputFormatter.digitsOnly,
                     CpfInputFormatter(),
                   ],
-                  decoration: getDecoration('CPF', !isCpfValid || _cpfExists),
-                  // decoration: getDecoration('CPF', !personalData.isCpfValid || _cpfExists),
+                  decoration: getDecoration(label: 'CPF', isValid: !wasCPFTouched || (isCpfValid && !_cpfExists)),
                 ),
               ),
               if (_validatingCpf)
@@ -212,13 +233,20 @@ class _PersonalInfoFormState extends State<_PersonalInfoForm> {
             children: [
               Expanded(
                 child: TextField(
+                  //enabled: personalData.id <= 0,
                   controller: _emailController,
                   focusNode: _emailFocus,
                   keyboardType: TextInputType.emailAddress,
                   onTapOutside: (_) => _emailFocus.unfocus(),
                   onSubmitted: (_) => _emailFocus.unfocus(),
-                  onChanged: _onEmailChanged,
-                  decoration: getDecoration('Email', personalData.isEmailValid || _emailExists),
+                  onChanged: (value){
+                    if(!wasEmailTouched) {
+                      setState(() => wasEmailTouched = true);
+                    }
+
+                    _onEmailChanged(value);
+                  },
+                  decoration: getDecoration(label: 'Email', isValid: !wasEmailTouched || (personalData.isEmailValid && !_emailExists)),
                 ),
               ),
               if (_validatingEmail)
@@ -234,10 +262,16 @@ class _PersonalInfoFormState extends State<_PersonalInfoForm> {
                 ? '${datePicked!.day.toString().padLeft(2, '0')}/${datePicked!.month.toString().padLeft(2, '0')}/${datePicked!.year}'
                 : 'Data de nascimento',
             width: double.infinity,
-            borderColor: datePicked == null ? CustomColor.vividRed : CustomColor.activeColor,
+            borderColor: (!wasBirthdayTouched || datePicked != null) ? CustomColor.activeColor : CustomColor.vividRed,
             leadingWidget: const Icon(Icons.calendar_month_outlined),
             onTap: () {
+              if(!wasBirthdayTouched) {
+                setState(() {
+                  wasBirthdayTouched = true;
+                });
+              }
               showDatePicker(
+                errorFormatText: "Formato incorreto. Formato: dd/mm/aaaa",
                 initialEntryMode: DatePickerEntryMode.calendar,
                 keyboardType: TextInputType.datetime,
                 context: context,

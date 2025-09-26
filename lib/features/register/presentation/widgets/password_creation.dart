@@ -9,6 +9,8 @@ class _PasswordCreation extends StatelessWidget {
   final ValueChanged<String> onPasswordSet;
   final ValueChanged<String> onPasswordConfirmSet;
 
+  static const DEF_PASSWORD_LENGTH = 6;
+
   @override
   Widget build(BuildContext context) {
     final titleLarge = Theme.of(context).textTheme.titleLarge!;
@@ -17,7 +19,7 @@ class _PasswordCreation extends StatelessWidget {
       children: [
         Text('Senha', style: titleLarge),
         const SizedBox(height: 16),
-        const Text('A senha deve conter pelo menos 6 caracteres'),
+        const Text('A senha deve conter pelo menos $DEF_PASSWORD_LENGTH caracteres'),
         const SizedBox(height: 8),
         TextField(
           onChanged: onPasswordSet,

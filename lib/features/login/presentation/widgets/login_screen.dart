@@ -1,4 +1,5 @@
 import 'package:brasil_fields/brasil_fields.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -43,10 +44,10 @@ class LoginScreen extends StatelessWidget {
                 return const Center(child: CircularProgressIndicator());
               } else if (state is LoginReady) {
 
-                // if(DEF_TEST) {
-                //   state.emailController.text = "069.091.440-74";
-                //   state.pwdController.text = "123123";
-                // }
+                if(DEF_TEST && kDebugMode) {
+                  state.emailController.text = "069.091.440-74";
+                  state.pwdController.text = "123123";
+                }
 
                 return SingleChildScrollView(
                   child: Column(

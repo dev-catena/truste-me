@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 
+import '../features/common/domain/entities/auth.dart';
 import '../features/common/domain/entities/user.dart';
 
 class ApiProvider {
@@ -19,7 +20,7 @@ class ApiProvider {
   Map<String, String> get _header {
     final tokenizedHeader = {
       'Content-Type': 'application/json; charset=UTF-8',
-      'Authorization': 'Bearer ${useToken ? userLoggedIn.authToken : ''}',
+      'Authorization': 'Bearer ${useToken ? (authData?.authToken ?? '') : ''}',
     };
     final tokenlessHeader = {'Content-Type': 'application/json; charset=UTF-8'};
 

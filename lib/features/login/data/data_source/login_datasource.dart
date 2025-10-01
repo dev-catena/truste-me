@@ -4,7 +4,9 @@ import 'dart:convert';
 import '../../../../core/api_provider.dart';
 import '../../../../core/providers/app_data_cubit.dart';
 import '../../../../core/providers/user_data_cubit.dart';
+import '../../../common/data/models/auth_model.dart';
 import '../../../common/data/models/user_model.dart';
+import '../../../common/domain/entities/auth.dart';
 
 class LoginDataSource {
   final bool useToken;
@@ -19,15 +21,10 @@ class LoginDataSource {
     final content = {'CPF': cpf, 'password': pwd};
     final rawData = await _apiProvider.post('login', jsonEncode(content));
 
-    if (rawData['user'] != null) {
-      final user = UserModel.fromJson(rawData).toEntity();
-      await userData.initialize(user);
+    if (rawData['token'] != null) {
+      final auth = AuthModel.fromJson(rawData).toEntity();
+      await setAuthData(auth);
       await appData.initialize();
-
-      //final rawDataUser = await _apiProvider.get('usuario/dados'); // TODO: Get User data on HOME SCREEN
-
-
-      // setLoggedInUser(user);
       return true;
     } else {
       return false;

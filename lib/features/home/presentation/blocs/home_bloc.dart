@@ -35,7 +35,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       ]);
 
       // TODO: Update user data properly to avoid initialize it again
-      user.authToken = userData.getUser.authToken;
+      //user.authToken = userData.getUser.authToken;
       await userData.initialize(user);
 
       debugPrint('USER DATA: ${userData.getUser.toString()}');

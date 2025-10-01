@@ -25,7 +25,7 @@ class DateParser<T> {
     } else if (isSameDay(date, yesterday)) {
       stringDate = 'ontem';
     } else {
-      stringDate = '$prefix ${DateFormat("d 'de' MMMM${showYear ? " 'de' yyyy":''}", 'pt_BR').format(date)}';
+      stringDate = '$prefix${DateFormat("d 'de' MMMM${showYear ? " 'de' yyyy":''}", 'pt_BR').format(date)}';
     }
 
     if(showTime){

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/common/domain/entities/auth.dart';
 import '../features/conection/domain/entities/connection.dart';
 import '../features/conection/presentation/widgets/screens/connection_detail_screen.dart';
 import '../features/conection/presentation/widgets/screens/connection_panel_screen.dart';
@@ -49,7 +50,7 @@ class AppRoutes {
 }
 
 final GoRouter _routes = GoRouter(
-  initialLocation: AppRoutes.loginScreen,
+  initialLocation: authData == null ? AppRoutes.loginScreen : AppRoutes.homeScreen,
   navigatorKey: _rootNavigatorKey,
   routes: [
     StatefulShellRoute.indexedStack(

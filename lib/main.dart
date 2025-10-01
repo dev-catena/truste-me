@@ -9,8 +9,10 @@ import 'core/providers/app_data_cubit.dart';
 import 'core/providers/user_data_cubit.dart';
 import 'core/routes.dart';
 import 'core/utils/globals.dart';
+import 'core/utils/preferences/app_preferences.dart';
 import 'features/common/data/data_source/app_data_source.dart';
 import 'features/common/data/data_source/user_data_source.dart';
+import 'features/common/domain/entities/auth.dart';
 import 'features/conection/data/data_source/connection_datasource.dart';
 import 'features/contracts/data/data_source/contract_datasource.dart';
 
@@ -25,12 +27,32 @@ import 'features/contracts/data/data_source/contract_datasource.dart';
 // mkdir profile\presentation\blocs
 // mkdir profile\presentation\widgets
 
-var DEF_TEST = false;
+var DEF_TEST = true;
 
 void main() {
-  initializeDateFormatting('pt_BR', null).then((_) {
+  initializeDateFormatting('pt_BR', null).then((_) async {
+    WidgetsFlutterBinding.ensureInitialized();
 
-    // TODO: Load local variables
+    //region # LOAD AUTH VARIABLES
+    final prefs = AppPreferences();
+
+    final authToken = await prefs.getString(KeyPrefs.AUTH_TOKEN, null);
+    final expirationAt = await prefs.getInt(KeyPrefs.AUTH_TOKEN_EXPIRATION, null);
+
+    if(authToken != null) {
+      await setAuthData(
+          Auth(
+            authToken: authToken,
+            expirationAt: expirationAt != null ? DateTime.fromMillisecondsSinceEpoch(expirationAt) : null,
+            refreshToken: await prefs.getString(KeyPrefs.REFRESH_TOKEN, null),
+          )
+      );
+    } else {
+      await prefs.getString(KeyPrefs.AUTH_TOKEN, null);
+      await prefs.getString(KeyPrefs.AUTH_TOKEN_EXPIRATION, null);
+      await prefs.getString(KeyPrefs.REFRESH_TOKEN, null);
+    }
+    //endregion
 
     runApp(const TrustMeApp());
   });

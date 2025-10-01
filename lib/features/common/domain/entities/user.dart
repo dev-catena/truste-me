@@ -43,7 +43,7 @@ class User extends Equatable {
   final DateTime memberSince;
 
   final List<Seal> sealsObtained;
-  String authToken; // TODO: Remove from this class
+  //String authToken; // TODO: Remove from this class
 
   int get age {
     final today = DateTime.now();
@@ -80,7 +80,7 @@ class User extends Equatable {
     required this.memberSince,
 
     required this.sealsObtained,
-    this.authToken = '',
+    //this.authToken = '',
   });
 
   User copyWith({
@@ -104,7 +104,7 @@ class User extends Equatable {
     DateTime? emailVerifiedAt,
     DateTime? memberSince,
     List<Seal>? sealsObtained,
-    String? authToken
+    //String? authToken
   }) {
     return User(
       id: id ?? this.id,
@@ -127,7 +127,7 @@ class User extends Equatable {
       emailVerifiedAt: emailVerifiedAt ?? this.emailVerifiedAt,
       memberSince: memberSince ?? this.memberSince,
       sealsObtained: sealsObtained ?? this.sealsObtained,
-      authToken: authToken ?? this.authToken,
+      //authToken: authToken ?? this.authToken,
 
     );
   }
@@ -152,7 +152,8 @@ class User extends Equatable {
         'country: $country, cep: $cep, state: $state, city: $city, address: $address, neighborhood: $neighborhood, addressNumber: $addressNumber, addressComplement: $addressComplement, '
         'profession: $profession, income: $income, birthDate: $birthDate, '
         'photoPath: $photoPath, emailVerifiedAt: $emailVerifiedAt, memberSince: $memberSince, '
-        'sealsObtained: $sealsObtained, authToken: $authToken}';
+        //'sealsObtained: $sealsObtained, authToken: $authToken}';
+        'sealsObtained: $sealsObtained}';
   }
 
   UserSummaryCard buildSummaryCard({required bool isLoggedUser, required bool showEditButton}) {

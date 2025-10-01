@@ -24,8 +24,6 @@ class UserModel extends User {
     super.photoPath,
     super.emailVerifiedAt,
     required super.memberSince,
-
-    required super.authToken,
     required super.sealsObtained,
   });
 
@@ -54,7 +52,6 @@ class UserModel extends User {
     memberSince: DateTime.parse(json['created_at'] ?? DateTime.now().toString()),
 
     sealsObtained: (json['selos'] as List<dynamic>? ?? []).map((e) => SealModel.fromJson(e).toEntity()).toList(),
-    authToken: json['token'] ?? '',
   );
 
   User toEntity() {
@@ -83,7 +80,6 @@ class UserModel extends User {
       memberSince: memberSince,
 
       sealsObtained: sealsObtained,
-      authToken: authToken,
     );
   }
 }

@@ -4,6 +4,7 @@ import 'dart:convert';
 import '../../../../core/api_provider.dart';
 import '../../../../core/providers/app_data_cubit.dart';
 import '../../../../core/providers/user_data_cubit.dart';
+import '../../../../core/utils/preferences/app_preferences.dart';
 import '../../../common/data/models/auth_model.dart';
 import '../../../common/data/models/user_model.dart';
 import '../../../common/domain/entities/auth.dart';
@@ -32,7 +33,13 @@ class LoginDataSource {
   }
 
   Future<void> logout() async {
-    await _apiProvider.post('logout', jsonEncode({}));
+    await _apiProvider.post('logout', jsonEncode({})); // TODO: Perguntar para o Raul o que o logout faz no backend
+
+    final prefs = AppPreferences();
+    await prefs.remove(KeyPrefs.AUTH_TOKEN);
+    await prefs.remove(KeyPrefs.REFRESH_TOKEN);
+    await prefs.remove(KeyPrefs.AUTH_TOKEN_EXPIRATION);
+
     // setLoggedInUser(
     //   Person(
     //     id: 0,

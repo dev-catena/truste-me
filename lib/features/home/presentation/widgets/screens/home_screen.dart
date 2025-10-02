@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
+import '../../../../../core/providers/app_data_cubit.dart';
 import '../../../../../core/providers/user_data_cubit.dart';
 import '../../../../../core/routes.dart';
 import '../../../../common/presentation/widgets/components/custom_scaffold.dart';
@@ -19,6 +20,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final userData = context.read<UserDataCubit>();
+    final appData = context.read<AppDataCubit>();
     final titleLarge = Theme.of(context).textTheme.titleLarge!;
 
     final List<FeatureData> features = [
@@ -28,7 +30,7 @@ class HomeScreen extends StatelessWidget {
     ];
 
     return BlocProvider(
-      create: (_) => HomeBloc(HomeDataSource(), userData),
+      create: (_) => HomeBloc(HomeDataSource(), userData, appData),
       child: CustomScaffold(
         child: BlocBuilder<HomeBloc, HomeState>(
           builder: (blocCtx, state) {

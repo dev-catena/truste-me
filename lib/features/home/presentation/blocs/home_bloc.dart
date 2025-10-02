@@ -3,6 +3,7 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
+import '../../../../core/providers/app_data_cubit.dart';
 import '../../../../core/providers/user_data_cubit.dart';
 import '../../../common/data/models/user_model.dart';
 import '../../../common/domain/entities/user.dart';
@@ -15,8 +16,9 @@ part 'home_state.dart';
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final HomeDataSource dataSource;
   final UserDataCubit userData;
+  final AppDataCubit appData;
 
-  HomeBloc(this.dataSource, this.userData) : super(HomeInitial()) {
+  HomeBloc(this.dataSource, this.userData, this.appData) : super(HomeInitial()) {
     on<HomeStarted>(_onStarted);
 
     // Start it on load (bloc created)
@@ -26,6 +28,13 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   Future<void> _onStarted(HomeStarted event, Emitter<HomeState> emit) async {
     emit(HomeLoadInProgress());
     try {
+
+      //region ## LOAD APP VARIABLES IF NEEDED
+      if(appData.state is AppDataInitial) {
+        await appData.initialize();
+      }
+      //endregion
+
       late GeneralUserInfo info;
       late UserModel user;
 

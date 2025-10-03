@@ -62,7 +62,7 @@ class ContractSpecificationWidget extends StatelessWidget {
             (index) {
               final practice = initialPractices[index];
               final number = (index + 1).toString().padLeft(4, '0');
-              final titlePrefix = 'PSX$number - ';
+              final titlePrefix = 'PSX$number';
 
               return Column(
                 mainAxisSize: MainAxisSize.min,

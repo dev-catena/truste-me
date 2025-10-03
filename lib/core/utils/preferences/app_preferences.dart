@@ -23,6 +23,8 @@ enum KeyPrefs {
   INSTALLATION_DATE,
 
   USER_LAST_ITERATION,
+
+  LAST_LOGOUT_REASON,
 }
 
 extension KeyPrefsEx on KeyPrefs {

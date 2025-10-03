@@ -5,11 +5,13 @@ Future<void> setAuthData(Auth auth) async {
   
   final prefs = AppPreferences();
   await prefs.setString(KeyPrefs.AUTH_TOKEN, auth.authToken);
+
   if(auth.refreshToken != null) {
     await prefs.setString(KeyPrefs.REFRESH_TOKEN, auth.refreshToken!);
   } else {
     await prefs.remove(KeyPrefs.REFRESH_TOKEN);
   }
+
   if(auth.expirationAt != null) {
     await prefs.setInt(KeyPrefs.AUTH_TOKEN_EXPIRATION, auth.expirationAt!.millisecondsSinceEpoch);
   } else {

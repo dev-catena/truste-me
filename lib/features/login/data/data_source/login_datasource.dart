@@ -16,11 +16,11 @@ class LoginDataSource {
 
   LoginDataSource(this.useToken, this.userData, this.appData);
 
-  late final ApiProvider _apiProvider = ApiProvider(useToken);
+  late final ApiProvider _apiProvider = ApiProvider();
 
   Future<bool> login(String cpf, String pwd) async {
     final content = {'CPF': cpf, 'password': pwd};
-    final rawData = await _apiProvider.post('login', jsonEncode(content));
+    final rawData = await _apiProvider.post('login', jsonEncode(content), useToken: false);
 
     if (rawData['token'] != null) {
       final auth = AuthModel.fromJson(rawData).toEntity();

@@ -3,7 +3,7 @@ import 'dart:convert';
 import '../../core/api_provider.dart';
 
 class NewPasswordDataSource {
-  final _apiProvider = ApiProvider(false);
+  final _apiProvider = ApiProvider();
 
   Future<bool> verifyEmail(String email) async {
     final content = {
@@ -11,7 +11,7 @@ class NewPasswordDataSource {
       'tipo': 'redefinicao',
     };
 
-    final resp = await _apiProvider.post('acesso/enviar-codigo', jsonEncode(content));
+    final resp = await _apiProvider.post('acesso/enviar-codigo', jsonEncode(content), useToken: false);
 
     if(resp['message'] == 'Email com código enviado com sucesso'){
       return true;
@@ -25,7 +25,7 @@ class NewPasswordDataSource {
       'codigo': code,
     };
 
-    final resp = await _apiProvider.post('acesso/validar-codigo', jsonEncode(content));
+    final resp = await _apiProvider.post('acesso/validar-codigo', jsonEncode(content), useToken: false);
 
     if(resp['success']){
       return true;
@@ -41,7 +41,7 @@ class NewPasswordDataSource {
       'new_password_confirmation': pwd
     };
 
-    final resp = await _apiProvider.post('acesso/redefinir-senha', jsonEncode(content));
+    final resp = await _apiProvider.post('acesso/redefinir-senha', jsonEncode(content), useToken: false);
 
     if(resp['success']){
       return true;

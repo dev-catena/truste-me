@@ -15,7 +15,7 @@ class UserDataSource {
 
   Future<User?> createUser(Map<String, dynamic> usr) async { // TODO: Change to User entity
     //final content = usr.toModel().toJson();
-    final rawData = await ApiProvider(false).post('usuario/gravar', jsonEncode(usr));
+    final rawData = await ApiProvider().post('usuario/gravar', jsonEncode(usr), useToken: false);
     final converted = UserModel.fromJson(rawData).toEntity();
 
     return converted;

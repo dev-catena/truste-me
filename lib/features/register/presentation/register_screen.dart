@@ -269,7 +269,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       'password_confirmation': userPwdConfirmation,
     };
     try {
-      final resp = await ApiProvider(false).post('usuario/gravar', jsonEncode(content));
+      final resp = await ApiProvider().post('usuario/gravar', jsonEncode(content), useToken: false);
       isRegistering = false;
       setState(() {});
 

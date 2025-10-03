@@ -58,7 +58,7 @@ class ProfileDetailBloc extends Bloc<ProfileDetailEvent, ProfileDetailState> {
           income: event.user['renda_classe']
       );
 
-      // TODO: Update user data properly
+      // Update user data properly
       await userData.initialize(updatedUser);
       internState.copyWith(user: updatedUser, message: "Dados atualizados com sucesso!");
     }

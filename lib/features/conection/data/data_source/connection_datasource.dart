@@ -11,7 +11,7 @@ import '../models/connection_model.dart';
 class ConnectionDataSource {
   final _apiProvider = ApiProvider();
 
-  Future<List<Connection>> getConnectionsForUser(User user) async {  // TODO: Remove user parameter
+  Future<List<Connection>> getConnectionsForUser() async {
     final rawData = await _apiProvider.get('usuario/conexoes');
     // final rawData = _MockData().connections;
     final List<Connection> connectionList = [];

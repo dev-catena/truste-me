@@ -1,7 +1,5 @@
 
-// TODO: Change this library to https://pub.dev/packages/encrypt_shared_preferences in the future AND IMPLEMENT getStringList and setStringList
 import 'package:encrypt_shared_preferences/provider.dart';
-//import 'package:shared_preferences/shared_preferences.dart';
 
 enum KeyPrefs {
   //region ## ACCOUNT CONTROL

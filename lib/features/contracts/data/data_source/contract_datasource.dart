@@ -29,7 +29,7 @@ class ContractDataSource {
     return converted;
   }
 
-  Future<List<Contract>> getContractsForUser(final User user) async {   // TODO: Remove user parameter
+  Future<List<Contract>> getContractsForUser() async {
     final rawData = await _apiProvider.get('usuario/contratos');
     final List<Contract> convertedData = [];
 

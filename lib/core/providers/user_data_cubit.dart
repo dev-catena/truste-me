@@ -43,8 +43,8 @@ class UserDataCubit extends Cubit<UserDataState> {
     await Future.wait([
       // userDataSource.getGeneralInfo().then((value) => _userInfo = value),
       userDataSource.getSeals(user).then((value) => seals.addAll(value)),
-      contractDataSource.getContractsForUser(user).then((value) => contracts.addAll(value)),
-      connectionDataSource.getConnectionsForUser(user).then((value) => connections.addAll(value)),
+      contractDataSource.getContractsForUser().then((value) => contracts.addAll(value)),
+      connectionDataSource.getConnectionsForUser().then((value) => connections.addAll(value)),
     ]);
 
     user.sealsObtained.clear();
@@ -140,7 +140,7 @@ class UserDataCubit extends Cubit<UserDataState> {
 
   Future<void> refreshContracts() async {
     final internState = state as UserDataReady;
-    final newContracts = await contractDataSource.getContractsForUser(internState.user);
+    final newContracts = await contractDataSource.getContractsForUser();
 
     emit(internState.copyWith(contracts: newContracts));
   }
@@ -148,7 +148,7 @@ class UserDataCubit extends Cubit<UserDataState> {
   Future<void> refreshConnections(User user) async {
     final internState = state as UserDataReady;
 
-    final updatedConnections = await connectionDataSource.getConnectionsForUser(user);
+    final updatedConnections = await connectionDataSource.getConnectionsForUser();
 
     emit(internState.copyWith(connections: updatedConnections));
   }

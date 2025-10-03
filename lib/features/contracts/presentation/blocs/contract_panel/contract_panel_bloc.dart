@@ -27,7 +27,7 @@ class ContractPanelBloc extends Bloc<ContractPanelEvent, ContractPanelState> {
       List<Contract> contracts = [];
 
       await Future.wait([
-        datasource.getContractsForUser(userData.getUser).then((value) => contracts = value),
+        datasource.getContractsForUser().then((value) => contracts = value),
       ]);
 
       emit(ContractPanelReady(contracts: contracts));

@@ -43,7 +43,6 @@ class User extends Equatable {
   final DateTime memberSince;
 
   final List<Seal> sealsObtained;
-  //String authToken; // TODO: Remove from this class
 
   int get age {
     final today = DateTime.now();
@@ -80,7 +79,6 @@ class User extends Equatable {
     required this.memberSince,
 
     required this.sealsObtained,
-    //this.authToken = '',
   });
 
   User copyWith({
@@ -104,7 +102,6 @@ class User extends Equatable {
     DateTime? emailVerifiedAt,
     DateTime? memberSince,
     List<Seal>? sealsObtained,
-    //String? authToken
   }) {
     return User(
       id: id ?? this.id,
@@ -127,7 +124,6 @@ class User extends Equatable {
       emailVerifiedAt: emailVerifiedAt ?? this.emailVerifiedAt,
       memberSince: memberSince ?? this.memberSince,
       sealsObtained: sealsObtained ?? this.sealsObtained,
-      //authToken: authToken ?? this.authToken,
 
     );
   }

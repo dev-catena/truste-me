@@ -10,6 +10,7 @@ import '../../../core/api_provider.dart';
 import '../../../core/cep_api.dart';
 import '../../../core/extensions/context_extensions.dart';
 import '../../../core/utils/custom_colors.dart';
+import '../../../core/utils/log/log.dart';
 import '../../common/domain/entities/location.dart';
 import '../../common/presentation/widgets/components/custom_selectable_tile.dart';
 import '../../common/presentation/widgets/dialogs/single_select_dialog.dart';
@@ -282,9 +283,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       }
 
       setState(() {});
-    } catch (e) {
+    } catch (e, s) {
       isRegistering = false;
-      debugPrint('Error: $e');
+      Log.e('$runtimeType', 'Error registring an user.', e, s);
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e')));
       setState(() {});
     }

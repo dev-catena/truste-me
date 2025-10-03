@@ -8,6 +8,7 @@ import 'core/app_theme.dart';
 import 'core/providers/app_data_cubit.dart';
 import 'core/providers/user_data_cubit.dart';
 import 'core/routes.dart';
+import 'core/services/app_lifecycle_service.dart';
 import 'core/utils/globals.dart';
 import 'core/utils/preferences/app_preferences.dart';
 import 'features/common/data/data_source/app_data_source.dart';
@@ -15,6 +16,7 @@ import 'features/common/data/data_source/user_data_source.dart';
 import 'features/common/domain/entities/auth.dart';
 import 'features/conection/data/data_source/connection_datasource.dart';
 import 'features/contracts/data/data_source/contract_datasource.dart';
+import 'features/login/data/data_source/logout_datasource.dart';
 
 // windows cmd
 // mkdir home\data\data_source && mkdir home\data\models && mkdir home\data\repositories && mkdir home\domain\entities && mkdir home\domain\repositories && mkdir home\domain\usecases && mkdir home\presentation\blocs && mkdir home\presentation\widgets
@@ -27,11 +29,13 @@ import 'features/contracts/data/data_source/contract_datasource.dart';
 // mkdir profile\presentation\blocs
 // mkdir profile\presentation\widgets
 
-var DEF_TEST = true;
+final DEF_TEST = true;
 
 void main() {
   initializeDateFormatting('pt_BR', null).then((_) async {
     WidgetsFlutterBinding.ensureInitialized();
+
+    AppLifecycleService().init();
 
     //region # LOAD AUTH VARIABLES
     final prefs = AppPreferences();
@@ -58,13 +62,25 @@ void main() {
   });
 }
 
-class TrustMeApp extends StatelessWidget {
+class TrustMeApp extends StatefulWidget {
   const TrustMeApp({super.key});
 
   static final GoRouter _routes = AppRoutes().routes;
 
+  static Future<void> logout() async {
+    await LogoutDataSource().logout();
+    _routes.goNamed(AppRoutes.loginScreen);
+  }
+
+  @override
+  State<TrustMeApp> createState() => _TrustMeAppState();
+}
+
+class _TrustMeAppState extends State<TrustMeApp> {
+
   @override
   Widget build(BuildContext context) {
+
     return MultiBlocProvider(
       providers: [
         BlocProvider<UserDataCubit>(
@@ -86,9 +102,9 @@ class TrustMeApp extends StatelessWidget {
           Locale('pt', 'BR'),
         ],
         theme: AppTheme().getAppTheme(context),
-        routeInformationParser: _routes.routeInformationParser,
-        routeInformationProvider: _routes.routeInformationProvider,
-        routerDelegate: _routes.routerDelegate,
+        routeInformationParser: TrustMeApp._routes.routeInformationParser,
+        routeInformationProvider: TrustMeApp._routes.routeInformationProvider,
+        routerDelegate: TrustMeApp._routes.routerDelegate,
       ),
     );
   }

@@ -5,6 +5,10 @@ import 'package:meta/meta.dart';
 
 import '../../../../core/providers/app_data_cubit.dart';
 import '../../../../core/providers/user_data_cubit.dart';
+import '../../../../core/services/app_lifecycle_service.dart';
+import '../../../../core/utils/log/log.dart';
+import '../../../../core/utils/preferences/app_preferences.dart';
+import '../../../../main.dart';
 import '../../../common/data/models/user_model.dart';
 import '../../../common/domain/entities/user.dart';
 import '../../data/data_source/home_datasource.dart';
@@ -29,12 +33,23 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     emit(HomeLoadInProgress());
     try {
 
+      //region ## CHECK if this session is VALID
+      if(!await AppLifecycleService().isUserLastIterationThresholdValid()) {
+        TrustMeApp.logout();
+        return;
+      }
+
+      // Set User last iteration as NOW
+      await AppPreferences().setInt(KeyPrefs.USER_LAST_ITERATION, DateTime.now().millisecondsSinceEpoch);
+      //endregion
+
       //region ## LOAD APP VARIABLES IF NEEDED
       if(appData.state is AppDataInitial) {
         await appData.initialize();
       }
       //endregion
 
+      //region ## LOAD USER DATA / INFO
       late GeneralUserInfo info;
       late UserModel user;
 
@@ -43,11 +58,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         dataSource.getGeneralInfo().then((value) => info = value),
       ]);
 
-      // TODO: Update user data properly to avoid initialize it again
-      //user.authToken = userData.getUser.authToken;
       await userData.initialize(user);
-
-      debugPrint('USER DATA: ${userData.getUser.toString()}');
+      Log.d('$runtimeType', 'USER DATA: ${userData.getUser.toString()}');
+      //endregion
       
       //await Future.delayed(Duration(seconds: 5));
 

@@ -4,6 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../../../../core/enums/contract_status.dart';
+import '../../../../../core/utils/log/log.dart';
 import '../../../../common/domain/entities/user.dart';
 import '../../../data/data_source/contract_datasource.dart';
 import '../../../domain/entities/clause.dart';
@@ -275,7 +276,7 @@ class ContractDetailBloc extends Bloc<ContractDetailEvent, ContractDetailState> 
 
     final updatedAnswers = List.of(internState.contract.answers);
     for (final ele in updatedAnswers) {
-      debugPrint('updatedAnswers question id ${ele.questionId} - ${ele.answer}');
+      Log.d('$runtimeType', 'updatedAnswers question id ${ele.questionId} - ${ele.answer}');
     }
     updatedAnswers
         .removeWhere((element) => element.questionId == event.question.id && element.userId == userLoggedIn.id);

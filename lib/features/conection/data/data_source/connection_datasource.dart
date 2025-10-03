@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
 import '../../../../core/api_provider.dart';
+import '../../../../core/utils/log/log.dart';
 import '../../../common/domain/entities/user.dart';
 import '../../domain/entities/connection.dart';
 import '../models/connection_model.dart';
@@ -35,7 +36,7 @@ class ConnectionDataSource {
     final content = {'usuario_codigo': code};
     final rawData = await _apiProvider.post('conexao/solicitar', jsonEncode(content));
 
-    debugPrint('$runtimeType - rawData $rawData');
+    Log.d('$runtimeType', 'rawData $rawData');
     return rawData;
   }
 

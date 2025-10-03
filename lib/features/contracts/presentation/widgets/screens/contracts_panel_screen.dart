@@ -6,6 +6,7 @@ import 'package:material_symbols_icons/material_symbols_icons.dart';
 import '../../../../../core/enums/contract_status.dart';
 import '../../../../../core/providers/user_data_cubit.dart';
 import '../../../../../core/routes.dart';
+import '../../../../../core/utils/log/log.dart';
 import '../../../../common/presentation/widgets/components/custom_scaffold.dart';
 import '../../../../common/presentation/widgets/components/header_line.dart';
 import '../../../../common/presentation/widgets/components/stateful_filter_chips.dart';
@@ -102,7 +103,7 @@ class _ContractsScreenState extends State<ContractsScreen> {
                                   } else if (contract.status == ContractStatus.pending){
                                     allContracts[allContractIndex] = contract.copyWith(status: ContractStatus.completed);
                                   }
-                                  debugPrint('$runtimeType - onExpire called');
+                                  Log.d('$runtimeType', 'onExpire called');
                                   if(context.mounted) {
                                     setState(() {});
                                   }

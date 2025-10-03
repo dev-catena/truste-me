@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
 import '../../../../core/api_provider.dart';
+import '../../../../core/utils/log/log.dart';
 import '../../../home/data/data_source/home_datasource.dart';
 import '../../domain/entities/seal.dart';
 import '../../domain/entities/user.dart';
@@ -43,7 +44,7 @@ class UserDataSource {
   Future<List<Seal>> getSeals(User user) async {
     final rawData = await _apiProvider.get('usuario/${user.id}/selos');
 
-    debugPrint('$runtimeType - rawData $rawData');
+    Log.d('$runtimeType', 'rawData $rawData');
     final allRawSeals = [
       ...(rawData['ativos'] as List).map((e) => e..['status'] = 'Ativo'),
 

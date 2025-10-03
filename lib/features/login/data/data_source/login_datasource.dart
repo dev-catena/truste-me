@@ -32,24 +32,24 @@ class LoginDataSource {
     }
   }
 
-  Future<void> logout() async {
-    await _apiProvider.post('logout', jsonEncode({})); // TODO: Perguntar para o Raul o que o logout faz no backend
-
-    final prefs = AppPreferences();
-    await prefs.remove(KeyPrefs.AUTH_TOKEN);
-    await prefs.remove(KeyPrefs.REFRESH_TOKEN);
-    await prefs.remove(KeyPrefs.AUTH_TOKEN_EXPIRATION);
-
-    // setLoggedInUser(
-    //   Person(
-    //     id: 0,
-    //     fullName: '',
-    //     cpf: '',
-    //     birthDate: DateTime.now(),
-    //     memberSince: DateTime.now(),
-    //     connectionCode: '',
-    //     authToken: '',
-    //   ),
-    // );
-  }
+  // Future<void> logout() async {
+  //   await _apiProvider.post('logout', jsonEncode({})); // TODO: Perguntar para o Raul o que o logout faz no backend
+  //
+  //   final prefs = AppPreferences();
+  //   await prefs.remove(KeyPrefs.AUTH_TOKEN);
+  //   await prefs.remove(KeyPrefs.REFRESH_TOKEN);
+  //   await prefs.remove(KeyPrefs.AUTH_TOKEN_EXPIRATION);
+  //
+  //   // setLoggedInUser(
+  //   //   Person(
+  //   //     id: 0,
+  //   //     fullName: '',
+  //   //     cpf: '',
+  //   //     birthDate: DateTime.now(),
+  //   //     memberSince: DateTime.now(),
+  //   //     connectionCode: '',
+  //   //     authToken: '',
+  //   //   ),
+  //   // );
+  // }
 }

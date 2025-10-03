@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../../../../core/providers/user_data_cubit.dart';
+import '../../../../../core/utils/log/log.dart';
 import '../../../data/data_source/contract_datasource.dart';
 import '../../../domain/entities/contract.dart';
 
@@ -21,7 +22,7 @@ class ContractPanelBloc extends Bloc<ContractPanelEvent, ContractPanelState> {
   Future<void> _onStarted(ContractPanelEvent event, Emitter<ContractPanelState> emit) async {
     // try {
       emit(ContractPanelLoadInProgress());
-      debugPrint('$runtimeType - started');
+      Log.d('$runtimeType', 'started');
 
       List<Contract> contracts = [];
 

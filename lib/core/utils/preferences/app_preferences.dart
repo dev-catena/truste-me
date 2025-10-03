@@ -22,7 +22,9 @@ enum KeyPrefs {
   // USER_EMAIL,
   //endregion
 
-  INSTALLATION_DATE
+  INSTALLATION_DATE,
+
+  USER_LAST_ITERATION,
 }
 
 extension KeyPrefsEx on KeyPrefs {
@@ -73,17 +75,17 @@ class AppPreferences {
   //endregion
 
   //region ## Get Methods
-  Future<String?> getString(KeyPrefs key, String? defValue, {justValue = false}) async {
+  Future<String?> getString(KeyPrefs key, String? defValue) async {
     await initializationDone;
     return prefs.getString(key.name, defaultValue: defValue);
   }
 
-  Future<int?> getInt(KeyPrefs key, int? defValue, {justValue = false}) async {
+  Future<int?> getInt(KeyPrefs key, int? defValue) async {
     await initializationDone;
     return prefs.getInt(key.name, defaultValue: defValue);
   }
 
-  Future<bool?> getBool(KeyPrefs key, bool? defValue, {justValue = false}) async {
+  Future<bool?> getBool(KeyPrefs key, bool? defValue) async {
     await initializationDone;
     return prefs.getBool(key.name, defaultValue: defValue);
   }

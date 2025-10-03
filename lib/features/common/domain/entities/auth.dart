@@ -23,6 +23,10 @@ Auth? get authData {
   return _auth;
 }
 
+void resetAuthData() {
+  _auth = null;
+}
+
 Auth? _auth;
 
 class Auth {

@@ -8,6 +8,7 @@ import 'package:http_parser/http_parser.dart';
 
 import '../features/common/domain/entities/auth.dart';
 import '../features/common/domain/entities/user.dart';
+import 'utils/log/log.dart';
 
 class ApiProvider {
   ApiProvider([this.useToken = true]);
@@ -38,11 +39,11 @@ class ApiProvider {
     url = Uri.https(_host, endPoint, params);
 
     final Map<String, dynamic> responseData;
-    debugPrint('$runtimeType - GET url $url');
+    Log.d('$runtimeType', 'GET url $url');
 
     try {
       final http.Response response = await http.get(url, headers: _header).timeout(const Duration(seconds: 10));
-      // debugPrint('$runtimeType - GET response ${response.body}');
+      // Log.d('$runtimeType', 'GET response ${response.body}');
 
       if (response.statusCode == 200) {
         //O IF abaixo é necessário pois nem todos os endpoints retornam um Map, alguns retornam apenas uma List de itens
@@ -57,7 +58,7 @@ class ApiProvider {
         throw HttpException('error ${response.statusCode}');
       }
     } catch (e, s) {
-      debugPrint('$runtimeType - Error: $e\nStack:$s');
+      Log.e('$runtimeType', 'Error on GET method', e, s);
       rethrow;
     }
   }
@@ -68,12 +69,12 @@ class ApiProvider {
     url = Uri.https(_host, endPoint);
     final http.Response response;
 
-    debugPrint('$runtimeType - POST url $url - content $content');
+    Log.d('$runtimeType', 'POST url $url - content $content');
 
     try {
       response = await http.post(url, body: content, headers: _header).timeout(const Duration(seconds: 7));
 
-      debugPrint('$runtimeType - POST response ${response.body}');
+      Log.d('$runtimeType', 'POST response ${response.body}');
 
       if (jsonDecode(response.body) is List<dynamic>) {
         final Map<String, dynamic> mapData = {'data': jsonDecode(response.body)};
@@ -81,7 +82,7 @@ class ApiProvider {
       }
       return jsonDecode(response.body) as Map<String, dynamic>;
     } catch (e, s) {
-      debugPrint('$runtimeType - Error: $e\nStack:$s');
+      Log.e('$runtimeType', 'Error on POST method.', e, s);
       rethrow;
     }
   }
@@ -92,12 +93,12 @@ class ApiProvider {
     url = Uri.https(_host, endPoint);
     final http.Response response;
 
-    debugPrint('$runtimeType - PATCH url $url - content $content');
+    Log.d('$runtimeType', 'PATCH url $url - content $content');
 
     try {
       response = await http.patch(url, body: content, headers: _header).timeout(const Duration(seconds: 7));
 
-      // debugPrint('$runtimeType - PATCH response ${response.body}');
+      // Log.d(TAG, '$runtimeType - PATCH response ${response.body}');
 
       if (jsonDecode(response.body) is List<dynamic>) {
         final Map<String, dynamic> mapData = {'data': jsonDecode(response.body)};
@@ -105,7 +106,7 @@ class ApiProvider {
       }
       return jsonDecode(response.body) as Map<String, dynamic>;
     } catch (e, s) {
-      debugPrint('$runtimeType - Error: $e\nStack:$s');
+      Log.e('$runtimeType', 'Error on PATCH method', e, s);
       rethrow;
     }
   }
@@ -125,15 +126,14 @@ class ApiProvider {
           )
           .timeout(const Duration(seconds: 10));
     } catch (e, s) {
-      debugPrint('$runtimeType - Error: $e\nStack:$s');
+      Log.d('$runtimeType', 'Error: $e\nStack:$s');
       rethrow;
     }
 
     if (response.statusCode == 201 || response.statusCode == 200) {
       return {'response': response.body};
     } else {
-      debugPrint(
-          '$runtimeType PUT: Status code: ${response.statusCode}\nResponse: ${response.reasonPhrase}\n${response.body}');
+      Log.d('$runtimeType', 'PUT: Status code: ${response.statusCode}\nResponse: ${response.reasonPhrase}\n${response.body}');
       return {};
     }
   }
@@ -179,7 +179,7 @@ class ApiProvider {
       response = await request.send().timeout(const Duration(seconds: 10));
     } catch (e, s) {
       // ExceptionMessageResolver(e,s).getExceptionMessage();
-      debugPrint('erro $e\nstack: $s');
+      Log.e('$runtimeType', 'Error on POST_WITH_FILES method.', e, s);
       rethrow;
     }
 

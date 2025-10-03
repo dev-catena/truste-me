@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../../../../core/api_provider.dart';
+import '../../../../core/utils/log/log.dart';
 import '../../../contracts/domain/entities/contract_type.dart';
 import '../../domain/entities/seal.dart';
 import '../models/seal_model.dart';
@@ -30,7 +31,7 @@ class AppDataSource {
     final rawData = await _apiProvider.get('selos/listar');
     final List<Seal> seals = [];
 
-    debugPrint('$runtimeType - rawData $rawData');
+    Log.d('$runtimeType', 'rawData $rawData');
 
     for(final ele in rawData['data']){
       // seals.add(SealModel.fromJson(ele..['status'] = ele['id']== 1 ? 'Ausente' :'Indisponível').toEntity());

@@ -66,7 +66,7 @@ class UserSummaryCard extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            'Perfil criado ${DateParser.formatDate(user.memberSince.toLocal(), showYear: true, prefix: "em")}',
+                            'Perfil criado ${DateParser.formatDate(user.memberSince.toLocal(), showYear: true, prefix: "em ")}',
                             textAlign: TextAlign.end,
                             style: const TextStyle(color: Colors.black54),
                           ),

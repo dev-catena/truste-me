@@ -4,13 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/providers/app_data_cubit.dart';
-import '../../../../core/providers/user_data_cubit.dart';
-import '../../../../core/routes.dart';
-import '../../../../core/utils/custom_colors.dart';
-import '../../../../main.dart';
-import '../../data/data_source/login_datasource.dart';
-import '../blocs/login_cubit.dart';
+import 'package:trustme/core/providers/app_data_cubit.dart';
+import 'package:trustme/core/providers/user_data_cubit.dart';
+import 'package:trustme/core/routes.dart';
+import 'package:trustme/core/utils/custom_colors.dart';
+import 'package:trustme/features/login/data/data_source/login_datasource.dart';
+import 'package:trustme/features/login/presentation/blocs/login_cubit.dart';
+import 'package:trustme/main.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});

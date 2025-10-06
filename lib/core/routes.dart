@@ -11,7 +11,7 @@ import 'package:trustme/features/contracts/presentation/widgets/screens/contract
 import 'package:trustme/features/contracts/presentation/widgets/screens/new_contract_screen.dart';
 import 'package:trustme/features/home/presentation/widgets/screens/home_screen.dart';
 import 'package:trustme/features/login/presentation/widgets/login_screen.dart';
-import 'package:trustme/features/new_password/new_password_screen.dart';
+import 'package:trustme/features/new_password/widgets/screens/new_password_screen.dart';
 import 'package:trustme/features/profile/presentation/widgets/screens/profile_detail_screen.dart';
 import 'package:trustme/features/profile/presentation/widgets/screens/profile_screen.dart';
 import 'package:trustme/features/register/presentation/widgets/screens/register_screen.dart';

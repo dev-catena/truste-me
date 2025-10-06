@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:trustme/core/api_provider.dart';
+import 'package:trustme/core/utils/log/log.dart';
 
 class NewPasswordDataSource {
   final _apiProvider = ApiProvider();
@@ -11,11 +12,16 @@ class NewPasswordDataSource {
       'tipo': 'redefinicao',
     };
 
-    final resp = await _apiProvider.post('acesso/enviar-codigo', jsonEncode(content), useToken: false);
+    try {
+      final resp = await _apiProvider.post('acesso/enviar-codigo', jsonEncode(content), useToken: false);
 
-    if(resp['message'] == 'Email com código enviado com sucesso'){
-      return true;
-    } else {
+      if(resp['message'] == 'Email com código enviado com sucesso'){
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e, s) {
+      Log.e('$runtimeType', 'Error on verifyEmail method.', e, s);
       return false;
     }
   }
@@ -25,11 +31,16 @@ class NewPasswordDataSource {
       'codigo': code,
     };
 
-    final resp = await _apiProvider.post('acesso/validar-codigo', jsonEncode(content), useToken: false);
+    try {
+      final resp = await _apiProvider.post('acesso/validar-codigo', jsonEncode(content), useToken: false);
 
-    if(resp['success']){
-      return true;
-    } else {
+      if(resp['success']){
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e, s) {
+      Log.e('$runtimeType', 'Error on validateCode method.', e, s);
       return false;
     }
   }
@@ -41,13 +52,18 @@ class NewPasswordDataSource {
       'new_password_confirmation': pwd
     };
 
-    final resp = await _apiProvider.post('acesso/redefinir-senha', jsonEncode(content), useToken: false);
 
-    if(resp['success']){
-      return true;
-    } else {
+    try {
+      final resp = await _apiProvider.post('acesso/redefinir-senha', jsonEncode(content), useToken: false);
+
+      if(resp['success']){
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e, s) {
+      Log.e('$runtimeType', 'Error on resetPwd method.', e, s);
       return false;
     }
-
   }
 }

@@ -15,7 +15,7 @@ import '../../../../common/presentation/widgets/components/generic_error_compone
 import '../../../../register/domain/entities/address_info_data.dart';
 import '../../../../register/domain/entities/complemenary_info_data.dart';
 import '../../../../register/domain/entities/user_info_data.dart';
-import '../../../../register/presentation/register_screen.dart';
+import '../../../../register/presentation/widgets/screens/register_screen.dart';
 import '../../blocs/profile_detail/profile_detail_bloc.dart';
 
 class ProfileDetailScreen extends StatefulWidget {

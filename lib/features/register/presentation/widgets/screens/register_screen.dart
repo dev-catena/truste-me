@@ -6,24 +6,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/api_provider.dart';
-import '../../../core/cep_api.dart';
-import '../../../core/extensions/context_extensions.dart';
-import '../../../core/utils/custom_colors.dart';
-import '../../../core/utils/log/log.dart';
-import '../../common/domain/entities/location.dart';
-import '../../common/presentation/widgets/components/custom_selectable_tile.dart';
-import '../../common/presentation/widgets/dialogs/single_select_dialog.dart';
-import '../domain/entities/user_info_data.dart';
-import 'widgets/address_info_form.dart';
+import '../../../../../core/api_provider.dart';
+import '../../../../../core/cep_api.dart';
+import '../../../../../core/extensions/context_extensions.dart';
+import '../../../../../core/utils/custom_colors.dart';
+import '../../../../../core/utils/log/log.dart';
+import '../../../../common/domain/entities/location.dart';
+import '../../../../common/presentation/widgets/components/custom_selectable_tile.dart';
+import '../../../../common/presentation/widgets/dialogs/single_select_dialog.dart';
+import '../../../domain/entities/user_info_data.dart';
+import '../address_info_form.dart';
 
 //part 'widgets/address_info_form.dart';
 
-part 'widgets/complementary_info_form.dart';
+part '../complementary_info_form.dart';
 
-part 'widgets/password_creation.dart';
+part '../password_creation.dart';
 
-part 'widgets/age_confirmation.dart';
+part '../age_confirmation.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});

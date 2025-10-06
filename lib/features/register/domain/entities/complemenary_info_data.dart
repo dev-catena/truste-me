@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 
-import '../../presentation/register_screen.dart';
+import '../../presentation/widgets/screens/register_screen.dart';
 
 class ComplementaryInfoData {
   final bool isEdition;

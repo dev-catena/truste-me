@@ -14,7 +14,7 @@ import '../features/login/presentation/widgets/login_screen.dart';
 import '../features/new_password/new_password_screen.dart';
 import '../features/profile/presentation/widgets/screens/profile_detail_screen.dart';
 import '../features/profile/presentation/widgets/screens/profile_screen.dart';
-import '../features/register/presentation/register_screen.dart';
+import '../features/register/presentation/widgets/screens/register_screen.dart';
 import 'enums/contract_status.dart';
 import 'scaffold_with_nested_navigation.dart';
 

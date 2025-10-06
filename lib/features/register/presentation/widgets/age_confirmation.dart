@@ -1,4 +1,4 @@
-part of '../register_screen.dart';
+part of 'screens/register_screen.dart';
 
 class _AgeConfirmation extends StatelessWidget {
   const _AgeConfirmation();

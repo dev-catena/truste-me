@@ -1,4 +1,4 @@
-part of '../register_screen.dart';
+part of 'screens/register_screen.dart';
 
 enum IncomeRange {
   classA('Classe A', 'Maior que R\$30 mil'),

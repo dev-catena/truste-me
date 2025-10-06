@@ -5,6 +5,9 @@ import 'package:brasil_fields/brasil_fields.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:trustme/features/register/presentation/widgets/age_confirmation.dart';
+import 'package:trustme/features/register/presentation/widgets/complementary_info_form.dart';
+import 'package:trustme/features/register/presentation/widgets/password_creation.dart';
 
 import '../../../../../core/api_provider.dart';
 import '../../../../../core/cep_api.dart';
@@ -17,13 +20,6 @@ import '../../../../common/presentation/widgets/dialogs/single_select_dialog.dar
 import '../../../domain/entities/user_info_data.dart';
 import '../address_info_form.dart';
 
-//part 'widgets/address_info_form.dart';
-
-part '../complementary_info_form.dart';
-
-part '../password_creation.dart';
-
-part '../age_confirmation.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -293,7 +289,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Widget getForm(int step) {
     if (step == 1) {
-      return const _AgeConfirmation();
+      return const AgeConfirmation();
     } else if (step == 2) {
       return personalData.buildForm(
         onPersonalDataSet: (value, email, cpf) {
@@ -316,7 +312,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         onIncomeSet: (value) => userIncome = value,
       );
     } else if (step == 5) {
-      return _PasswordCreation(
+      return PasswordCreation(
         onPasswordSet: (value) => userPwd = value,
         onPasswordConfirmSet: (value) => userPwdConfirmation = value,
       );

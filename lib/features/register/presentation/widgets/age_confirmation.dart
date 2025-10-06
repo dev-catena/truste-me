@@ -1,7 +1,8 @@
-part of 'screens/register_screen.dart';
+//part of 'screens/register_screen.dart';
+import 'package:flutter/material.dart';
 
-class _AgeConfirmation extends StatelessWidget {
-  const _AgeConfirmation();
+class AgeConfirmation extends StatelessWidget {
+  const AgeConfirmation({super.key});
 
   @override
   Widget build(BuildContext context) {

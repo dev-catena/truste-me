@@ -1,13 +1,16 @@
-part of 'screens/register_screen.dart';
+//part of 'screens/register_screen.dart';
 
-class _PasswordCreation extends StatelessWidget {
-  const _PasswordCreation({
+import 'package:flutter/material.dart';
+
+class PasswordCreation extends StatelessWidget {
+  final ValueChanged<String> onPasswordSet;
+  final ValueChanged<String> onPasswordConfirmSet;
+
+  const PasswordCreation({
+    super.key,
     required this.onPasswordSet,
     required this.onPasswordConfirmSet,
   });
-
-  final ValueChanged<String> onPasswordSet;
-  final ValueChanged<String> onPasswordConfirmSet;
 
   static const DEF_PASSWORD_LENGTH = 6;
 

@@ -1,4 +1,10 @@
-part of 'screens/register_screen.dart';
+//part of 'screens/register_screen.dart';
+
+import 'package:flutter/material.dart';
+
+import '../../../../core/utils/custom_colors.dart';
+import '../../../common/presentation/widgets/components/custom_selectable_tile.dart';
+import '../../../common/presentation/widgets/dialogs/single_select_dialog.dart';
 
 enum IncomeRange {
   classA('Classe A', 'Maior que R\$30 mil'),

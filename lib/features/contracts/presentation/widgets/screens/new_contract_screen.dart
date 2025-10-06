@@ -3,19 +3,19 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
-import '../../../../../core/enums/contract_status.dart';
-import '../../../../../core/providers/user_data_cubit.dart';
-import '../../../../common/domain/entities/user.dart';
-import '../../../../common/presentation/widgets/components/custom_scaffold.dart';
-import '../../../../common/presentation/widgets/components/header_line.dart';
-import '../../../data/data_source/contract_datasource.dart';
-import '../../../domain/entities/clause.dart';
-import '../../../domain/entities/contract.dart';
-import '../../../domain/entities/contract_type.dart';
-import '../../../domain/entities/sexual_practice.dart';
-import '../components/clause_selection_card.dart';
-import '../components/contract_specification_widget.dart';
-import '../components/new_contract_header.dart';
+import 'package:trustme/core/enums/contract_status.dart';
+import 'package:trustme/core/providers/user_data_cubit.dart';
+import 'package:trustme/features/common/domain/entities/user.dart';
+import 'package:trustme/features/common/presentation/widgets/components/custom_scaffold.dart';
+import 'package:trustme/features/common/presentation/widgets/components/header_line.dart';
+import 'package:trustme/features/contracts/data/data_source/contract_datasource.dart';
+import 'package:trustme/features/contracts/domain/entities/clause.dart';
+import 'package:trustme/features/contracts/domain/entities/contract.dart';
+import 'package:trustme/features/contracts/domain/entities/contract_type.dart';
+import 'package:trustme/features/contracts/domain/entities/sexual_practice.dart';
+import 'package:trustme/features/contracts/presentation/widgets/components/clause_selection_card.dart';
+import 'package:trustme/features/contracts/presentation/widgets/components/contract_specification_widget.dart';
+import 'package:trustme/features/contracts/presentation/widgets/components/new_contract_header.dart';
 
 class NewContractScreen extends StatefulWidget {
   const NewContractScreen({super.key});

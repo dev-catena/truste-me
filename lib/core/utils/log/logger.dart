@@ -1,6 +1,6 @@
 import 'package:logger/logger.dart';
 
-import '../../global/global_variables.dart';
+import 'package:trustme/core/global/global_variables.dart';
 
 /*
 * The LogFilter decides which log events should be shown and which don't.

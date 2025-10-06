@@ -1,12 +1,12 @@
-import '../../../../core/enums/contract_status.dart';
-import '../../../common/data/models/user_model.dart';
-import '../../domain/entities/clause.dart';
-import '../../domain/entities/contract.dart';
-import '../../domain/entities/contract_answer.dart';
-import '../../domain/entities/contract_signature.dart';
-import '../../domain/entities/contract_type.dart';
-import '../../domain/entities/sexual_practice.dart';
-import 'clause_model.dart';
+import 'package:trustme/core/enums/contract_status.dart';
+import 'package:trustme/features/common/data/models/user_model.dart';
+import 'package:trustme/features/contracts/domain/entities/clause.dart';
+import 'package:trustme/features/contracts/domain/entities/contract.dart';
+import 'package:trustme/features/contracts/domain/entities/contract_answer.dart';
+import 'package:trustme/features/contracts/domain/entities/contract_signature.dart';
+import 'package:trustme/features/contracts/domain/entities/contract_type.dart';
+import 'package:trustme/features/contracts/domain/entities/sexual_practice.dart';
+import 'package:trustme/features/contracts/data/models/clause_model.dart';
 
 class ContractModel extends Contract {
   const ContractModel({

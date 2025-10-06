@@ -2,9 +2,9 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
-import '../../../../core/providers/user_data_cubit.dart';
-import '../../../../core/utils/exception_handler.dart';
-import '../../data/data_source/login_datasource.dart';
+import 'package:trustme/core/providers/user_data_cubit.dart';
+import 'package:trustme/core/utils/exception_handler.dart';
+import 'package:trustme/features/login/data/data_source/login_datasource.dart';
 
 part 'login_state.dart';
 

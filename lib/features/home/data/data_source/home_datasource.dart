@@ -1,6 +1,5 @@
-import '../../../../core/api_provider.dart';
-import '../../../common/data/models/user_model.dart';
-import '../../../common/domain/entities/user.dart';
+import 'package:trustme/core/api_provider.dart';
+import 'package:trustme/features/common/data/models/user_model.dart';
 
 class HomeDataSource {
   final ApiProvider _apiProvider = ApiProvider();

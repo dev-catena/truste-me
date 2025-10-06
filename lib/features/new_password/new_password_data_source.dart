@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import '../../core/api_provider.dart';
+import 'package:trustme/core/api_provider.dart';
 
 class NewPasswordDataSource {
   final _apiProvider = ApiProvider();

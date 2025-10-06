@@ -1,14 +1,12 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
-
-import '../../../../core/api_provider.dart';
-import '../../../../core/utils/log/log.dart';
-import '../../../home/data/data_source/home_datasource.dart';
-import '../../domain/entities/seal.dart';
-import '../../domain/entities/user.dart';
-import '../models/seal_model.dart';
-import '../models/user_model.dart';
+import 'package:trustme/core/api_provider.dart';
+import 'package:trustme/core/utils/log/log.dart';
+import 'package:trustme/features/home/data/data_source/home_datasource.dart';
+import 'package:trustme/features/common/domain/entities/seal.dart';
+import 'package:trustme/features/common/domain/entities/user.dart';
+import 'package:trustme/features/common/data/models/seal_model.dart';
+import 'package:trustme/features/common/data/models/user_model.dart';
 
 class UserDataSource {
   final ApiProvider _apiProvider = ApiProvider();

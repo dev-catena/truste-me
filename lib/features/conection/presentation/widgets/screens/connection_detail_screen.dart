@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../../core/providers/user_data_cubit.dart';
-import '../../../../../core/utils/date_parser.dart';
-import '../../../../common/domain/entities/seal.dart';
-import '../../../../common/presentation/widgets/components/custom_scaffold.dart';
-import '../../../domain/entities/connection.dart';
-import '../components/seals_board.dart';
+import 'package:trustme/core/providers/user_data_cubit.dart';
+import 'package:trustme/core/utils/date_parser.dart';
+import 'package:trustme/features/common/domain/entities/seal.dart';
+import 'package:trustme/features/common/presentation/widgets/components/custom_scaffold.dart';
+import 'package:trustme/features/conection/domain/entities/connection.dart';
+import 'package:trustme/features/conection/presentation/widgets/components/seals_board.dart';
 
 class ConnectionDetailScreen extends StatefulWidget {
   const ConnectionDetailScreen(this.connection, {super.key});

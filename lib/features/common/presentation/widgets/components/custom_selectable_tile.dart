@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../../core/utils/custom_colors.dart';
+import 'package:trustme/core/utils/custom_colors.dart';
 
 class CustomSelectableTile extends StatelessWidget {
   const CustomSelectableTile({

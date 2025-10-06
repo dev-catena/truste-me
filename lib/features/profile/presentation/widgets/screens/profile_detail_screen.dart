@@ -1,23 +1,18 @@
-
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:trustme/features/register/presentation/widgets/complementary_info_form.dart';
 
-import '../../../../../core/extensions/context_extensions.dart';
-import '../../../../../core/providers/user_data_cubit.dart';
-import '../../../../../core/utils/custom_colors.dart';
-import '../../../../common/data/data_source/user_data_source.dart';
-import '../../../../common/domain/entities/location.dart';
-import '../../../../common/domain/entities/user.dart';
-import '../../../../common/presentation/widgets/components/custom_scaffold.dart';
-import '../../../../common/presentation/widgets/components/generic_error_component.dart';
-import '../../../../register/domain/entities/address_info_data.dart';
-import '../../../../register/domain/entities/complemenary_info_data.dart';
-import '../../../../register/domain/entities/user_info_data.dart';
-import '../../../../register/presentation/widgets/screens/register_screen.dart';
-import '../../blocs/profile_detail/profile_detail_bloc.dart';
+import 'package:trustme/core/extensions/context_extensions.dart';
+import 'package:trustme/core/providers/user_data_cubit.dart';
+import 'package:trustme/core/utils/custom_colors.dart';
+import 'package:trustme/features/common/domain/entities/location.dart';
+import 'package:trustme/features/common/domain/entities/user.dart';
+import 'package:trustme/features/common/presentation/widgets/components/generic_error_component.dart';
+import 'package:trustme/features/register/domain/entities/address_info_data.dart';
+import 'package:trustme/features/register/domain/entities/complemenary_info_data.dart';
+import 'package:trustme/features/register/domain/entities/user_info_data.dart';
+import 'package:trustme/features/profile/presentation/blocs/profile_detail/profile_detail_bloc.dart';
 
 class ProfileDetailScreen extends StatefulWidget {
   const ProfileDetailScreen({super.key});

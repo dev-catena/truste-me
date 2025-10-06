@@ -1,12 +1,10 @@
-
 import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/foundation.dart';
 
-import '../../../../../core/providers/user_data_cubit.dart';
-import '../../../../common/data/data_source/user_data_source.dart';
-import '../../../../common/data/models/user_model.dart';
-import '../../../../common/domain/entities/user.dart';
+import 'package:trustme/core/providers/user_data_cubit.dart';
+import 'package:trustme/features/common/data/data_source/user_data_source.dart';
+import 'package:trustme/features/common/domain/entities/user.dart';
 
 part 'profile_detail_event.dart';
 part 'profile_detail_state.dart';

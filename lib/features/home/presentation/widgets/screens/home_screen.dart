@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
-import '../../../../../core/providers/app_data_cubit.dart';
-import '../../../../../core/providers/user_data_cubit.dart';
-import '../../../../../core/routes.dart';
-import '../../../../common/presentation/widgets/components/custom_scaffold.dart';
-import '../../../../common/presentation/widgets/components/generic_error_component.dart';
-import '../../../data/data_source/home_datasource.dart';
-import '../../../data/models/feature_data.dart';
-import '../../blocs/home_bloc.dart';
-import '../components/user_home_info_component.dart';
+import 'package:trustme/core/providers/app_data_cubit.dart';
+import 'package:trustme/core/providers/user_data_cubit.dart';
+import 'package:trustme/core/routes.dart';
+import 'package:trustme/features/common/presentation/widgets/components/custom_scaffold.dart';
+import 'package:trustme/features/common/presentation/widgets/components/generic_error_component.dart';
+import 'package:trustme/features/home/data/data_source/home_datasource.dart';
+import 'package:trustme/features/home/data/models/feature_data.dart';
+import 'package:trustme/features/home/presentation/blocs/home_bloc.dart';
+import 'package:trustme/features/home/presentation/widgets/components/user_home_info_component.dart';
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});

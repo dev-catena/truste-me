@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../domain/entities/clause.dart';
+import 'package:trustme/features/contracts/domain/entities/clause.dart';
 
 class InspectClauseDialog extends StatelessWidget {
   const InspectClauseDialog(this.clause, {super.key});

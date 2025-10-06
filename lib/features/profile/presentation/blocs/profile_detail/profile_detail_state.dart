@@ -1,4 +1,3 @@
-
 part of 'profile_detail_bloc.dart';
 
 @immutable

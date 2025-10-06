@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../../../../common/domain/entities/user.dart';
-import '../../../domain/entities/clause.dart';
-import '../../../domain/entities/contract_answer.dart';
-import '../../../domain/entities/contract_type.dart';
-import '../../../domain/entities/sexual_practice.dart';
+import 'package:trustme/features/common/domain/entities/user.dart';
+import 'package:trustme/features/contracts/domain/entities/clause.dart';
+import 'package:trustme/features/contracts/domain/entities/contract_answer.dart';
+import 'package:trustme/features/contracts/domain/entities/contract_type.dart';
+import 'package:trustme/features/contracts/domain/entities/sexual_practice.dart';
 
 class ContractSpecificationWidget extends StatelessWidget {
   const ContractSpecificationWidget({

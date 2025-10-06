@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../../core/routes.dart';
-import '../../../../../core/utils/date_parser.dart';
-import '../../../../common/domain/entities/user.dart';
-import '../../../domain/entities/connection.dart';
+import 'package:trustme/core/routes.dart';
+import 'package:trustme/core/utils/date_parser.dart';
+import 'package:trustme/features/common/domain/entities/user.dart';
+import 'package:trustme/features/conection/domain/entities/connection.dart';
 
 class ConnectionTile extends StatelessWidget {
   ConnectionTile(this.connection, {super.key});

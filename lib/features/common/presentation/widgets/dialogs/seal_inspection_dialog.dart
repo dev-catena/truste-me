@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../../core/extensions/context_extensions.dart';
-import '../../../data/data_source/seal_data_source.dart';
-import '../../../domain/entities/seal.dart';
+import 'package:trustme/core/extensions/context_extensions.dart';
+import 'package:trustme/features/common/data/data_source/seal_data_source.dart';
+import 'package:trustme/features/common/domain/entities/seal.dart';
 
 class SealInspectionDialog extends StatefulWidget {
   const SealInspectionDialog(this.seal, {required this.canGetSeal, super.key});

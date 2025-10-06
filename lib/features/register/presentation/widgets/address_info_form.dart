@@ -1,14 +1,11 @@
-//part of '../register_screen.dart';
-
 import 'package:brasil_fields/brasil_fields.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../../core/cep_api.dart';
-import '../../../../core/extensions/context_extensions.dart';
-import '../../../../core/utils/custom_colors.dart';
-import '../../../common/domain/entities/location.dart';
+import 'package:trustme/core/cep_api.dart';
+import 'package:trustme/core/extensions/context_extensions.dart';
+import 'package:trustme/core/utils/custom_colors.dart';
+import 'package:trustme/features/common/domain/entities/location.dart';
 
 enum _InputType {
   number,

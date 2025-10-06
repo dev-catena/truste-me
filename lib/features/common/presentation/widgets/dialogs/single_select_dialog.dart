@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../components/custom_selectable_tile.dart';
+import 'package:trustme/features/common/presentation/widgets/components/custom_selectable_tile.dart';
 
 /// Caixa de diálogo genérica que disponibiliza ao usuário selecionar uma opção e retorna a opção escolhida
 /// pelo callback de [onChoose].

@@ -1,5 +1,3 @@
-//part of 'screens/register_screen.dart';
-
 import 'package:flutter/material.dart';
 
 class PasswordCreation extends StatelessWidget {

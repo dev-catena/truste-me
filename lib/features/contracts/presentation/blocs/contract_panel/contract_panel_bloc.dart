@@ -1,10 +1,10 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/foundation.dart';
 
-import '../../../../../core/providers/user_data_cubit.dart';
-import '../../../../../core/utils/log/log.dart';
-import '../../../data/data_source/contract_datasource.dart';
-import '../../../domain/entities/contract.dart';
+import 'package:trustme/core/providers/user_data_cubit.dart';
+import 'package:trustme/core/utils/log/log.dart';
+import 'package:trustme/features/contracts/data/data_source/contract_datasource.dart';
+import 'package:trustme/features/contracts/domain/entities/contract.dart';
 
 part 'contract_panel_event.dart';
 

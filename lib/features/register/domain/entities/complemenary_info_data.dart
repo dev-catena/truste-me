@@ -3,8 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:trustme/features/register/presentation/widgets/complementary_info_form.dart';
 
-import '../../presentation/widgets/screens/register_screen.dart';
-
 class ComplementaryInfoData {
   final bool isEdition;
   String? userProfession;

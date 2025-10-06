@@ -1,13 +1,11 @@
 import 'dart:convert';
 
 
-import '../../../../core/api_provider.dart';
-import '../../../../core/providers/app_data_cubit.dart';
-import '../../../../core/providers/user_data_cubit.dart';
-import '../../../../core/utils/preferences/app_preferences.dart';
-import '../../../common/data/models/auth_model.dart';
-import '../../../common/data/models/user_model.dart';
-import '../../../common/domain/entities/auth.dart';
+import 'package:trustme/core/api_provider.dart';
+import 'package:trustme/core/providers/app_data_cubit.dart';
+import 'package:trustme/core/providers/user_data_cubit.dart';
+import 'package:trustme/features/common/data/models/auth_model.dart';
+import 'package:trustme/features/common/domain/entities/auth.dart';
 
 class LoginDataSource {
   final bool useToken;

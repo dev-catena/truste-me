@@ -1,7 +1,4 @@
-import 'package:flutter/material.dart';
-
-import '../../../register/presentation/widgets/address_info_form.dart';
-import '../../data/models/location_model.dart';
+import 'package:trustme/features/common/data/models/location_model.dart';
 
 class Location {
   final int id;

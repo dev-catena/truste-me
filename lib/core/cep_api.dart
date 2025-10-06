@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-import '../features/common/data/models/location_model.dart';
-import '../features/common/domain/entities/location.dart';
+import 'package:trustme/features/common/data/models/location_model.dart';
+import 'package:trustme/features/common/domain/entities/location.dart';
 
 class CepAPI {
   final String _host = 'viacep.com.br';

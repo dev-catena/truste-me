@@ -1,5 +1,5 @@
 
-import '../../../../core/utils/preferences/app_preferences.dart';
+import 'package:trustme/core/utils/preferences/app_preferences.dart';
 
 Future<void> setAuthData(Auth auth) async {
   

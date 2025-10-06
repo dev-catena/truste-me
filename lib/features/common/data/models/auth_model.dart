@@ -1,4 +1,4 @@
-import '../../domain/entities/auth.dart';
+import 'package:trustme/features/common/domain/entities/auth.dart';
 
 class AuthModel extends Auth {
   AuthModel({

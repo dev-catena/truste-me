@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-import '../../../../../core/enums/connection_status.dart';
-import '../../../../../core/extensions/context_extensions.dart';
-import '../../../../../core/providers/user_data_cubit.dart';
-import '../../../../common/presentation/widgets/components/custom_scaffold.dart';
-import '../../../../common/presentation/widgets/components/header_line.dart';
-import '../../../../common/presentation/widgets/components/stateful_filter_chips.dart';
-import '../../../domain/entities/connection.dart';
-import '../dialogs/request_connection_dialog.dart';
+import 'package:trustme/core/enums/connection_status.dart';
+import 'package:trustme/core/extensions/context_extensions.dart';
+import 'package:trustme/core/providers/user_data_cubit.dart';
+import 'package:trustme/features/common/presentation/widgets/components/custom_scaffold.dart';
+import 'package:trustme/features/common/presentation/widgets/components/header_line.dart';
+import 'package:trustme/features/common/presentation/widgets/components/stateful_filter_chips.dart';
+import 'package:trustme/features/conection/domain/entities/connection.dart';
+import 'package:trustme/features/conection/presentation/widgets/dialogs/request_connection_dialog.dart';
 
 class ConnectionPanelScreen extends StatefulWidget {
   const ConnectionPanelScreen({super.key, this.initialFilter});

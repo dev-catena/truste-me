@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../../core/enums/contract_status.dart';
-import '../../../../../core/providers/user_data_cubit.dart';
-import '../../../../../core/routes.dart';
-import '../../../../conection/domain/entities/connection.dart';
-import 'summary_card.dart';
+import 'package:trustme/core/enums/contract_status.dart';
+import 'package:trustme/core/providers/user_data_cubit.dart';
+import 'package:trustme/core/routes.dart';
+import 'package:trustme/features/conection/domain/entities/connection.dart';
+import 'package:trustme/features/home/presentation/widgets/components/summary_card.dart';
 
 class UserHomeInfoComponent extends StatelessWidget {
   const UserHomeInfoComponent({super.key});

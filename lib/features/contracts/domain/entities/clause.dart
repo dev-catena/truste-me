@@ -3,11 +3,11 @@ import 'dart:convert';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../core/utils/custom_colors.dart';
-import '../../../common/domain/entities/user.dart';
-import '../../../common/presentation/widgets/components/stateful_segmented_button.dart';
-import '../../presentation/widgets/components/clause_tile.dart';
-import 'contract_answer.dart';
+import 'package:trustme/core/utils/custom_colors.dart';
+import 'package:trustme/features/common/domain/entities/user.dart';
+import 'package:trustme/features/common/presentation/widgets/components/stateful_segmented_button.dart';
+import 'package:trustme/features/contracts/presentation/widgets/components/clause_tile.dart';
+import 'package:trustme/features/contracts/domain/entities/contract_answer.dart';
 
 class Clause extends Equatable {
   final int id;

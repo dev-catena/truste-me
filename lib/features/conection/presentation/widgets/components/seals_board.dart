@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../../core/providers/app_data_cubit.dart';
-import '../../../../common/domain/entities/seal.dart';
+import 'package:trustme/core/providers/app_data_cubit.dart';
+import 'package:trustme/features/common/domain/entities/seal.dart';
 
 class SealsBoard extends StatelessWidget {
   const SealsBoard(this._sealsObtained, {super.key, required this.canGetSeal});

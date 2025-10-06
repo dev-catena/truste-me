@@ -6,13 +6,12 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 
-import '../features/common/data/models/auth_model.dart';
-import '../features/common/domain/entities/auth.dart';
-import '../features/common/domain/entities/user.dart';
-import '../main.dart';
-import 'global/global_variables.dart';
-import 'utils/log/log.dart';
-import 'utils/preferences/app_preferences.dart';
+import 'package:trustme/features/common/data/models/auth_model.dart';
+import 'package:trustme/features/common/domain/entities/auth.dart';
+import 'package:trustme/main.dart';
+import 'package:trustme/core/global/global_variables.dart';
+import 'package:trustme/core/utils/log/log.dart';
+import 'package:trustme/core/utils/preferences/app_preferences.dart';
 import 'package:synchronized/synchronized.dart';
 
 enum Response401Result {

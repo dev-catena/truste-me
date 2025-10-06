@@ -1,5 +1,3 @@
-//part of '../../domain/entities/user_info_data.dart';
-
 import 'dart:async';
 import 'dart:convert';
 

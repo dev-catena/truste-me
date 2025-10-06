@@ -1,9 +1,9 @@
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 
-import '../../features/common/data/data_source/app_data_source.dart';
-import '../../features/common/domain/entities/seal.dart';
-import '../../features/contracts/domain/entities/contract_type.dart';
+import 'package:trustme/features/common/data/data_source/app_data_source.dart';
+import 'package:trustme/features/common/domain/entities/seal.dart';
+import 'package:trustme/features/contracts/domain/entities/contract_type.dart';
 
 part 'app_data_state.dart';
 

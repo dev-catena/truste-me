@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../../common/domain/entities/user.dart';
-import '../../../domain/entities/clause.dart';
+import 'package:trustme/features/common/domain/entities/user.dart';
+import 'package:trustme/features/contracts/domain/entities/clause.dart';
 
 class ClauseSelectionCard extends StatelessWidget {
   const ClauseSelectionCard({

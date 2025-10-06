@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../../../../core/utils/custom_colors.dart';
-import '../../../domain/entities/seal.dart';
-import '../dialogs/seal_inspection_dialog.dart';
+import 'package:trustme/core/utils/custom_colors.dart';
+import 'package:trustme/features/common/domain/entities/seal.dart';
+import 'package:trustme/features/common/presentation/widgets/dialogs/seal_inspection_dialog.dart';
 
 class SealCard extends StatelessWidget {
   const SealCard(this.seal, {required this.canGetSeal, super.key});

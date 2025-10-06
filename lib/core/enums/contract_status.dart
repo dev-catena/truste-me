@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import '../utils/custom_colors.dart';
+import 'package:trustme/core/utils/custom_colors.dart';
 
 enum ContractStatus {
   pending(0, 'Pendente', CustomColor.pendingYellow),

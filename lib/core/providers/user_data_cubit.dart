@@ -1,14 +1,14 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/foundation.dart';
 
-import '../../features/common/data/data_source/user_data_source.dart';
-import '../../features/common/domain/entities/seal.dart';
-import '../../features/common/domain/entities/user.dart';
-import '../../features/conection/data/data_source/connection_datasource.dart';
-import '../../features/conection/domain/entities/connection.dart';
-import '../../features/contracts/data/data_source/contract_datasource.dart';
-import '../../features/contracts/domain/entities/contract.dart';
-import '../enums/connection_status.dart';
+import 'package:trustme/features/common/data/data_source/user_data_source.dart';
+import 'package:trustme/features/common/domain/entities/seal.dart';
+import 'package:trustme/features/common/domain/entities/user.dart';
+import 'package:trustme/features/conection/data/data_source/connection_datasource.dart';
+import 'package:trustme/features/conection/domain/entities/connection.dart';
+import 'package:trustme/features/contracts/data/data_source/contract_datasource.dart';
+import 'package:trustme/features/contracts/domain/entities/contract.dart';
+import 'package:trustme/core/enums/connection_status.dart';
 
 part 'user_data_state.dart';
 

@@ -1,4 +1,4 @@
-import '../../domain/entities/location.dart';
+import 'package:trustme/features/common/domain/entities/location.dart';
 
 class LocationModel extends Location {
   LocationModel({

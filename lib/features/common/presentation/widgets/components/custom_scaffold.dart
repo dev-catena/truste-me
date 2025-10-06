@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../../core/providers/user_data_cubit.dart';
-import '../../../../../core/routes.dart';
-import '../../../../../core/utils/custom_colors.dart';
+import 'package:trustme/core/providers/user_data_cubit.dart';
+import 'package:trustme/core/routes.dart';
+import 'package:trustme/core/utils/custom_colors.dart';
 
 class CustomScaffold extends StatelessWidget {
   const CustomScaffold({

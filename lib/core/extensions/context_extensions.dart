@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../utils/custom_colors.dart';
+import 'package:trustme/core/utils/custom_colors.dart';
 
 extension SnackBarExtension on BuildContext {
   void showSnack(String message) {

@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../../../../core/enums/contract_status.dart';
-import '../../../../../core/utils/custom_colors.dart';
-import '../../../domain/entities/contract.dart';
+import 'package:trustme/core/enums/contract_status.dart';
+import 'package:trustme/core/utils/custom_colors.dart';
+import 'package:trustme/features/contracts/domain/entities/contract.dart';
 
 // TODO: Refatorar esse widget para suportar tipo dinâmico OU (melhor) controlar apenas o tempo restante, sem importar qual tipo de dado é passado
 class TimeLeftTicker extends StatefulWidget {

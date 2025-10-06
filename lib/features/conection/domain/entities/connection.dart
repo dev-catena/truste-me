@@ -2,9 +2,9 @@ import 'dart:ui';
 
 import 'package:equatable/equatable.dart';
 
-import '../../../../core/utils/custom_colors.dart';
-import '../../../common/domain/entities/user.dart';
-import '../../presentation/widgets/components/connection_tile.dart';
+import 'package:trustme/core/utils/custom_colors.dart';
+import 'package:trustme/features/common/domain/entities/user.dart';
+import 'package:trustme/features/conection/presentation/widgets/components/connection_tile.dart';
 
 class Connection extends Equatable {
   final int id;

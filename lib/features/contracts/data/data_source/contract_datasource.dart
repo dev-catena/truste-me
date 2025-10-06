@@ -1,14 +1,13 @@
 import 'dart:convert';
 
-import '../../../../core/api_provider.dart';
-import '../../../common/domain/entities/user.dart';
-import '../../domain/entities/clause.dart';
-import '../../domain/entities/contract.dart';
-import '../../domain/entities/contract_answer.dart';
-import '../../domain/entities/contract_type.dart';
-import '../../domain/entities/sexual_practice.dart';
-import '../models/clause_model.dart';
-import '../models/contract_model.dart';
+import 'package:trustme/core/api_provider.dart';
+import 'package:trustme/features/contracts/domain/entities/clause.dart';
+import 'package:trustme/features/contracts/domain/entities/contract.dart';
+import 'package:trustme/features/contracts/domain/entities/contract_answer.dart';
+import 'package:trustme/features/contracts/domain/entities/contract_type.dart';
+import 'package:trustme/features/contracts/domain/entities/sexual_practice.dart';
+import 'package:trustme/features/contracts/data/models/clause_model.dart';
+import 'package:trustme/features/contracts/data/models/contract_model.dart';
 
 class ContractDataSource {
   final _apiProvider = ApiProvider();

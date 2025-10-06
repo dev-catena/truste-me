@@ -3,17 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 
-import '../../../../core/enums/contract_status.dart';
-import '../../../../core/routes.dart';
-import '../../../../core/utils/custom_colors.dart';
-import '../../../common/domain/entities/user.dart';
-import '../../data/models/contract_model.dart';
-import '../../presentation/widgets/components/time_left_ticker.dart';
-import 'clause.dart';
-import 'contract_answer.dart';
-import 'contract_signature.dart';
-import 'contract_type.dart';
-import 'sexual_practice.dart';
+import 'package:trustme/core/enums/contract_status.dart';
+import 'package:trustme/core/routes.dart';
+import 'package:trustme/core/utils/custom_colors.dart';
+import 'package:trustme/features/common/domain/entities/user.dart';
+import 'package:trustme/features/contracts/data/models/contract_model.dart';
+import 'package:trustme/features/contracts/presentation/widgets/components/time_left_ticker.dart';
+import 'package:trustme/features/contracts/domain/entities/clause.dart';
+import 'package:trustme/features/contracts/domain/entities/contract_answer.dart';
+import 'package:trustme/features/contracts/domain/entities/contract_signature.dart';
+import 'package:trustme/features/contracts/domain/entities/contract_type.dart';
+import 'package:trustme/features/contracts/domain/entities/sexual_practice.dart';
 
 part '../../presentation/widgets/components/contract_card.dart';
 

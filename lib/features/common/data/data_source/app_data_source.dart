@@ -1,10 +1,9 @@
-import 'package:flutter/foundation.dart';
 
-import '../../../../core/api_provider.dart';
-import '../../../../core/utils/log/log.dart';
-import '../../../contracts/domain/entities/contract_type.dart';
-import '../../domain/entities/seal.dart';
-import '../models/seal_model.dart';
+import 'package:trustme/core/api_provider.dart';
+import 'package:trustme/core/utils/log/log.dart';
+import 'package:trustme/features/contracts/domain/entities/contract_type.dart';
+import 'package:trustme/features/common/domain/entities/seal.dart';
+import 'package:trustme/features/common/data/models/seal_model.dart';
 
 class AppDataSource {
   final _apiProvider = ApiProvider();

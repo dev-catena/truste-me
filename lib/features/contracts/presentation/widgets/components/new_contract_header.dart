@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../../core/providers/app_data_cubit.dart';
-import '../../../../common/domain/entities/user.dart';
-import '../../../../common/presentation/widgets/components/custom_selectable_tile.dart';
-import '../../../../common/presentation/widgets/components/stateful_segmented_button.dart';
-import '../../../../common/presentation/widgets/dialogs/single_select_dialog.dart';
-import '../../../../conection/domain/entities/connection.dart';
-import '../../../domain/entities/contract_type.dart';
+import 'package:trustme/core/providers/app_data_cubit.dart';
+import 'package:trustme/features/common/domain/entities/user.dart';
+import 'package:trustme/features/common/presentation/widgets/components/custom_selectable_tile.dart';
+import 'package:trustme/features/common/presentation/widgets/components/stateful_segmented_button.dart';
+import 'package:trustme/features/common/presentation/widgets/dialogs/single_select_dialog.dart';
+import 'package:trustme/features/conection/domain/entities/connection.dart';
+import 'package:trustme/features/contracts/domain/entities/contract_type.dart';
 
 class NewContractHeader extends StatelessWidget {
   const NewContractHeader(

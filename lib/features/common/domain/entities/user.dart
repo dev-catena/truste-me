@@ -1,12 +1,12 @@
-import 'dart:convert';
+
 import 'dart:math';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
-import 'seal.dart';
-import '../../../../core/utils/custom_colors.dart';
-import '../../presentation/widgets/components/user_summary_card.dart';
+import 'package:trustme/features/common/domain/entities/seal.dart';
+import 'package:trustme/core/utils/custom_colors.dart';
+import 'package:trustme/features/common/presentation/widgets/components/user_summary_card.dart';
 
 void setLoggedInUser(User user) {
   _userLoggedIn = user;

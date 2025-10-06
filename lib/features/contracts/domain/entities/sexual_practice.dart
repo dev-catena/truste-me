@@ -1,9 +1,9 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../core/utils/custom_colors.dart';
-import '../../../common/domain/entities/user.dart';
-import 'clause.dart';
+import 'package:trustme/core/utils/custom_colors.dart';
+import 'package:trustme/features/common/domain/entities/user.dart';
+import 'package:trustme/features/contracts/domain/entities/clause.dart';
 
 class SexualPractice extends Equatable {
   final int id;

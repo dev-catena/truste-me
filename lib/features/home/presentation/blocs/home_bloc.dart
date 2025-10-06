@@ -3,15 +3,14 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
-import '../../../../core/providers/app_data_cubit.dart';
-import '../../../../core/providers/user_data_cubit.dart';
-import '../../../../core/services/app_lifecycle_service.dart';
-import '../../../../core/utils/log/log.dart';
-import '../../../../core/utils/preferences/app_preferences.dart';
-import '../../../../main.dart';
-import '../../../common/data/models/user_model.dart';
-import '../../../common/domain/entities/user.dart';
-import '../../data/data_source/home_datasource.dart';
+import 'package:trustme/core/providers/app_data_cubit.dart';
+import 'package:trustme/core/providers/user_data_cubit.dart';
+import 'package:trustme/core/services/app_lifecycle_service.dart';
+import 'package:trustme/core/utils/log/log.dart';
+import 'package:trustme/core/utils/preferences/app_preferences.dart';
+import 'package:trustme/main.dart';
+import 'package:trustme/features/common/data/models/user_model.dart';
+import 'package:trustme/features/home/data/data_source/home_datasource.dart';
 
 part 'home_event.dart';
 

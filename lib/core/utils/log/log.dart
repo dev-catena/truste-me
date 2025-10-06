@@ -1,5 +1,5 @@
 
-import 'logger.dart';
+import 'package:trustme/core/utils/log/logger.dart';
 
 class Log {
   static const APP_NAME = "TRUSTME";

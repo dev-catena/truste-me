@@ -1,5 +1,5 @@
-import '../../../../core/api_provider.dart';
-import '../../domain/entities/seal.dart';
+import 'package:trustme/core/api_provider.dart';
+import 'package:trustme/features/common/domain/entities/seal.dart';
 
 class SealDataSource {
   final ApiProvider _apiProvider = ApiProvider();

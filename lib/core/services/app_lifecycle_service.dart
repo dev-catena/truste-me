@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../main.dart';
-import '../utils/log/log.dart';
-import '../utils/preferences/app_preferences.dart';
+import 'package:trustme/main.dart';
+import 'package:trustme/core/utils/log/log.dart';
+import 'package:trustme/core/utils/preferences/app_preferences.dart';
 
 class AppLifecycleService with WidgetsBindingObserver {
   static final AppLifecycleService _instance = AppLifecycleService._internal();

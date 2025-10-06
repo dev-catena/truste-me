@@ -1,5 +1,5 @@
-import '../../domain/entities/user.dart';
-import 'seal_model.dart';
+import 'package:trustme/features/common/domain/entities/user.dart';
+import 'package:trustme/features/common/data/models/seal_model.dart';
 
 class UserModel extends User {
   UserModel({

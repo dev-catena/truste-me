@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../features/common/domain/entities/auth.dart';
-import '../features/conection/domain/entities/connection.dart';
-import '../features/conection/presentation/widgets/screens/connection_detail_screen.dart';
-import '../features/conection/presentation/widgets/screens/connection_panel_screen.dart';
-import '../features/contracts/domain/entities/contract.dart';
-import '../features/contracts/presentation/widgets/screens/contract_detail_screen.dart';
-import '../features/contracts/presentation/widgets/screens/contracts_panel_screen.dart';
-import '../features/contracts/presentation/widgets/screens/new_contract_screen.dart';
-import '../features/home/presentation/widgets/screens/home_screen.dart';
-import '../features/login/presentation/widgets/login_screen.dart';
-import '../features/new_password/new_password_screen.dart';
-import '../features/profile/presentation/widgets/screens/profile_detail_screen.dart';
-import '../features/profile/presentation/widgets/screens/profile_screen.dart';
-import '../features/register/presentation/widgets/screens/register_screen.dart';
-import 'enums/contract_status.dart';
-import 'scaffold_with_nested_navigation.dart';
+import 'package:trustme/features/common/domain/entities/auth.dart';
+import 'package:trustme/features/conection/domain/entities/connection.dart';
+import 'package:trustme/features/conection/presentation/widgets/screens/connection_detail_screen.dart';
+import 'package:trustme/features/conection/presentation/widgets/screens/connection_panel_screen.dart';
+import 'package:trustme/features/contracts/domain/entities/contract.dart';
+import 'package:trustme/features/contracts/presentation/widgets/screens/contract_detail_screen.dart';
+import 'package:trustme/features/contracts/presentation/widgets/screens/contracts_panel_screen.dart';
+import 'package:trustme/features/contracts/presentation/widgets/screens/new_contract_screen.dart';
+import 'package:trustme/features/home/presentation/widgets/screens/home_screen.dart';
+import 'package:trustme/features/login/presentation/widgets/login_screen.dart';
+import 'package:trustme/features/new_password/new_password_screen.dart';
+import 'package:trustme/features/profile/presentation/widgets/screens/profile_detail_screen.dart';
+import 'package:trustme/features/profile/presentation/widgets/screens/profile_screen.dart';
+import 'package:trustme/features/register/presentation/widgets/screens/register_screen.dart';
+import 'package:trustme/core/enums/contract_status.dart';
+import 'package:trustme/core/scaffold_with_nested_navigation.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorAKey = GlobalKey<NavigatorState>(debugLabel: 'shellA');

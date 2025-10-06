@@ -1,9 +1,6 @@
-import 'dart:async';
-import 'dart:convert';
 
 import 'package:brasil_fields/brasil_fields.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:trustme/features/register/presentation/widgets/personal_info_form.dart';
 
 import 'package:trustme/core/extensions/datetime_extensions.dart';

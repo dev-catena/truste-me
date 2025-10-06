@@ -3,18 +3,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
-import '../../../../../core/enums/contract_status.dart';
-import '../../../../../core/extensions/context_extensions.dart';
-import '../../../../../core/utils/custom_colors.dart';
-import '../../../../common/presentation/widgets/components/custom_scaffold.dart';
-import '../../../../common/presentation/widgets/components/generic_error_component.dart';
-import '../../../../common/presentation/widgets/components/header_line.dart';
-import '../../../data/data_source/contract_datasource.dart';
-import '../../../domain/entities/clause.dart';
-import '../../../domain/entities/contract.dart';
-import '../../blocs/contract_detail/contract_detail_bloc.dart';
-import '../components/clause_selection_card.dart';
-import '../components/contract_specification_widget.dart';
+import 'package:trustme/core/enums/contract_status.dart';
+import 'package:trustme/core/extensions/context_extensions.dart';
+import 'package:trustme/core/utils/custom_colors.dart';
+import 'package:trustme/features/common/presentation/widgets/components/custom_scaffold.dart';
+import 'package:trustme/features/common/presentation/widgets/components/generic_error_component.dart';
+import 'package:trustme/features/common/presentation/widgets/components/header_line.dart';
+import 'package:trustme/features/contracts/data/data_source/contract_datasource.dart';
+import 'package:trustme/features/contracts/domain/entities/clause.dart';
+import 'package:trustme/features/contracts/domain/entities/contract.dart';
+import 'package:trustme/features/contracts/presentation/blocs/contract_detail/contract_detail_bloc.dart';
+import 'package:trustme/features/contracts/presentation/widgets/components/clause_selection_card.dart';
+import 'package:trustme/features/contracts/presentation/widgets/components/contract_specification_widget.dart';
 
 class ContractDetailScreen extends StatelessWidget {
   const ContractDetailScreen(this.contract, {super.key});

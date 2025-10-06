@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../core/extensions/context_extensions.dart';
-import '../../core/utils/custom_colors.dart';
-import 'new_password_data_source.dart';
+import 'package:trustme/core/extensions/context_extensions.dart';
+import 'package:trustme/core/utils/custom_colors.dart';
+import 'package:trustme/features/new_password/new_password_data_source.dart';
 
 class NewPasswordScreen extends StatefulWidget {
   const NewPasswordScreen({super.key});

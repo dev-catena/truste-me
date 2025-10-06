@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
-import 'extensions/context_extensions.dart';
-import 'utils/custom_colors.dart';
+import 'package:trustme/core/extensions/context_extensions.dart';
+import 'package:trustme/core/utils/custom_colors.dart';
 
 final scaffoldKey = GlobalKey<ScaffoldState>();
 

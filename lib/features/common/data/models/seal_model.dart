@@ -1,4 +1,4 @@
-import '../../domain/entities/seal.dart';
+import 'package:trustme/features/common/domain/entities/seal.dart';
 
 class SealModel extends Seal {
   Seal toEntity() {

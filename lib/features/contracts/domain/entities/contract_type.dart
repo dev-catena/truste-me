@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import 'clause.dart';
+import 'package:trustme/features/contracts/domain/entities/clause.dart';
 
 class ContractType extends Equatable {
   final int id;

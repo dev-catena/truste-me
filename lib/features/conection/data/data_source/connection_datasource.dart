@@ -1,12 +1,9 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
-
-import '../../../../core/api_provider.dart';
-import '../../../../core/utils/log/log.dart';
-import '../../../common/domain/entities/user.dart';
-import '../../domain/entities/connection.dart';
-import '../models/connection_model.dart';
+import 'package:trustme/core/api_provider.dart';
+import 'package:trustme/core/utils/log/log.dart';
+import 'package:trustme/features/conection/domain/entities/connection.dart';
+import 'package:trustme/features/conection/data/models/connection_model.dart';
 
 class ConnectionDataSource {
   final _apiProvider = ApiProvider();

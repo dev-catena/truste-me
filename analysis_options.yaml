@@ -21,6 +21,7 @@ linter:
   # `// ignore_for_file: name_of_lint` syntax on the line or in the file
   # producing the lint.
   rules:
+    //ignore: non_constant_identifier_names
     prefer_single_quotes: true
     prefer_final_locals: true
     always_use_package_imports: true

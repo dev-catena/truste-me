@@ -13,7 +13,6 @@ import 'package:trustme/features/register/presentation/widgets/complementary_inf
 
 part 'register_state.dart';
 
-
 class RegisterCubit extends Cubit<RegisterState> {
   final BuildContext context;
   final _pageController = PageController();

@@ -2,9 +2,9 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 
-import '../../../../core/providers/user_data_cubit.dart';
-import '../../data/data_source/connection_datasource.dart';
-import '../../domain/entities/connection.dart';
+import 'package:trustme/core/providers/user_data_cubit.dart';
+import 'package:trustme/features/conection/data/data_source/connection_datasource.dart';
+import 'package:trustme/features/conection/domain/entities/connection.dart';
 
 part 'connection_panel_event.dart';
 part 'connection_panel_state.dart';

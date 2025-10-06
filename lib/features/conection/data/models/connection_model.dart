@@ -1,5 +1,5 @@
-import '../../../common/data/models/user_model.dart';
-import '../../domain/entities/connection.dart';
+import 'package:trustme/features/common/data/models/user_model.dart';
+import 'package:trustme/features/conection/domain/entities/connection.dart';
 
 class ConnectionModel extends Connection {
   ConnectionModel.fromJson(Map<String, dynamic> json)

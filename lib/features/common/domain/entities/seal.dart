@@ -2,8 +2,8 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
-import '../../../../core/utils/custom_colors.dart';
-import '../../presentation/widgets/components/seal_card.dart';
+import 'package:trustme/core/utils/custom_colors.dart';
+import 'package:trustme/features/common/presentation/widgets/components/seal_card.dart';
 
 class Seal extends Equatable {
   final int id;

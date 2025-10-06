@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../../../../core/utils/custom_colors.dart';
-import '../../../../common/domain/entities/user.dart';
-import '../../../domain/entities/clause.dart';
-import 'inspect_clause_dialog.dart';
+import 'package:trustme/core/utils/custom_colors.dart';
+import 'package:trustme/features/common/domain/entities/user.dart';
+import 'package:trustme/features/contracts/domain/entities/clause.dart';
+import 'package:trustme/features/contracts/presentation/widgets/components/inspect_clause_dialog.dart';
 
 class ClauseTile extends StatelessWidget {
   const ClauseTile(

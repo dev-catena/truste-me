@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../common/domain/entities/location.dart';
-import '../../presentation/widgets/address_info_form.dart';
+import 'package:trustme/features/common/domain/entities/location.dart';
+import 'package:trustme/features/register/presentation/widgets/address_info_form.dart';
 
 class AddressInfoData {
   final bool isEdition;

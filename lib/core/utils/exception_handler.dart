@@ -1,9 +1,7 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
-
-import 'log/log.dart';
+import 'package:trustme/core/utils/log/log.dart';
 
 class ExceptionHandler {
   final Object e;

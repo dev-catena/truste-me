@@ -1,4 +1,4 @@
-import '../../domain/entities/clause.dart';
+import 'package:trustme/features/contracts/domain/entities/clause.dart';
 
 class ClauseModel extends Clause {
   Clause toEntity() {

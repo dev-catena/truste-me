@@ -4,23 +4,18 @@ import 'dart:convert';
 import 'package:brasil_fields/brasil_fields.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:trustme/features/register/presentation/widgets/personal_info_form.dart';
 
-import '../../../../core/api_provider.dart';
-import '../../../../core/extensions/context_extensions.dart';
-import '../../../../core/extensions/datetime_extensions.dart';
-import '../../../../core/utils/custom_colors.dart';
-import '../../../common/presentation/widgets/components/custom_selectable_tile.dart';
-
-part '../../presentation/widgets/personal_info_form.dart';
+import 'package:trustme/core/extensions/datetime_extensions.dart';
 
 class UserInfoData {
   final int id;
   final String name;
   final String cpf;
   final String email;
-  final DateTime birthDate;
+  final DateTime? birthDate;
 
-  UserInfoData({
+  const UserInfoData({
     required this.id,
     required this.name,
     required this.cpf,
@@ -28,7 +23,9 @@ class UserInfoData {
     required this.birthDate,
   });
 
-  final _emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+  const UserInfoData.empty() : this(id: -1, name: '', email: '', cpf: '', birthDate: null);
+
+  static const _emailRegex = r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$';
 
   UserInfoData copyWith({int? id, String? name, String? cpf, String? email, DateTime? birthDate}) {
     return UserInfoData(
@@ -46,7 +43,7 @@ class UserInfoData {
 
   bool get isEmailValid => RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
 
-  bool get isBirthValid => birthDate.isLegalAge();
+  bool get isBirthValid => birthDate?.isLegalAge() ?? false;
 
   bool get isValid => isNameValid && isCpfValid && isEmailValid && isBirthValid;
 
@@ -59,10 +56,10 @@ class UserInfoData {
     if (!CPFValidator.isValid(cpf)) {
       errors.add('CPF');
     }
-    if (!_emailRegex.hasMatch(email)) {
+    if (!RegExp(_emailRegex).hasMatch(email)) {
       errors.add('e-mail');
     }
-    if (!birthDate.isLegalAge()) {
+    if (!(birthDate?.isLegalAge() ?? false)) {
       errors.add('Idade mínima de 18 anos');
     }
 
@@ -87,8 +84,6 @@ class UserInfoData {
   Widget buildForm({
     required void Function(UserInfoData userData, bool emailAlreadyExists, bool cpfAlreadyExists) onPersonalDataSet,
   }) {
-    return _PersonalInfoForm(currentData: this, onPersonalDataSet: onPersonalDataSet);
+    return PersonalInfoForm(currentData: this, onPersonalDataSet: onPersonalDataSet);
   }
-
-  UserInfoData.empty() : this(id: -1, name: '', email: '', cpf: '', birthDate: DateTime.now());
 }

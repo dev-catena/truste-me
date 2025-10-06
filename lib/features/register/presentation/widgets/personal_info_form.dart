@@ -1,16 +1,29 @@
-part of '../../domain/entities/user_info_data.dart';
+//part of '../../domain/entities/user_info_data.dart';
 
-class _PersonalInfoForm extends StatefulWidget {
+import 'dart:async';
+import 'dart:convert';
+
+import 'package:brasil_fields/brasil_fields.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:trustme/core/api_provider.dart';
+import 'package:trustme/core/extensions/context_extensions.dart';
+import 'package:trustme/core/extensions/datetime_extensions.dart';
+import 'package:trustme/core/utils/custom_colors.dart';
+import 'package:trustme/features/common/presentation/widgets/components/custom_selectable_tile.dart';
+import 'package:trustme/features/register/domain/entities/user_info_data.dart';
+
+class PersonalInfoForm extends StatefulWidget {
   final UserInfoData? currentData;
   final void Function(UserInfoData userData, bool emailAlreadyExists, bool cpfAlreadyExists) onPersonalDataSet;
 
-  const _PersonalInfoForm({required this.currentData, required this.onPersonalDataSet});
+  const PersonalInfoForm({required this.currentData, required this.onPersonalDataSet});
 
   @override
-  State<_PersonalInfoForm> createState() => _PersonalInfoFormState();
+  State<PersonalInfoForm> createState() => _PersonalInfoFormState();
 }
 
-class _PersonalInfoFormState extends State<_PersonalInfoForm> {
+class _PersonalInfoFormState extends State<PersonalInfoForm> {
   final _nameController = TextEditingController();
   final _cpfController = TextEditingController();
   final _emailController = TextEditingController();
@@ -48,7 +61,7 @@ class _PersonalInfoFormState extends State<_PersonalInfoForm> {
       _emailController.text = personalData.email;
     }
 
-    if (personalData.birthDate.isLegalAge()) {
+    if (personalData.birthDate?.isLegalAge() ?? false) {
       datePicked = personalData.birthDate;
       wasBirthdayTouched = true;
     } else {

@@ -5,6 +5,8 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
+import 'package:trustme/core/utils/http/custom_http_error.dart';
+import 'package:trustme/core/utils/http/custom_http_result.dart';
 
 import 'package:trustme/features/common/data/models/auth_model.dart';
 import 'package:trustme/features/common/domain/entities/auth.dart';
@@ -54,48 +56,49 @@ class ApiProvider {
     }
   }
 
+  // TODO: Replace it to return HttpResult
+  // TODO: Catch exception on caller
+  // TODO: Update the other methods
   Future<Map<String, dynamic>> get(String endPoint, {bool useToken = true, bool checkErrors = false, int attempt = 0, Map<String, dynamic>? params}) async {
     endPoint = 'api/$endPoint';
 
     final Uri url;
     url = Uri.https(_host, endPoint, params);
 
-    final Map<String, dynamic> responseData;
     Log.d('$runtimeType', 'GET url $url');
 
     try {
       final http.Response response = await http.get(url, headers: _getHeader(useToken)).timeout(const Duration(seconds: 10));
       // Log.d('$runtimeType', 'GET response ${response.body}');
 
-      if (DEF_SUCCESS_HTTP_RESPONSE_CODES.contains(response.statusCode)) {
-        //O IF abaixo é necessário pois nem todos os endpoints retornam um Map, alguns retornam apenas uma List de itens
-        if (jsonDecode(response.body) is List<dynamic>) {
-          final Map<String, dynamic> mapData = {'data': jsonDecode(response.body)};
-          return mapData;
+      final httpResult = handleHttpResponse(response);
+      return httpResult.data;
+    } on ClientErrorException catch (e, s) {
+      Log.e('$runtimeType', '❌ Erro do cliente.', e, s);
+
+      if(GlobalVariables.DEF_CHECK_AUTH_ERRORS && checkErrors) {
+        final error403 = await _checkError403(url, e.statusCode);
+
+        if (!error403 && await _checkError401(url, e.statusCode, attempt) == Response401Result.TRY_AGAIN) {
+          return get(
+              endPoint,
+              useToken: useToken,
+              checkErrors: checkErrors,
+              attempt: attempt + 1,
+              params: params
+          );
         }
-
-        responseData = jsonDecode(response.body);
-        return responseData;
-      } else {
-
-        if(GlobalVariables.DEF_CHECK_AUTH_ERRORS && checkErrors) {
-          final error403 = await _checkError403(url, response.statusCode);
-
-          if (!error403 && await _checkError401(url, response.statusCode, attempt) == Response401Result.TRY_AGAIN) {
-            return get(
-                endPoint,
-                useToken: useToken,
-                checkErrors: checkErrors,
-                attempt: attempt + 1,
-                params: params
-            );
-          }
-        }
-
-        throw HttpException('Error ${response.statusCode}');
       }
-    } catch (e, s) {
-      Log.e('$runtimeType', 'Error on GET method', e, s);
+
+      rethrow;
+    } on ServerErrorException catch (e, s) {
+      Log.e('$runtimeType', '🔥 Server error.', e, s);
+      rethrow;
+    } on HttpRequestException catch (e, s) {
+      Log.e('$runtimeType', '⚠️ Generic error.', e, s);
+      rethrow;
+    } on Exception catch(e, s) {
+      Log.e('$runtimeType', '⚠️ Error on GET method', e, s);
       rethrow;
     }
   }
@@ -112,7 +115,7 @@ class ApiProvider {
       response = await http.post(url, body: content, headers: _getHeader(useToken)).timeout(const Duration(seconds: 7));
       Log.d('$runtimeType', 'POST response ${response.body}');
 
-      if (DEF_SUCCESS_HTTP_RESPONSE_CODES.contains(response.statusCode)) {
+      if (response.statusCode >= 200 && response.statusCode < 300) {
         if (jsonDecode(response.body) is List<dynamic>) {
           final Map<String, dynamic> mapData = {'data': jsonDecode(response.body)};
           return mapData;
@@ -154,7 +157,7 @@ class ApiProvider {
       response = await http.patch(url, body: content, headers: _getHeader(useToken)).timeout(const Duration(seconds: 7));
       // Log.d(TAG, '$runtimeType - PATCH response ${response.body}');
 
-      if (DEF_SUCCESS_HTTP_RESPONSE_CODES.contains(response.statusCode)) {
+      if (response.statusCode >= 200 && response.statusCode < 300) {
         if (jsonDecode(response.body) is List<dynamic>) {
           final Map<String, dynamic> mapData = {'data': jsonDecode(response.body)};
           return mapData;
@@ -192,7 +195,7 @@ class ApiProvider {
     try {
       response = await http.put(url, body: content, headers: _getHeader(useToken),).timeout(const Duration(seconds: 10));
 
-      if (DEF_SUCCESS_HTTP_RESPONSE_CODES.contains(response.statusCode)) {
+      if (response.statusCode >= 200 && response.statusCode < 300) {
         return {'response': response.body};
       } else {
 
@@ -230,7 +233,7 @@ class ApiProvider {
 
     response = await http.delete(url, headers: _getHeader(useToken), body: content);
 
-    if (DEF_SUCCESS_HTTP_RESPONSE_CODES.contains(response.statusCode)) {
+    if (response.statusCode >= 200 && response.statusCode < 300) {
       Log.d('$runtimeType', 'DELETE method OK');
     } else {
       if(GlobalVariables.DEF_CHECK_AUTH_ERRORS && checkErrors) {
@@ -278,7 +281,7 @@ class ApiProvider {
     try {
       response = await request.send().timeout(const Duration(seconds: 10));
 
-      if (DEF_SUCCESS_HTTP_RESPONSE_CODES.contains(response.statusCode)) {
+      if (response.statusCode >= 200 && response.statusCode < 300) {
         return {'response': response.reasonPhrase, 'statusCode': response.statusCode};
       } else {
 
@@ -312,6 +315,62 @@ class ApiProvider {
       rethrow;
     }
   }
+
+  HttpResult handleHttpResponse(http.Response response) {
+    final status = response.statusCode;
+
+    // try to decode JSON if possible
+    dynamic body;
+
+    try {
+      body = jsonDecode(response.body);
+    } catch (_) {
+      rethrow;
+    }
+
+    if (status >= 200 && status < 300) {
+      // success: returns the content directly
+      return HttpResult(
+          statusCode: status,
+          success: true,
+          message: (body is Map)
+              ? body['message']
+              : null,
+          data: (body is List<dynamic>)
+              ? {'data': body}
+              : (body['result']?? body is List<dynamic> ? {'data': body['result']?? body} : body['result']?? body)
+      );
+    } else if (status >= 400 && status < 500) {
+      throw ClientErrorException(
+          statusCode: status,
+          message: body is Map && body['message'] != null
+              ? body['message']
+              : 'Erro do cliente (${status})',
+          details: body,
+          success: body['success']?? false,
+          stackTrace: body['stack']
+      );
+    } else if (status >= 500 && status < 600) {
+      throw ServerErrorException(
+          statusCode: status,
+          message: body is Map && body['message'] != null
+              ? body['message']
+              : 'Erro do servidor (${status})',
+          details: body,
+          success: body['success']?? false,
+          stackTrace: body['stack']
+      );
+    } else {
+      throw HttpRequestException(
+          statusCode: status,
+          message: 'Erro inesperado (${status})',
+          details: body,
+          success: body['success']?? false,
+          stackTrace: body['stack']
+      );
+    }
+  }
+
 
   //region ## AUX METHODS
   Future<bool> _checkError403(Uri uri, int respStatusCode) async {
@@ -389,14 +448,15 @@ class ApiProvider {
     return Response401Result.NO_401;
   }
 
+  // WARNING: It will not be implemented for now. Maybe it is not needed for this project!
   Future<RefreshTokenResult> refreshAuthToken() async {
 
     if(!_lock.inLock) {
       return await _lock.synchronized(() async {
 
         final body = json.encode({
-          't': authData?.authToken,
-          'r': authData?.refreshToken,
+          'token': authData?.authToken,
+          'refresh_token': authData?.refreshToken,
         });
 
         try {

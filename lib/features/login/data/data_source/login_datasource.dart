@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-
 import 'package:trustme/core/api_provider.dart';
 import 'package:trustme/core/providers/app_data_cubit.dart';
 import 'package:trustme/core/providers/user_data_cubit.dart';

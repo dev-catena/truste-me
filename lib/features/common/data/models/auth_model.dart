@@ -10,7 +10,7 @@ class AuthModel extends Auth {
   AuthModel.fromJson(Map<String, dynamic> json) : super(
     authToken: json['token'] ?? '',
     refreshToken: json['refresh_token'] ?? '',
-    expirationAt: DateTime.tryParse(json['expiration_at'] ?? ''),
+    expirationAt: DateTime.tryParse(json['expires_at'] ?? ''),
   );
 
   Auth toEntity() {

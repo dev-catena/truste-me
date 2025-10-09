@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:trustme/core/extensions/context_extensions.dart';
 
 import 'package:trustme/core/providers/user_data_cubit.dart';
 import 'package:trustme/core/utils/date_parser.dart';
+import 'package:trustme/core/utils/http/custom_http_error.dart';
 import 'package:trustme/features/common/domain/entities/seal.dart';
 import 'package:trustme/features/common/presentation/widgets/components/custom_scaffold.dart';
 import 'package:trustme/features/conection/domain/entities/connection.dart';
@@ -26,14 +28,21 @@ class _ConnectionDetailScreenState extends State<ConnectionDetailScreen> {
 
   Future<void> acceptConnection(bool hasAccepted) async {
     acceptInProgress = true;
-    await userData.establishConnection(widget.connection, hasAccepted);
-    acceptInProgress = false;
 
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Conexão ${hasAccepted ? 'aceita' : 'recusada'}!'),
-      ));
-      context.pop();
+    try {
+      await userData.establishConnection(widget.connection, hasAccepted);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Conexão ${hasAccepted ? 'aceita' : 'recusada'}!'),
+        ));
+        context.pop();
+      }
+    } on HttpRequestException catch (e, s) {
+      context.showSnack('Erro ao estabelecer conexão. ${e.message}');
+    } on Exception catch(e, s) {
+      context.showSnack('Erro ao estabelecer conexão. ${e.toString()}');
+    } finally {
+      acceptInProgress = false;
     }
   }
 
@@ -103,10 +112,16 @@ class _ConnectionDetailScreenState extends State<ConnectionDetailScreen> {
                     onPressed: () async {
                       Navigator.of(dialogContext).pop(); // Dismiss the dialog
 
-                      await userData.deleteConnection(widget.connection);
+                      try {
+                        await userData.deleteConnection(widget.connection);
 
-                      if (context.mounted) {
-                        context.pop();
+                        if (context.mounted) {
+                          context.pop();
+                        }
+                      } on HttpRequestException catch (e, s) {
+                        context.showSnack('Não foi possível desfazer a conexão. ${e.message}');
+                      } on Exception catch(e, s) {
+                        context.showSnack('Não foi possível desfazer a conexão. ${e.toString()}');
                       }
                     },
                   ),
@@ -119,10 +134,16 @@ class _ConnectionDetailScreenState extends State<ConnectionDetailScreen> {
     } else if (widget.connection.status == ConnectionStatus.cancelled) {
       return OutlinedButton(
         onPressed: () async {
-          await userData.deleteConnection(widget.connection);
+          try {
+            await userData.deleteConnection(widget.connection);
 
-          if (context.mounted) {
-            context.pop();
+            if (context.mounted) {
+              context.pop();
+            }
+          } on HttpRequestException catch (e, s) {
+            context.showSnack('Não foi possível cancelar a solicitação. ${e.message}');
+          } on Exception catch(e, s) {
+            context.showSnack('Não foi possível cancelar a solicitação. ${e.toString()}');
           }
         },
         child: const Text('Cancelar solicitação'),

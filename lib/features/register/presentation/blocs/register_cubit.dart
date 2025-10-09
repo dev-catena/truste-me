@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:trustme/core/api_provider.dart';
 import 'package:trustme/core/extensions/context_extensions.dart';
+import 'package:trustme/core/utils/http/custom_http_error.dart';
 import 'package:trustme/core/utils/log/log.dart';
+import 'package:trustme/features/common/data/data_source/user_data_source.dart';
 import 'package:trustme/features/common/domain/entities/location.dart';
 import 'package:trustme/features/register/domain/entities/user_info_data.dart';
 import 'package:trustme/features/register/presentation/widgets/complementary_info_form.dart';
@@ -15,9 +17,10 @@ part 'register_state.dart';
 
 class RegisterCubit extends Cubit<RegisterState> {
   final BuildContext context;
+  final UserDataSource datasource;
   final _pageController = PageController();
 
-  RegisterCubit(this.context) : super(RegisterInitial());
+  RegisterCubit(this.context, this.datasource) : super(RegisterInitial());
 
   void init() => emit(RegisterFlow(pageController: _pageController));
 
@@ -142,20 +145,20 @@ class RegisterCubit extends Cubit<RegisterState> {
     };
 
     try {
-      final resp = await ApiProvider().post('usuario/gravar', jsonEncode(content), useToken: false);
+      //final resp = await ApiProvider().post('usuario/gravar', jsonEncode(content), useToken: false);
+      final resp = await datasource.createUser(content);
       if (context.mounted) {
-        if (resp['user'] != null) {
+        if (resp != null) {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Usuário cadastrado com sucesso!'), backgroundColor: Colors.green));
           context.pop();
         } else {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erro!\n$resp')));
         }
       }
-    } catch (e, st) {
-      Log.e('RegisterCubit', 'Error registering an user.', e, st);
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e')));
-      }
+    } on HttpRequestException catch (e, s) {
+      context.showSnack(e.message);
+    } on Exception catch(e, s) {
+      context.showSnack(e.toString());
     } finally {
       if (context.mounted) {
         emit(s.copyWith(isSubmitting: false));

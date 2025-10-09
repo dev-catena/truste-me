@@ -11,6 +11,7 @@ import 'package:trustme/features/common/data/models/user_model.dart';
 class UserDataSource {
   final ApiProvider _apiProvider = ApiProvider();
 
+  // CHECKED: 1
   Future<User?> createUser(Map<String, dynamic> usr) async { // TODO: Change to User entity
     //final content = usr.toModel().toJson();
     final rawData = await ApiProvider().post('usuario/gravar', jsonEncode(usr), useToken: false);

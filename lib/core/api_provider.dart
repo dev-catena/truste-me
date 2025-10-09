@@ -30,7 +30,6 @@ enum RefreshTokenResult {
 
 class ApiProvider {
   static const DEF_MAX_ATTEMPT = 5;
-  static const DEF_SUCCESS_HTTP_RESPONSE_CODES = [200, 201, 202, 204, 205, 206, 207, 208, 226];
 
   /// Use this object to prevent concurrent access to data
   static final _lock = Lock();
@@ -38,9 +37,6 @@ class ApiProvider {
   ApiProvider();
 
   final String _host = 'api-trustme.catenasystem.com.br';
-  //final bool useToken;
-
-  // final _header = {'Content-Type': 'application/json; charset=UTF-8', 'Authorization': 'Bearer ${userLoggedIn?.token ?? ''}'};
 
   Map<String, String> _getHeader(bool useToken) {
     final tokenizedHeader = {
@@ -56,15 +52,13 @@ class ApiProvider {
     }
   }
 
-  // TODO: Replace it to return HttpResult
   // TODO: Catch exception on caller
-  // TODO: Update the other methods
+  // TODO: Change the return type: Map<String, dynamic> -> HttpResult
   Future<Map<String, dynamic>> get(String endPoint, {bool useToken = true, bool checkErrors = false, int attempt = 0, Map<String, dynamic>? params}) async {
     endPoint = 'api/$endPoint';
 
     final Uri url;
     url = Uri.https(_host, endPoint, params);
-
     Log.d('$runtimeType', 'GET url $url');
 
     try {
@@ -72,9 +66,9 @@ class ApiProvider {
       // Log.d('$runtimeType', 'GET response ${response.body}');
 
       final httpResult = handleHttpResponse(response);
-      return httpResult.data;
+      return httpResult.data; // TODO: Change it to HttpResult
     } on ClientErrorException catch (e, s) {
-      Log.e('$runtimeType', '❌ Erro do cliente.', e, s);
+      Log.e('$runtimeType', '❌ Client error on GET method.', e, s);
 
       if(GlobalVariables.DEF_CHECK_AUTH_ERRORS && checkErrors) {
         final error403 = await _checkError403(url, e.statusCode);
@@ -92,13 +86,13 @@ class ApiProvider {
 
       rethrow;
     } on ServerErrorException catch (e, s) {
-      Log.e('$runtimeType', '🔥 Server error.', e, s);
+      Log.e('$runtimeType', '🔥 Server error on GET method.', e, s);
       rethrow;
     } on HttpRequestException catch (e, s) {
-      Log.e('$runtimeType', '⚠️ Generic error.', e, s);
+      Log.e('$runtimeType', '⚠️ Generic error on GET method.', e, s);
       rethrow;
     } on Exception catch(e, s) {
-      Log.e('$runtimeType', '⚠️ Error on GET method', e, s);
+      Log.e('$runtimeType', '⛔ Error on GET method', e, s);
       rethrow;
     }
   }
@@ -115,32 +109,34 @@ class ApiProvider {
       response = await http.post(url, body: content, headers: _getHeader(useToken)).timeout(const Duration(seconds: 7));
       Log.d('$runtimeType', 'POST response ${response.body}');
 
-      if (response.statusCode >= 200 && response.statusCode < 300) {
-        if (jsonDecode(response.body) is List<dynamic>) {
-          final Map<String, dynamic> mapData = {'data': jsonDecode(response.body)};
-          return mapData;
-        }
-        return jsonDecode(response.body) as Map<String, dynamic>;
-      } else {
+      final httpResult = handleHttpResponse(response);
+      return httpResult.data; // TODO: Change it to HttpResult
+    } on ClientErrorException catch (e, s) {
+      Log.e('$runtimeType', '❌ Client error on POST method.', e, s);
 
-        if(GlobalVariables.DEF_CHECK_AUTH_ERRORS && checkErrors) {
-          final error403 = await _checkError403(url, response.statusCode);
+      if(GlobalVariables.DEF_CHECK_AUTH_ERRORS && checkErrors) {
+        final error403 = await _checkError403(url, e.statusCode);
 
-          if (!error403 && await _checkError401(url, response.statusCode, attempt) == Response401Result.TRY_AGAIN) {
-            return post(
+        if (!error403 && await _checkError401(url, e.statusCode, attempt) == Response401Result.TRY_AGAIN) {
+          return post(
               endPoint,
               content,
               useToken: useToken,
               checkErrors: checkErrors,
-              attempt: attempt + 1,
-            );
-          }
+              attempt: attempt + 1
+          );
         }
-
-        throw HttpException('Error ${response.statusCode}');
       }
-    } catch (e, s) {
-      Log.e('$runtimeType', 'Error on POST method.', e, s);
+
+      rethrow;
+    } on ServerErrorException catch (e, s) {
+      Log.e('$runtimeType', '🔥 Server error on POST method.', e, s);
+      rethrow;
+    } on HttpRequestException catch (e, s) {
+      Log.e('$runtimeType', '⚠️ Generic error on POST method.', e, s);
+      rethrow;
+    } on Exception catch(e, s) {
+      Log.e('$runtimeType', '⛔ Error on POST method', e, s);
       rethrow;
     }
   }
@@ -157,31 +153,34 @@ class ApiProvider {
       response = await http.patch(url, body: content, headers: _getHeader(useToken)).timeout(const Duration(seconds: 7));
       // Log.d(TAG, '$runtimeType - PATCH response ${response.body}');
 
-      if (response.statusCode >= 200 && response.statusCode < 300) {
-        if (jsonDecode(response.body) is List<dynamic>) {
-          final Map<String, dynamic> mapData = {'data': jsonDecode(response.body)};
-          return mapData;
-        }
-        return jsonDecode(response.body) as Map<String, dynamic>;
-      } else {
-        if(GlobalVariables.DEF_CHECK_AUTH_ERRORS && checkErrors) {
-          final error403 = await _checkError403(url, response.statusCode);
+      final httpResult = handleHttpResponse(response);
+      return httpResult.data; // TODO: Change it to HttpResult
+    } on ClientErrorException catch (e, s) {
+      Log.e('$runtimeType', '❌ Client error on PATCH method.', e, s);
 
-          if (!error403 && await _checkError401(url, response.statusCode, attempt) == Response401Result.TRY_AGAIN) {
-            return patch(
-              endPoint,
-              content,
-              useToken: useToken,
-              checkErrors: checkErrors,
-              attempt: attempt + 1,
-            );
-          }
-        }
+      if(GlobalVariables.DEF_CHECK_AUTH_ERRORS && checkErrors) {
+        final error403 = await _checkError403(url, e.statusCode);
 
-        throw HttpException('Error ${response.statusCode}');
+        if (!error403 && await _checkError401(url, e.statusCode, attempt) == Response401Result.TRY_AGAIN) {
+          return patch(
+            endPoint,
+            content,
+            useToken: useToken,
+            checkErrors: checkErrors,
+            attempt: attempt + 1,
+          );
+        }
       }
-    } catch (e, s) {
-      Log.e('$runtimeType', 'Error on PATCH method', e, s);
+
+      rethrow;
+    } on ServerErrorException catch (e, s) {
+      Log.e('$runtimeType', '🔥 Server error on PATCH method.', e, s);
+      rethrow;
+    } on HttpRequestException catch (e, s) {
+      Log.e('$runtimeType', '⚠️ Generic error on PATCH method.', e, s);
+      rethrow;
+    } on Exception catch(e, s) {
+      Log.e('$runtimeType', '⛔ Error on PATCH method', e, s);
       rethrow;
     }
   }
@@ -194,52 +193,59 @@ class ApiProvider {
 
     try {
       response = await http.put(url, body: content, headers: _getHeader(useToken),).timeout(const Duration(seconds: 10));
+      // Log.d(TAG, '$runtimeType - PUT response ${response.body}');
 
-      if (response.statusCode >= 200 && response.statusCode < 300) {
-        return {'response': response.body};
-      } else {
+      final httpResult = handleHttpResponse(response);
+      return httpResult.data; // TODO: Change it to HttpResult
+    } on ClientErrorException catch (e, s) {
+      Log.e('$runtimeType', '❌ Client error on PUT method.', e, s);
 
-        if(GlobalVariables.DEF_CHECK_AUTH_ERRORS && checkErrors) {
-          final error403 = await _checkError403(url, response.statusCode);
+      if(GlobalVariables.DEF_CHECK_AUTH_ERRORS && checkErrors) {
+        final error403 = await _checkError403(url, e.statusCode);
 
-          if (!error403 && await _checkError401(url, response.statusCode, attempt) == Response401Result.TRY_AGAIN) {
-            return put(
-              endPoint,
-              content,
-              useToken: useToken,
-              checkErrors: checkErrors,
-              attempt: attempt + 1,
-            );
-          }
+        if (!error403 && await _checkError401(url, e.statusCode, attempt) == Response401Result.TRY_AGAIN) {
+          return put(
+            endPoint,
+            content,
+            useToken: useToken,
+            checkErrors: checkErrors,
+            attempt: attempt + 1,
+          );
         }
-
-        //throw HttpException('Error ${response.statusCode}');
-        Log.d('$runtimeType', 'PUT: Status code: ${response.statusCode}\nResponse: ${response.reasonPhrase}\n${response.body}');
-        return {};
       }
 
-    } catch (e, s) {
-      Log.d('$runtimeType', 'Error: $e\nStack:$s');
+      rethrow;
+    } on ServerErrorException catch (e, s) {
+      Log.e('$runtimeType', '🔥 Server error on PUT method.', e, s);
+      rethrow;
+    } on HttpRequestException catch (e, s) {
+      Log.e('$runtimeType', '⚠️ Generic error on PUT method.', e, s);
+      rethrow;
+    } on Exception catch(e, s) {
+      Log.e('$runtimeType', '⛔ Error on PUT method', e, s);
       rethrow;
     }
   }
 
-  Future<void> delete(String endPoint, {bool useToken = true, bool checkErrors = false, int attempt = 0, String? content}) async {
+  Future<HttpResult> delete(String endPoint, {bool useToken = true, bool checkErrors = false, int attempt = 0, String? content}) async {
     endPoint = 'api/$endPoint';
 
-    final http.Response response;
     final Uri url;
     url = Uri.https(_host, endPoint);
+    Log.d('$runtimeType', 'DELETE url $url');
 
-    response = await http.delete(url, headers: _getHeader(useToken), body: content);
+    try {
+      final http.Response response = await http.delete(url, headers: _getHeader(useToken), body: content);
 
-    if (response.statusCode >= 200 && response.statusCode < 300) {
-      Log.d('$runtimeType', 'DELETE method OK');
-    } else {
+      final httpResult = handleHttpResponse(response);
+      return httpResult;
+    } on ClientErrorException catch (e, s) {
+      Log.e('$runtimeType', '❌ Client error on DELETE method.', e, s);
+
       if(GlobalVariables.DEF_CHECK_AUTH_ERRORS && checkErrors) {
-        final error403 = await _checkError403(url, response.statusCode);
+        final error403 = await _checkError403(url, e.statusCode);
 
-        if (!error403 && await _checkError401(url, response.statusCode, attempt) == Response401Result.TRY_AGAIN) {
+        if (!error403 && await _checkError401(url, e.statusCode, attempt) == Response401Result.TRY_AGAIN) {
           return delete(endPoint,
             content: content,
             useToken: useToken,
@@ -249,13 +255,21 @@ class ApiProvider {
         }
       }
 
-      throw HttpException('Error ${response.statusCode}');
+      rethrow;
+    } on ServerErrorException catch (e, s) {
+      Log.e('$runtimeType', '🔥 Server error on DELETE method.', e, s);
+      rethrow;
+    } on HttpRequestException catch (e, s) {
+      Log.e('$runtimeType', '⚠️ Generic error on DELETE method.', e, s);
+      rethrow;
+    } on Exception catch(e, s) {
+      Log.e('$runtimeType', '⛔ Error on DELETE method', e, s);
+      rethrow;
     }
   }
 
-  Future<Map<String, dynamic>> postWithFiles(String endPoint, List<File> files, {bool useToken = true, bool checkErrors = false, int attempt = 0, Map<String, dynamic>? otherFields}) async {
+  Future<HttpResult> postWithFiles(String endPoint, List<File> files, {bool useToken = true, bool checkErrors = false, int attempt = 0, Map<String, dynamic>? otherFields}) async {
     endPoint = 'api/$endPoint';
-    final http.StreamedResponse response;
 
     final Uri url;
     if (kReleaseMode) {
@@ -279,43 +293,43 @@ class ApiProvider {
     }
 
     try {
-      response = await request.send().timeout(const Duration(seconds: 10));
+      final http.StreamedResponse streamedResponse = await request.send().timeout(const Duration(seconds: 10));
+      final response = await http.Response.fromStream(streamedResponse);
 
-      if (response.statusCode >= 200 && response.statusCode < 300) {
-        return {'response': response.reasonPhrase, 'statusCode': response.statusCode};
-      } else {
+      final httpResult = handleHttpResponse(response);
+      return httpResult;
+    } on ClientErrorException catch (e, s) {
+      Log.e('$runtimeType', '❌ Client error on POST_WITH_FILES method.', e, s);
 
-        if(GlobalVariables.DEF_CHECK_AUTH_ERRORS && checkErrors) {
-          final error403 = await _checkError403(url, response.statusCode);
+      if(GlobalVariables.DEF_CHECK_AUTH_ERRORS && checkErrors) {
+        final error403 = await _checkError403(url, e.statusCode);
 
-          if (!error403 && await _checkError401(url, response.statusCode, attempt) == Response401Result.TRY_AGAIN) {
-            return postWithFiles(
-              endPoint,
-              files,
-              useToken: useToken,
-              checkErrors: checkErrors,
-              attempt: attempt + 1,
-              otherFields: otherFields,
-            );
-          }
+        if (!error403 && await _checkError401(url, e.statusCode, attempt) == Response401Result.TRY_AGAIN) {
+          return postWithFiles(
+            endPoint,
+            files,
+            useToken: useToken,
+            checkErrors: checkErrors,
+            attempt: attempt + 1,
+            otherFields: otherFields,
+          );
         }
-
-        //throw HttpException('Error ${response.statusCode}');
-        return {
-          'response': {
-            'error': '${response.reasonPhrase}',
-            'statusCode': '${response.statusCode}',
-          },
-        };
       }
 
-    } catch (e, s) {
-      // ExceptionMessageResolver(e,s).getExceptionMessage();
-      Log.e('$runtimeType', 'Error on POST_WITH_FILES method.', e, s);
+      rethrow;
+    } on ServerErrorException catch (e, s) {
+      Log.e('$runtimeType', '🔥 Server error on POST_WITH_FILES method.', e, s);
+      rethrow;
+    } on HttpRequestException catch (e, s) {
+      Log.e('$runtimeType', '⚠️ Generic error on POST_WITH_FILES method.', e, s);
+      rethrow;
+    } on Exception catch(e, s) {
+      Log.e('$runtimeType', '⛔ Error on POST_WITH_FILES method', e, s);
       rethrow;
     }
   }
 
+  //region ## AUX METHODS
   HttpResult handleHttpResponse(http.Response response) {
     final status = response.statusCode;
 
@@ -329,23 +343,31 @@ class ApiProvider {
     }
 
     if (status >= 200 && status < 300) {
-      // success: returns the content directly
+      // success: returns the content as Map<String, dynamic>
+      Map<String, dynamic>? responseData;
+
+      if(body is List<dynamic>) {
+        responseData = {'data': body};
+      } else if((body['result']?? body) is List<dynamic>){
+        responseData = {'data': body['result']?? body};
+      } else {
+        responseData = body['result']?? body;
+      }
+
       return HttpResult(
           statusCode: status,
           success: true,
           message: (body is Map)
               ? body['message']
               : null,
-          data: (body is List<dynamic>)
-              ? {'data': body}
-              : (body['result']?? body is List<dynamic> ? {'data': body['result']?? body} : body['result']?? body)
+          data: responseData
       );
     } else if (status >= 400 && status < 500) {
       throw ClientErrorException(
           statusCode: status,
           message: body is Map && body['message'] != null
               ? body['message']
-              : 'Erro do cliente (${status})',
+              : 'Erro na requisição (${status})',
           details: body,
           success: body['success']?? false,
           stackTrace: body['stack']
@@ -355,7 +377,7 @@ class ApiProvider {
           statusCode: status,
           message: body is Map && body['message'] != null
               ? body['message']
-              : 'Erro do servidor (${status})',
+              : 'Erro no servidor (${status})',
           details: body,
           success: body['success']?? false,
           stackTrace: body['stack']
@@ -371,8 +393,6 @@ class ApiProvider {
     }
   }
 
-
-  //region ## AUX METHODS
   Future<bool> _checkError403(Uri uri, int respStatusCode) async {
     // If it gets 403, log out!
 

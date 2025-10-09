@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:trustme/core/extensions/context_extensions.dart';
+import 'package:trustme/core/utils/http/custom_http_error.dart';
 import 'package:trustme/features/common/data/data_source/seal_data_source.dart';
 import 'package:trustme/features/common/domain/entities/seal.dart';
 
@@ -29,17 +30,29 @@ class _SealInspectionDialogState extends State<SealInspectionDialog> {
   Future<void> requestSeal() async {
     isProcessing = true;
     setState(() {});
-    final resp = await SealDataSource().requestSeal(widget.seal);
-    isProcessing = false;
-    setState(() {});
-    final String message;
-    if(resp.containsKey('error')){
-      message = 'Erro ao solicitar selo! ${resp['error']}';
-    } else {
-      message = '${resp['message']} Verifique sua caixa de entrada.';
+
+    try {
+      final resp = await SealDataSource().requestSeal(widget.seal);
+
+      final String message;
+      if(resp.containsKey('error')){
+        message = 'Erro ao solicitar selo! ${resp['error']}';
+      } else {
+        message = '${resp['message']} Verifique sua caixa de entrada.';
+      }
+
+      context.pop();
+      context.showSnack(message);
+    } on HttpRequestException catch (e, s) {
+      context.pop();
+      context.showSnack(e.message);
+    } on Exception catch(e, s) {
+      context.pop();
+      context.showSnack('Erro ao solicitar selo! ${e.toString()}');
+    } finally {
+      isProcessing = false;
+      setState(() {});
     }
-    context.pop();
-    context.showSnack(message);
   }
 
   @override

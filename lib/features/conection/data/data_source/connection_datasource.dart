@@ -29,6 +29,7 @@ class ConnectionDataSource {
     return connectionList;
   }
 
+  // CHECKED: 1
   Future<Map<String, dynamic>> requestConnection(int code) async {
     final content = {'usuario_codigo': code};
     final rawData = await _apiProvider.post('conexao/solicitar', jsonEncode(content));
@@ -37,6 +38,7 @@ class ConnectionDataSource {
     return rawData;
   }
 
+  // CHECKED: 1
   Future<void> acceptConnection(Connection connection, bool hasAccepted)async  {
     final content = {
       'conexao_id': connection.id,

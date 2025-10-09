@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/foundation.dart';
+import 'package:trustme/core/utils/http/custom_http_error.dart';
 
 import 'package:trustme/features/common/data/data_source/user_data_source.dart';
 import 'package:trustme/features/common/domain/entities/seal.dart';
@@ -86,15 +87,18 @@ class UserDataCubit extends Cubit<UserDataState> {
     try {
       final resp = await connectionDataSource.requestConnection(userCode);
 
+      // TODO: Check if it can be changed by emit(internState.copyWith(connectionRequestStatus: ConnectionRequestStatus.success));
       if (resp.containsKey('error')) {
-        emit(internState.copyWith(connectionRequestStatus: ConnectionRequestStatus.failure, requestMessage: (resp['error'] as String)));
+        emit(internState.copyWith(connectionRequestStatus: ConnectionRequestStatus.failure, message: (resp['error'] as String)));
       } else {
         emit(internState.copyWith(connectionRequestStatus: ConnectionRequestStatus.success));
       }
+      //
 
       emit(internState.copyWith(connectionRequestStatus: ConnectionRequestStatus.initial));
-    } catch (_) {
-      final internState = state as UserDataReady;
+    } on HttpRequestException catch (e, s) {
+      emit(internState.copyWith(connectionRequestStatus: ConnectionRequestStatus.failure, message: e.message));
+    } on Exception catch(e, s) {
       emit(internState.copyWith(connectionRequestStatus: ConnectionRequestStatus.failure));
     }
   }

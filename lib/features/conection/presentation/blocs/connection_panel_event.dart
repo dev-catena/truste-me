@@ -1,12 +1,14 @@
-part of 'connection_panel_bloc.dart';
+// WARNING: 20250910 - UNUSED! Why??
 
-@immutable
-sealed class ConnectionPanelEvent {}
-
-class ConnectionPanelStarted extends ConnectionPanelEvent {}
-
-class ConnectionPanelRequested extends ConnectionPanelEvent {
-  final int userCode;
-
-  ConnectionPanelRequested(this.userCode);
-}
+// part of 'connection_panel_bloc.dart';
+//
+// @immutable
+// sealed class ConnectionPanelEvent {}
+//
+// class ConnectionPanelStarted extends ConnectionPanelEvent {}
+//
+// class ConnectionPanelRequested extends ConnectionPanelEvent {
+//   final int userCode;
+//
+//   ConnectionPanelRequested(this.userCode);
+// }

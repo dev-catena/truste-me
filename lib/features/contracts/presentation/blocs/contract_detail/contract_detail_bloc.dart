@@ -278,8 +278,7 @@ class ContractDetailBloc extends Bloc<ContractDetailEvent, ContractDetailState> 
     for (final ele in updatedAnswers) {
       Log.d('$runtimeType', 'updatedAnswers question id ${ele.questionId} - ${ele.answer}');
     }
-    updatedAnswers
-        .removeWhere((element) => element.questionId == event.question.id && element.userId == userLoggedIn.id);
+    updatedAnswers.removeWhere((element) => element.questionId == event.question.id && element.userId == userLoggedIn.id);
     updatedAnswers.add(newAnswer);
 
     await datasource.answerQuestion(internState.contract, [newAnswer]);

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:trustme/core/providers/user_data_cubit.dart';
 
 import 'package:trustme/core/utils/custom_colors.dart';
 import 'package:trustme/features/register/presentation/blocs/register_cubit.dart';
@@ -13,8 +14,10 @@ class RegisterScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userData = context.read<UserDataCubit>();
+
     return BlocProvider(
-      create: (context) => RegisterCubit(context)..init(),
+      create: (context) => RegisterCubit(context, userData.userDataSource)..init(),
       child: BlocBuilder<RegisterCubit, RegisterState>(
         builder: (context, state) {
           if (state is! RegisterFlow) {

@@ -13,16 +13,16 @@ class ConnectionDataSource {
     // final rawData = _MockData().connections;
     final List<Connection> connectionList = [];
 
-    for (final ele in rawData['pendentes']) {
+    for (final ele in rawData.result['pendentes']) {
       connectionList.add(ConnectionModel.fromJson(ele..['status'] = 'Solicitação Recebida').toEntity());
     }
 
-    for (final ele in rawData['ativas']) {
+    for (final ele in rawData.result['ativas']) {
       connectionList.add(ConnectionModel.fromJson(ele..['status'] = 'Aceita').toEntity());
     }
 
 
-    for (final ele in rawData['aguardando_resposta']) {
+    for (final ele in rawData.result['aguardando_resposta']) {
       connectionList.add(ConnectionModel.fromJson(ele..['status'] = 'Solicitação Enviada').toEntity());
     }
 
@@ -35,7 +35,7 @@ class ConnectionDataSource {
     final rawData = await _apiProvider.post('conexao/solicitar', jsonEncode(content));
 
     Log.d('$runtimeType', 'rawData $rawData');
-    return rawData;
+    return rawData.result;
   }
 
   // CHECKED: 1

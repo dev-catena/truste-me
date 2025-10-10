@@ -7,7 +7,7 @@ class SealDataSource {
   // CHECKED: 1
   Future<Map<String, dynamic>> requestSeal(Seal seal) async {
     if(seal.id == 1){
-      return await _apiProvider.post('usuario/enviar-verificacao', '');
+      return (await _apiProvider.post('usuario/enviar-verificacao', '')).result;
     } else {
       return {};
     }

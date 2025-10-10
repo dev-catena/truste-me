@@ -15,7 +15,7 @@ class ContractDataSource {
   Future<Contract> getContractFullInfo(Contract cont) async {
     final rawData = await _apiProvider.get('contrato/buscar-completo/${cont.id}');
 
-    final contract = ContractModel.fromJson(rawData).toEntity();
+    final contract = ContractModel.fromJson(rawData.result).toEntity();
 
     return contract;
   }
@@ -23,7 +23,7 @@ class ContractDataSource {
   Future<Contract> updateContract(Contract cont) async {
     final content = cont.toModel().toJson();
     final rawData = await _apiProvider.patch('contrato/atualizar/${cont.id}', jsonEncode(content));
-    final converted = ContractModel.fromJson(rawData).toEntity();
+    final converted = ContractModel.fromJson(rawData.result).toEntity();
 
     return converted;
   }
@@ -32,11 +32,11 @@ class ContractDataSource {
     final rawData = await _apiProvider.get('usuario/contratos');
     final List<Contract> convertedData = [];
 
-    for (final ele in rawData['contratos_como_contratante']) {
+    for (final ele in rawData.result['contratos_como_contratante']) {
       convertedData.add(ContractModel.fromJson(ele).toEntity());
     }
 
-    for (final ele in rawData['contratos_como_participante']) {
+    for (final ele in rawData.result['contratos_como_participante']) {
       convertedData.add(ContractModel.fromJson(ele).toEntity());
     }
 
@@ -49,7 +49,7 @@ class ContractDataSource {
     final List<Clause> clau = [];
     final List<SexualPractice> pract = [];
 
-    for (final ele in rawData['clausulas'] as List? ?? []) {
+    for (final ele in rawData.result['clausulas'] as List? ?? []) {
       if (ele['sexual'] != null) {
         if (ele['sexual'] == 0) {
           clau.add(ClauseModel.fromJson(ele).toEntity());
@@ -81,9 +81,9 @@ class ContractDataSource {
   // }
 
   Future<Contract> createContract(ContractModel contract) async {
-    final response = await _apiProvider.post('contrato/gravar', jsonEncode(contract.toJson()));
+    final rawData = await _apiProvider.post('contrato/gravar', jsonEncode(contract.toJson()));
 
-    final newContract = ContractModel.fromJson(response).toEntity();
+    final newContract = ContractModel.fromJson(rawData.result).toEntity();
 
     return newContract;
   }

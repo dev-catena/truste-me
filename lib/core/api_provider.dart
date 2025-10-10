@@ -53,8 +53,7 @@ class ApiProvider {
   }
 
   // TODO: Catch exception on caller
-  // TODO: Change the return type: Map<String, dynamic> -> HttpResult
-  Future<Map<String, dynamic>> get(String endPoint, {bool useToken = true, bool checkErrors = false, int attempt = 0, Map<String, dynamic>? params}) async {
+  Future<HttpResult> get(String endPoint, {bool useToken = true, bool checkErrors = false, int attempt = 0, Map<String, dynamic>? params}) async {
     endPoint = 'api/$endPoint';
 
     final Uri url;
@@ -66,7 +65,7 @@ class ApiProvider {
       // Log.d('$runtimeType', 'GET response ${response.body}');
 
       final httpResult = handleHttpResponse(response);
-      return httpResult.data; // TODO: Change it to HttpResult
+      return httpResult;
     } on ClientErrorException catch (e, s) {
       Log.e('$runtimeType', '❌ Client error on GET method.', e, s);
 
@@ -97,7 +96,8 @@ class ApiProvider {
     }
   }
 
-  Future<Map<String, dynamic>> post(String endPoint, String content, {bool useToken = true, bool checkErrors = false, int attempt = 0}) async {
+  // TODO: Catch exception on caller
+  Future<HttpResult> post(String endPoint, String content, {bool useToken = true, bool checkErrors = false, int attempt = 0}) async {
     endPoint = 'api/$endPoint';
     final Uri url;
     url = Uri.https(_host, endPoint);
@@ -110,7 +110,7 @@ class ApiProvider {
       Log.d('$runtimeType', 'POST response ${response.body}');
 
       final httpResult = handleHttpResponse(response);
-      return httpResult.data; // TODO: Change it to HttpResult
+      return httpResult;
     } on ClientErrorException catch (e, s) {
       Log.e('$runtimeType', '❌ Client error on POST method.', e, s);
 
@@ -141,7 +141,8 @@ class ApiProvider {
     }
   }
 
-  Future<Map<String, dynamic>> patch(String endPoint, String content, {bool useToken = true, bool checkErrors = false, int attempt = 0}) async {
+  // TODO: Catch exception on caller
+  Future<HttpResult> patch(String endPoint, String content, {bool useToken = true, bool checkErrors = false, int attempt = 0}) async {
     endPoint = 'api/$endPoint';
     final Uri url;
     url = Uri.https(_host, endPoint);
@@ -154,7 +155,7 @@ class ApiProvider {
       // Log.d(TAG, '$runtimeType - PATCH response ${response.body}');
 
       final httpResult = handleHttpResponse(response);
-      return httpResult.data; // TODO: Change it to HttpResult
+      return httpResult;
     } on ClientErrorException catch (e, s) {
       Log.e('$runtimeType', '❌ Client error on PATCH method.', e, s);
 
@@ -185,7 +186,8 @@ class ApiProvider {
     }
   }
 
-  Future<Map<String, dynamic>> put(String endPoint, String content, {bool useToken = true, bool checkErrors = false, int attempt = 0}) async {
+  // TODO: Catch exception on caller
+  Future<HttpResult> put(String endPoint, String content, {bool useToken = true, bool checkErrors = false, int attempt = 0}) async {
     endPoint = 'api/$endPoint';
     final Uri url;
     url = Uri.https(_host, endPoint);
@@ -196,7 +198,7 @@ class ApiProvider {
       // Log.d(TAG, '$runtimeType - PUT response ${response.body}');
 
       final httpResult = handleHttpResponse(response);
-      return httpResult.data; // TODO: Change it to HttpResult
+      return httpResult;
     } on ClientErrorException catch (e, s) {
       Log.e('$runtimeType', '❌ Client error on PUT method.', e, s);
 
@@ -227,6 +229,7 @@ class ApiProvider {
     }
   }
 
+  // TODO: Catch exception on caller
   Future<HttpResult> delete(String endPoint, {bool useToken = true, bool checkErrors = false, int attempt = 0, String? content}) async {
     endPoint = 'api/$endPoint';
 
@@ -268,6 +271,7 @@ class ApiProvider {
     }
   }
 
+  // TODO: Catch exception on caller
   Future<HttpResult> postWithFiles(String endPoint, List<File> files, {bool useToken = true, bool checkErrors = false, int attempt = 0, Map<String, dynamic>? otherFields}) async {
     endPoint = 'api/$endPoint';
 
@@ -360,7 +364,7 @@ class ApiProvider {
           message: (body is Map)
               ? body['message']
               : null,
-          data: responseData
+          result: responseData
       );
     } else if (status >= 400 && status < 500) {
       throw ClientErrorException(
@@ -480,9 +484,9 @@ class ApiProvider {
         });
 
         try {
-          final Map<String, dynamic> rawData = await post('refresh', body, useToken: false, checkErrors: false);
+          final rawData = await post('refresh', body, useToken: false, checkErrors: false);
 
-          final auth = AuthModel.fromJson(rawData).toEntity();
+          final auth = AuthModel.fromJson(rawData.result).toEntity();
           await setAuthData(auth);
           return RefreshTokenResult.TOKEN_REFRESHED;
         } catch(e) {

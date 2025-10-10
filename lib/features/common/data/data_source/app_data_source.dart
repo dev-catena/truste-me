@@ -19,7 +19,7 @@ class AppDataSource {
     final rawData = await _apiProvider.get('contrato-tipos/listar');
     final List<ContractType> types = [];
 
-    for (final ele in rawData['data']) {
+    for (final ele in rawData.result['data']) {
       types.add(ContractType.fromJson(ele));
     }
 
@@ -32,7 +32,7 @@ class AppDataSource {
 
     Log.d('$runtimeType', 'rawData $rawData');
 
-    for(final ele in rawData['data']){
+    for(final ele in rawData.result['data']){
       // seals.add(SealModel.fromJson(ele..['status'] = ele['id']== 1 ? 'Ausente' :'Indisponível').toEntity());
       seals.add(SealModel.fromJson(ele..['status'] = ele['id']== 1 ? 'Ausente' :'Indisponível').toEntity());
     }

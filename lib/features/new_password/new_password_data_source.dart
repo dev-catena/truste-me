@@ -13,7 +13,7 @@ class NewPasswordDataSource {
     };
 
     try {
-      final resp = await _apiProvider.post('acesso/enviar-codigo', jsonEncode(content), useToken: false);
+      final resp = (await _apiProvider.post('acesso/enviar-codigo', jsonEncode(content), useToken: false)).result;
 
       if(resp['message'] == 'Email com código enviado com sucesso'){
         return true;
@@ -32,7 +32,7 @@ class NewPasswordDataSource {
     };
 
     try {
-      final resp = await _apiProvider.post('acesso/validar-codigo', jsonEncode(content), useToken: false);
+      final resp = (await _apiProvider.post('acesso/validar-codigo', jsonEncode(content), useToken: false)).result;
 
       if(resp['success']){
         return true;
@@ -54,7 +54,7 @@ class NewPasswordDataSource {
 
 
     try {
-      final resp = await _apiProvider.post('acesso/redefinir-senha', jsonEncode(content), useToken: false);
+      final resp = (await _apiProvider.post('acesso/redefinir-senha', jsonEncode(content), useToken: false)).result;
 
       if(resp['success']){
         return true;

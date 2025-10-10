@@ -120,7 +120,7 @@ class _PersonalInfoFormState extends State<PersonalInfoForm> {
       _validatingEmail = true;
       _emailExists = false;
     });
-    final resp = await ApiProvider().post('cadastro/verificar-dados', jsonEncode({'email': email}), useToken: personalData.id > 0);
+    final resp = (await ApiProvider().post('cadastro/verificar-dados', jsonEncode({'email': email}), useToken: personalData.id > 0)).result;
     setState(() {
       _validatingEmail = false;
       _emailExists = resp['email_exists'] == true;
@@ -136,7 +136,7 @@ class _PersonalInfoFormState extends State<PersonalInfoForm> {
       _validatingCpf = true;
       _cpfExists = false;
     });
-    final resp = await ApiProvider().post('cadastro/verificar-dados', jsonEncode({'CPF': cpf}), useToken: personalData.id > 0);
+    final resp = (await ApiProvider().post('cadastro/verificar-dados', jsonEncode({'CPF': cpf}), useToken: personalData.id > 0)).result;
     setState(() {
       _validatingCpf = false;
       _cpfExists = resp['cpf_exists'] == true;

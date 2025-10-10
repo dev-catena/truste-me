@@ -19,8 +19,8 @@ class LoginDataSource {
     final content = {'CPF': cpf, 'password': pwd};
     final rawData = await _apiProvider.post('login', jsonEncode(content), useToken: false);
 
-    if (rawData['token'] != null) {
-      final auth = AuthModel.fromJson(rawData).toEntity();
+    if (rawData.result['token'] != null) {
+      final auth = AuthModel.fromJson(rawData.result).toEntity();
       await setAuthData(auth);
       await appData.initialize();
       return true;

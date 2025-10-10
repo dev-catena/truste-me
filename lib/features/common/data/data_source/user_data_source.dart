@@ -28,7 +28,7 @@ class UserDataSource {
     return rawData;
   }
 
-  Future<User> updateUser2(Map<String, dynamic> usr) async { // TODO: Change to User entity
+  Future<User> updateUser2(Map<String, dynamic> usr) async {
     //final content = cont.toModel().toJson();
     final rawData = await _apiProvider.put('usuario/atualizar', jsonEncode(usr));
     final converted = UserModel.fromJson(rawData).toEntity();

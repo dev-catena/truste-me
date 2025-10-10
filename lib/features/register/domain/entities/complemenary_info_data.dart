@@ -10,6 +10,18 @@ class ComplementaryInfoData {
 
   ComplementaryInfoData({required this.isEdition, this.userProfession, this.userIncome});
 
+  ComplementaryInfoData copyWith({
+    String? userProfession,
+    ValueGetter<IncomeRange?>? userIncome,
+    bool? isEdition,
+  }) {
+    return ComplementaryInfoData(
+      userProfession: userProfession ?? this.userProfession,
+      userIncome: userIncome != null ? userIncome() : this.userIncome,
+      isEdition: isEdition ?? this.isEdition,
+    );
+  }
+
   bool get isProfessionValid => userProfession != null && userProfession!.isNotEmpty;
   bool get isIncomeValid => userIncome != null;
 

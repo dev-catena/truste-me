@@ -5,16 +5,26 @@ import 'package:trustme/features/register/presentation/widgets/address_info_form
 
 class AddressInfoData {
   final bool isEdition;
-  Location loc;
+  Location? loc;
 
-  AddressInfoData({required this.loc, this.isEdition = false});
+  AddressInfoData({this.loc, this.isEdition = false});
 
-  bool get isCEPValid => loc.cep.isNotEmpty;
-  bool get isStateValid => loc.state.isNotEmpty;
-  bool get isCityValid => loc.city.isNotEmpty;
-  bool get isNeighborhood => loc.neighborhood.isNotEmpty;
-  bool get isStreetValid => loc.street.isNotEmpty;
-  bool get isAddressNumberValid => loc.number.isNotEmpty;
+  AddressInfoData copyWith({
+    ValueGetter<Location?>? loc,
+    bool? isEdition,
+  }) {
+    return AddressInfoData(
+      loc: loc != null ? loc() : this.loc,
+      isEdition: isEdition ?? this.isEdition
+    );
+  }
+
+  bool get isCEPValid => loc?.cep.isNotEmpty ?? false;
+  bool get isStateValid => loc?.state.isNotEmpty ?? false;
+  bool get isCityValid => loc?.city.isNotEmpty ?? false;
+  bool get isNeighborhood => loc?.neighborhood.isNotEmpty ?? false;
+  bool get isStreetValid => loc?.street.isNotEmpty ?? false;
+  bool get isAddressNumberValid => loc?.number.isNotEmpty ?? false;
 
   bool get isValid => isCEPValid && isStateValid && isCityValid && isNeighborhood && isStreetValid && isAddressNumberValid;
 

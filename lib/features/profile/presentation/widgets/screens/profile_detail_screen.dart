@@ -1,52 +1,20 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:trustme/features/register/presentation/widgets/complementary_info_form.dart';
 
-import 'package:trustme/core/extensions/context_extensions.dart';
 import 'package:trustme/core/providers/user_data_cubit.dart';
 import 'package:trustme/core/utils/custom_colors.dart';
-import 'package:trustme/features/common/domain/entities/location.dart';
-import 'package:trustme/features/common/domain/entities/user.dart';
 import 'package:trustme/features/common/presentation/widgets/components/generic_error_component.dart';
-import 'package:trustme/features/register/domain/entities/address_info_data.dart';
-import 'package:trustme/features/register/domain/entities/complemenary_info_data.dart';
-import 'package:trustme/features/register/domain/entities/user_info_data.dart';
 import 'package:trustme/features/profile/presentation/blocs/profile_detail/profile_detail_bloc.dart';
 
-class ProfileDetailScreen extends StatefulWidget {
+class ProfileDetailScreen extends StatelessWidget {
   const ProfileDetailScreen({super.key});
-
-  @override
-  State<ProfileDetailScreen> createState() => _ProfileDetailScreenState();
-}
-
-class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
-
-  late UserInfoData personalData;
-  late AddressInfoData addressData;
-  late ComplementaryInfoData complementaryInfoData;
-
-  //late User userEdition;
-
-  @override
-  void initState() {
-    final userData = context.read<UserDataCubit>();
-    final userEdition = userData.getUser; //.copyWith();
-
-    personalData = UserInfoData(id: userEdition.id, name: userEdition.fullName, cpf: userEdition.cpf, email: userEdition.email, birthDate: userEdition.birthDate);
-    addressData = AddressInfoData(isEdition: true, loc: Location(id: userEdition.id, cep: userEdition.cep ?? '', state: userEdition.state ?? '', city: userEdition.city ?? '', neighborhood: userEdition.neighborhood ?? '', street: userEdition.address ?? '', number: userEdition.addressNumber ?? '', complement: userEdition.addressComplement ?? ''));
-    complementaryInfoData = ComplementaryInfoData(isEdition: true, userProfession: userEdition.profession, userIncome: IncomeRange.values.firstWhereOrNull( (x) => x.description == userEdition.income ));
-
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
     final userData = context.read<UserDataCubit>();
 
     return BlocProvider(
-      create: (_) => ProfileDetailBloc(userData.userDataSource, userData),
+      create: (_) => ProfileDetailBloc(userData.userDataSource, userData)..add(ProfileDetailStarted()),
       child: Scaffold(
         backgroundColor: CustomColor.backgroundPrimaryColor,
         appBar: _buildAppBar(),
@@ -81,7 +49,7 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
                     } else if (state is ProfileDetailLoadInProgress) {
                       return const Center(child: CircularProgressIndicator());
                     } else if (state is ProfileDetailReady) {
-                      return _buildProfileForm(state.user);
+                      return _buildProfileForm(blocCtx, state);
                     } else if (state is ProfileDetailError) {
                       return GenericErrorComponent(state.msg, onRefresh: () => bloc.add(ProfileDetailStarted()));
                     } else {
@@ -103,41 +71,47 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
     );
   }
 
-  Widget _buildProfileForm(User user) {
+  Widget _buildProfileForm(BuildContext context, ProfileDetailReady state) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         SizedBox(height: 4,),
-        personalData.buildForm(
+        state.personalData.buildForm(
           onPersonalDataSet: (value, email, cpf) {
-            //personalData = value;
-            //emailExists = email;
-            //cpfExists = cpf;
-            personalData = value;
-            //setState(() {});
-          },
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 16),
-          child: addressData.buildForm(onLocationChanged: (Location loc) {
-            // ...
-            //setState(() {});
-            addressData.loc = loc;
-          }),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 16),
-          child: complementaryInfoData.buildForm(onIncomeSet: (value) {
-            // ...
-            //setState(() {});
-            complementaryInfoData.userIncome = value;
-          },
-          onProfessionSet: (value) {
-            // ...
-            //setState(() {});
+            final currentState = context.read<ProfileDetailBloc>().state as ProfileDetailReady;
 
-            complementaryInfoData.userProfession = value;
+            final newPersonalData = currentState.personalData.copyWith(
+              name: value.name,
+              email: value.email,
+              cpf: value.cpf,
+              birthDate: value.birthDate,
+            );
+
+            context.read<ProfileDetailBloc>().add(PersonalDataChanged(newPersonalData));
+          },
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 16),
+          child: state.addressData.buildForm(onLocationChanged: (loc) {
+            final currentState = context.read<ProfileDetailBloc>().state as ProfileDetailReady;
+            final newAddressData = currentState.addressData.copyWith(loc: () => loc);
+            context.read<ProfileDetailBloc>().add(AddressDataChanged(newAddressData));
           }),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 16),
+          child: state.complementaryInfoData.buildForm(
+            onIncomeSet: (value) {
+              final currentState = context.read<ProfileDetailBloc>().state as ProfileDetailReady;
+              final newCompData = currentState.complementaryInfoData.copyWith(userIncome: () => value);
+              context.read<ProfileDetailBloc>().add(ComplementaryDataChanged(newCompData));
+            },
+            onProfessionSet: (value) {
+              final currentState = context.read<ProfileDetailBloc>().state as ProfileDetailReady;
+              final newCompData = currentState.complementaryInfoData.copyWith(userProfession: value);
+              context.read<ProfileDetailBloc>().add(ComplementaryDataChanged(newCompData));
+            },
+          ),
         ),
 
         SizedBox(height: 50,),
@@ -149,7 +123,9 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
     return AppBar(
       //titleSpacing: 0,
       //bottom: tabBar,
-      title: Text('Atualizar dados', style: Theme.of(context).textTheme.headlineMedium!.copyWith(color: Colors.white)),
+      title: Text('Atualizar dados',
+        style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+      ),
       // Row(
       //   mainAxisAlignment: MainAxisAlignment.start,
       //   children: [
@@ -165,60 +141,28 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
       //   ],
       // ),
       actions: [
-        Builder(
-          builder: (context) {
+        BlocBuilder<ProfileDetailBloc, ProfileDetailState>(
+          builder: (context, state) {
+            bool isSaving = (state is ProfileDetailReady && state.isSaving);
             return TextButton(
-              onPressed: () => _save(context),
-              child: const Text('SALVAR', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white),),
+              onPressed: isSaving ? null : () => context.read<ProfileDetailBloc>().add(ProfileDetailSave()),
+              child: isSaving
+                  ? const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+              )
+                  : const Text(
+                'SALVAR',
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white),
+              ),
             );
-          }
+          },
         ),
         const SizedBox(width: 10),
       ],
       backgroundColor: CustomColor.activeColor,
     );
-  }
-
-  Future<void> _save(BuildContext context) async {
-    if (!personalData.isValid) {
-      context.showSnack(personalData.getWarningMessage());
-      return;
-    }
-
-    if (!addressData.isValid) {
-      context.showSnack(addressData.getWarningMessage());
-      return;
-    }
-
-    if (!complementaryInfoData.isValid) {
-      context.showSnack(complementaryInfoData.getWarningMessage());
-      return;
-    }
-
-    // Everything is OK, let's update it!
-
-    String? professionValue;
-
-    if(complementaryInfoData.userProfession != null && complementaryInfoData.userProfession!.trim().isNotEmpty) {
-      professionValue = complementaryInfoData.userProfession!.trim();
-    }
-
-    final userDataUpdated = {
-      'email': personalData.email,
-      'CPF': personalData.cpf,
-      'nome_completo': personalData.name,
-      'pais': 'Brasil',
-      ...addressData.loc.toModel().toJson(),
-      'profissao': professionValue,
-      'dt_nascimento': personalData.birthDate.toString(),
-      'renda_classe': complementaryInfoData.userIncome?.description,
-
-      // 'password': userPwd,
-      // 'password_confirmation': userPwdConfirmation,
-    };
-
-    final bloc = context.read<ProfileDetailBloc>();
-    bloc.add(ProfileDetailSave(userDataUpdated));
   }
 }
 

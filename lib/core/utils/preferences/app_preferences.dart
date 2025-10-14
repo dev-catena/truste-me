@@ -14,13 +14,14 @@ enum KeyPrefs {
   //endregion
 
   //region ## USER DATA
-  // USER_CODE,
-  // USER_FULL_NAME,
-  // USER_CPF,
-  // USER_EMAIL,
+  USER_CODE,
+  USER_FULL_NAME,
+  USER_CPF,
+  USER_EMAIL,
   //endregion
 
   INSTALLATION_DATE,
+  IS_TEST_USER,
 
   USER_LAST_ITERATION,
 

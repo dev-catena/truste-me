@@ -46,7 +46,7 @@ class LoginScreen extends StatelessWidget {
 
                 if(DEF_TEST && kDebugMode) {
                   state.emailController.text = "069.091.440-74";
-                  //state.pwdController.text = "123123";
+                  state.pwdController.text = "123123";
                 }
 
                 return SingleChildScrollView(

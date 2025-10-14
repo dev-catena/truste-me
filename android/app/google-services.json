@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "757359455681",
+    "project_id": "trust-me-622bd",
+    "storage_bucket": "trust-me-622bd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:757359455681:android:d447628338dd96a7a91340",
+        "android_client_info": {
+          "package_name": "br.com.catenasystem.trustme"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBVLo0lZkQPURGfytGh3IqfEpFWXGUjwFw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

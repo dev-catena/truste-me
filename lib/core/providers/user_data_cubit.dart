@@ -1,6 +1,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/foundation.dart';
+import 'package:trustme/core/utils/firebase/crashlytics_util.dart';
 import 'package:trustme/core/utils/http/custom_http_error.dart';
+import 'package:trustme/core/utils/preferences/app_preferences.dart';
 
 import 'package:trustme/features/common/data/data_source/user_data_source.dart';
 import 'package:trustme/features/common/domain/entities/seal.dart';
@@ -50,6 +52,18 @@ class UserDataCubit extends Cubit<UserDataState> {
 
     user.sealsObtained.clear();
     user.sealsObtained.addAll(seals);
+
+    //region ## SET USER DATA TO PREFERENCES
+    final prefs = AppPreferences();
+    await prefs.setString(KeyPrefs.USER_CODE, user.connectionCode.toString());
+    await prefs.setString(KeyPrefs.USER_FULL_NAME, user.fullName.toString());
+    await prefs.setString(KeyPrefs.USER_CPF, user.cpf.toString());
+    await prefs.setString(KeyPrefs.USER_EMAIL, user.email.toString());
+
+    // Set Crashlytics variables
+    CrashlyticsUtil.setCrashlyticsCustomVariables();
+    CrashlyticsUtil.setUserIdentifier(user.id.toString(), user.fullName);
+    //endregion
 
     emit(UserDataReady(
       user: user,

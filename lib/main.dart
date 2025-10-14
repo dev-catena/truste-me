@@ -1,8 +1,14 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_testlab_detector/firebase_testlab_detector.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:trustme/core/global/global_variables.dart';
+import 'package:trustme/core/utils/firebase/crashlytics_util.dart';
 
 import 'core/app_theme.dart';
 import 'core/providers/app_data_cubit.dart';
@@ -57,6 +63,30 @@ void main() {
       await prefs.getString(KeyPrefs.REFRESH_TOKEN, null);
     }
     //endregion
+
+    await Firebase.initializeApp();
+
+    //region ## CRASHLYTICS CONFIGURATION
+    // Pass all uncaught "fatal" errors from the framework to Crashlytics
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+
+    FlutterError.onError = (errorDetails) {
+      FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
+    };
+
+    // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
+    PlatformDispatcher.instance.onError = (error, stack) {
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      return true;
+    };
+    //endregion
+
+    GlobalVariables.isFirebaseTestLab = await FirebaseTestlabDetector.isAppRunningInTestlab() ?? false;
+
+    await CrashlyticsUtil.setCrashlyticsEnabledWithCheck();
+    await CrashlyticsUtil.setCrashlyticsCustomVariables();
+
+    GlobalVariables.isGoogleTestUser = (await prefs.getBool(KeyPrefs.IS_TEST_USER, false))!;
 
     runApp(const TrustMeApp());
   });

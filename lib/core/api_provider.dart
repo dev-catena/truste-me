@@ -36,7 +36,9 @@ class ApiProvider {
 
   ApiProvider();
 
-  final String _host = 'api-trustme.catenasystem.com.br';
+  final String _host = GlobalVariables.DEF_USE_DEV_ENVIRONMENT
+      ? 'api-trustme-dev.catenasystem.com.br:8443'
+      : 'api-trustme.catenasystem.com.br';
 
   Map<String, String> _getHeader(bool useToken) {
     final tokenizedHeader = {

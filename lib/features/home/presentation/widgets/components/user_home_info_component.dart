@@ -29,6 +29,7 @@ class UserHomeInfoComponent extends StatelessWidget {
             ),
             SummaryData(
               'Contratos pendentes',
+              emphasizeQuantity: true,
               state.contracts.where((element) => element.status == ContractStatus.pending).length,
               onTap: () => context.go(
                 AppRoutes.contractsScreen,
@@ -38,6 +39,7 @@ class UserHomeInfoComponent extends StatelessWidget {
             SummaryData(
               'Selos pendentes',
               0,
+              emphasizeQuantity: true,
               onTap: () => context.push(AppRoutes.profileScreen),
             ),
             SummaryData(
@@ -50,6 +52,7 @@ class UserHomeInfoComponent extends StatelessWidget {
             ),
             SummaryData(
               'Conexões pendentes',
+              emphasizeQuantity: true,
               state.connections.where((element) => element.status == ConnectionStatus.pending).length,
               onTap: () => context.pushNamed(
                 AppRoutes.connectionPanelScreen,

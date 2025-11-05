@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 class SummaryCard extends StatelessWidget {
-  const SummaryCard(this.data, {required this.onTap, super.key});
-
   final SummaryData data;
   final VoidCallback onTap;
+
+  const SummaryCard(this.data, {required this.onTap, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +32,7 @@ class SummaryCard extends StatelessWidget {
               ),
               Padding(
                 padding: const EdgeInsets.only(bottom: 8),
-                child: Text('${data.quantity}', style: headlineMedium),
+                child: Text('${data.quantity}', style: (data.emphasizeQuantity && data.quantity > 0) ? headlineMedium.copyWith(color: Colors.redAccent) : headlineMedium),
               ),
             ],
           ),
@@ -46,10 +46,11 @@ class SummaryData {
   final String description;
   final int quantity;
   final VoidCallback onTap;
+  final bool emphasizeQuantity;
 
-  const SummaryData(this.description, this.quantity, {required this.onTap});
+  const SummaryData(this.description, this.quantity, {this.emphasizeQuantity = false, required this.onTap});
 
   SummaryCard buildCard(){
-    return SummaryCard(this, onTap: onTap);
+    return SummaryCard(this, onTap: onTap,);
   }
 }

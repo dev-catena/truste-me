@@ -46,12 +46,20 @@ class ContractCard extends StatelessWidget {
                     Text(contract.status.description, style: const TextStyle(fontWeight: FontWeight.w600)),
                   ],
                 ),
-                if ((contract.status == ContractStatus.active || contract.status == ContractStatus.pending) && !isExpired)
+                if ([ContractStatus.pending, ContractStatus.active].contains(contract.status) && !isExpired)
                   Column(
                     children: [
                       Icon(Icons.hourglass_top_outlined, color: CustomColor.activeGreyed.withAlpha(100)),
                       TimeLeftTicker(contract: contract, textStyle: titleMedium, onExpire: onExpire),
                       // TimeLeftTicker(contract: contract, textStyle: titleMedium, onExpire: onExpire),
+                    ],
+                  ),
+                if ([ContractStatus.completed].contains(contract.status) && isExpired)
+                  Column(
+                    children: [
+                      SizedBox(height: 18,),
+                      //Icon(Icons.hourglass_top_outlined, color: CustomColor.activeGreyed.withAlpha(100)),
+                      Text('${contract.duration}h', style: titleMedium.copyWith(color: CustomColor.activeGreyed)),
                     ],
                   ),
               ],

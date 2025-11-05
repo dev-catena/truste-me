@@ -6,7 +6,7 @@ import 'package:trustme/features/common/domain/entities/user.dart';
 import 'package:trustme/features/common/presentation/widgets/components/custom_selectable_tile.dart';
 import 'package:trustme/features/common/presentation/widgets/components/stateful_segmented_button.dart';
 import 'package:trustme/features/common/presentation/widgets/dialogs/single_select_dialog.dart';
-import 'package:trustme/features/conection/domain/entities/connection.dart';
+import 'package:trustme/features/connection/domain/entities/connection.dart';
 import 'package:trustme/features/contracts/domain/entities/contract_type.dart';
 
 class NewContractHeader extends StatelessWidget {

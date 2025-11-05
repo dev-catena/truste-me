@@ -8,7 +8,7 @@ class GlobalVariables {
   static bool DEF_CHECK_AUTH_ERRORS = true;
 
   // TODO: Don't use it for PRODUCTION deploy
-  static bool DEF_USE_DEV_ENVIRONMENT = true;
+  static bool DEF_USE_DEV_ENVIRONMENT = false;
 
   static var isGoogleTestUser = false;
   static var isFirebaseTestLab = false;

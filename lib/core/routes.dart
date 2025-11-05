@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:trustme/features/common/domain/entities/auth.dart';
-import 'package:trustme/features/conection/domain/entities/connection.dart';
-import 'package:trustme/features/conection/presentation/widgets/screens/connection_detail_screen.dart';
-import 'package:trustme/features/conection/presentation/widgets/screens/connection_panel_screen.dart';
+import 'package:trustme/features/connection/domain/entities/connection.dart';
+import 'package:trustme/features/connection/presentation/widgets/screens/connection_detail_screen.dart';
+import 'package:trustme/features/connection/presentation/widgets/screens/connection_panel_screen.dart';
 import 'package:trustme/features/contracts/domain/entities/contract.dart';
 import 'package:trustme/features/contracts/presentation/widgets/screens/contract_detail_screen.dart';
 import 'package:trustme/features/contracts/presentation/widgets/screens/contracts_panel_screen.dart';
@@ -17,6 +17,7 @@ import 'package:trustme/features/profile/presentation/widgets/screens/profile_sc
 import 'package:trustme/features/register/presentation/widgets/screens/register_screen.dart';
 import 'package:trustme/core/enums/contract_status.dart';
 import 'package:trustme/core/scaffold_with_nested_navigation.dart';
+import 'package:trustme/features/seals/presentation/widgets/screeens/seals_screen.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorAKey = GlobalKey<NavigatorState>(debugLabel: 'shellA');
@@ -43,6 +44,8 @@ class AppRoutes {
   static const profileScreen = '/perfil';
 
   static const profileDetailScreen = '/perfil-detalhes';
+
+  static const sealsScreen = '/selos';
 
   GoRouter get routes {
     return _routes;
@@ -174,6 +177,13 @@ final GoRouter _routes = GoRouter(
       name: AppRoutes.profileDetailScreen,
       builder: (context, __) {
         return const ProfileDetailScreen();
+      },
+    ),
+    GoRoute(
+      path: AppRoutes.sealsScreen,
+      name: AppRoutes.sealsScreen,
+      builder: (context, __) {
+        return const SealsScreen();
       },
     ),
   ],

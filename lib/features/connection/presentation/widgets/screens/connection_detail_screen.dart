@@ -8,8 +8,8 @@ import 'package:trustme/core/utils/date_parser.dart';
 import 'package:trustme/core/utils/http/custom_http_error.dart';
 import 'package:trustme/features/common/domain/entities/seal.dart';
 import 'package:trustme/features/common/presentation/widgets/components/custom_scaffold.dart';
-import 'package:trustme/features/conection/domain/entities/connection.dart';
-import 'package:trustme/features/conection/presentation/widgets/components/seals_board.dart';
+import 'package:trustme/features/connection/domain/entities/connection.dart';
+import 'package:trustme/features/connection/presentation/widgets/components/seals_board.dart';
 
 class ConnectionDetailScreen extends StatefulWidget {
   const ConnectionDetailScreen(this.connection, {super.key});

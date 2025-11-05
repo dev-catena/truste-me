@@ -2,8 +2,8 @@ import 'dart:convert';
 
 import 'package:trustme/core/api_provider.dart';
 import 'package:trustme/core/utils/log/log.dart';
-import 'package:trustme/features/conection/domain/entities/connection.dart';
-import 'package:trustme/features/conection/data/models/connection_model.dart';
+import 'package:trustme/features/connection/domain/entities/connection.dart';
+import 'package:trustme/features/connection/data/models/connection_model.dart';
 
 class ConnectionDataSource {
   final _apiProvider = ApiProvider();

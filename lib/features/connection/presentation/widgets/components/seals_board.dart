@@ -5,10 +5,11 @@ import 'package:trustme/core/providers/app_data_cubit.dart';
 import 'package:trustme/features/common/domain/entities/seal.dart';
 
 class SealsBoard extends StatelessWidget {
-  const SealsBoard(this._sealsObtained, {super.key, required this.canGetSeal});
-
   final List<Seal> _sealsObtained;
   final bool canGetSeal;
+  final bool showTitle;
+
+  const SealsBoard(this._sealsObtained, {super.key, required this.canGetSeal, this.showTitle = true});
 
   @override
   Widget build(BuildContext context) {
@@ -24,8 +25,10 @@ class SealsBoard extends StatelessWidget {
 
     return Column(
       children: [
-        Text('Selos', style: titleLarge),
-        const SizedBox(height: 4),
+        if(showTitle)
+          Text('Selos', style: titleLarge),
+        if(showTitle)
+          const SizedBox(height: 4),
         Wrap(
           spacing: 5,
           runSpacing: 5,

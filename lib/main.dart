@@ -20,7 +20,7 @@ import 'core/utils/preferences/app_preferences.dart';
 import 'features/common/data/data_source/app_data_source.dart';
 import 'features/common/data/data_source/user_data_source.dart';
 import 'features/common/domain/entities/auth.dart';
-import 'features/conection/data/data_source/connection_datasource.dart';
+import 'features/connection/data/data_source/connection_datasource.dart';
 import 'features/contracts/data/data_source/contract_datasource.dart';
 import 'features/login/data/data_source/logout_datasource.dart';
 

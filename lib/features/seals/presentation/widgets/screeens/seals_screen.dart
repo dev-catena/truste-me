@@ -1,21 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:trustme/core/providers/user_data_cubit.dart';
 
-import 'package:trustme/core/utils/custom_colors.dart';
-import 'package:trustme/main.dart';
 import 'package:trustme/features/common/presentation/widgets/components/custom_scaffold.dart';
+import 'package:trustme/features/common/presentation/widgets/components/header_line.dart';
 import 'package:trustme/features/connection/presentation/widgets/components/seals_board.dart';
 
-class ProfileScreen extends StatelessWidget {
-  final bool showEditButton;
-  final bool showSealsInfo;
+class SealsScreen extends StatelessWidget {
 
-  const ProfileScreen({
-    super.key,
-    this.showEditButton = true,
-    this.showSealsInfo = true,
-  });
+  const SealsScreen({super.key,});
 
   @override
   Widget build(BuildContext context) {
@@ -33,24 +27,11 @@ class ProfileScreen extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    state.user.buildSummaryCard(
-                      isLoggedUser: true,
-                      showEditButton: showEditButton,
-                    ),
-                    Visibility(
-                      visible: showSealsInfo,
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 16),
-                        child: SealsBoard(state.user.sealsObtained, canGetSeal: true),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    ListTile(
-                      title: const Text('Sair'),
-                      leading: const Icon(Icons.logout_outlined, color: CustomColor.vividRed),
-                      onTap: () {
-                        TrustMeApp.logout();
-                      },
+                    const HeaderLine('Selos', Symbols.asterisk),
+                    //const SizedBox(height: 12),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16),
+                      child: SealsBoard(state.user.sealsObtained, canGetSeal: true, showTitle: false,),
                     ),
                   ],
                 ),

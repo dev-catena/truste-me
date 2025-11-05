@@ -8,8 +8,8 @@ import 'package:trustme/core/providers/user_data_cubit.dart';
 import 'package:trustme/features/common/presentation/widgets/components/custom_scaffold.dart';
 import 'package:trustme/features/common/presentation/widgets/components/header_line.dart';
 import 'package:trustme/features/common/presentation/widgets/components/stateful_filter_chips.dart';
-import 'package:trustme/features/conection/domain/entities/connection.dart';
-import 'package:trustme/features/conection/presentation/widgets/dialogs/request_connection_dialog.dart';
+import 'package:trustme/features/connection/domain/entities/connection.dart';
+import 'package:trustme/features/connection/presentation/widgets/dialogs/request_connection_dialog.dart';
 
 class ConnectionPanelScreen extends StatefulWidget {
   const ConnectionPanelScreen({super.key, this.initialFilter});

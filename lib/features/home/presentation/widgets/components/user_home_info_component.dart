@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:trustme/core/enums/contract_status.dart';
 import 'package:trustme/core/providers/user_data_cubit.dart';
 import 'package:trustme/core/routes.dart';
-import 'package:trustme/features/conection/domain/entities/connection.dart';
+import 'package:trustme/features/connection/domain/entities/connection.dart';
 import 'package:trustme/features/home/presentation/widgets/components/summary_card.dart';
 
 class UserHomeInfoComponent extends StatelessWidget {

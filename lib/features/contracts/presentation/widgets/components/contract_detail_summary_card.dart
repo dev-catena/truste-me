@@ -33,7 +33,7 @@ class ContractDetailSummaryCard extends StatelessWidget {
       if (difference.inHours <= 1) {
         timeRemaining = '${difference.inMinutes}m';
       } else {
-        timeRemaining = '${difference.inHours}h';
+        timeRemaining = '${difference.inHours}h ${difference.inMinutes % 60}m';
       }
     } else if (contract.status == ContractStatus.pending) {
       timeRemaining = '${difference.inMinutes}m';

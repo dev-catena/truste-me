@@ -1,3 +1,4 @@
+import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 
 import 'package:trustme/core/utils/custom_colors.dart';
@@ -9,6 +10,7 @@ extension SnackBarExtension on BuildContext {
     }
   }
 
+  // Deprecated, use showTopFlushbar instead
   void showTopSnackBar(Widget child) {
     if(this.mounted) {
       ScaffoldMessenger.of(this).showSnackBar(SnackBar(
@@ -28,6 +30,22 @@ extension SnackBarExtension on BuildContext {
           left: 20,
         ),
       ));
+    }
+  }
+
+  void showTopFlushbar(Widget child, String title) {
+    if(this.mounted) {
+      Flushbar(
+        title: title,
+        messageText: child,
+        backgroundColor: CustomColor.vividRed.withRed(180),
+        flushbarPosition: FlushbarPosition.TOP,
+        flushbarStyle: FlushbarStyle.FLOATING,
+        borderRadius: BorderRadius.circular(8),
+        dismissDirection: FlushbarDismissDirection.HORIZONTAL,
+        margin: EdgeInsets.all(24),
+        duration: Duration(seconds: 20),
+      )..show(this);
     }
   }
 }

@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -85,16 +86,23 @@ class _ContractReady extends StatelessWidget {
     ];
 
     final isMainClausesOk = _getPendingClauses(state.contract.clauses, participantsId);
-    final isOtherClausesOk =
-        _getPendingClauses(state.contract.sexualPractices.map((e) => e.toClause()).toList(), participantsId);
+    final isOtherClausesOk = _getPendingClauses(state.contract.sexualPractices.map((e) => e.toClause()).toList(), participantsId, isSexual: true);
 
     return isMainClausesOk.isEmpty && isOtherClausesOk.isEmpty;
   }
 
-  List<Clause> _getPendingClauses(List<Clause> clauses, List<int> participantsId) {
+  List<Clause> _getPendingClauses(List<Clause> clauses, List<int> participantsId, {bool isSexual = false}) {
     final pending = <Clause>[];
 
-    pending.addAll(clauses.where((element) => !element.isClauseOk(participantsId)));
+    //region # WARNING: Overriding code to sequential code for Clauses OR Sexual Practices
+    clauses.forEachIndexed((index, element) {
+      if(!element.isClauseOk(participantsId)) {
+        final number = (index + 1).toString().padLeft(4, '0');
+        final titlePrefix = isSexual ? 'PSX$number' : 'CLA$number';
+        pending.add(element.copyWith(code: titlePrefix));
+      }
+    });
+    //endregion
 
     return pending;
   }
@@ -157,10 +165,7 @@ class _ContractReady extends StatelessWidget {
                       ];
 
                       final pendingClauses = _getPendingClauses(state.contract.clauses, participantsId);
-                      final pendingPractices = _getPendingClauses(
-                        state.contract.sexualPractices.map((e) => e.toClause()).toList(),
-                        participantsId,
-                      );
+                      final pendingPractices = _getPendingClauses(state.contract.sexualPractices.map((e) => e.toClause()).toList(), participantsId, isSexual: true);
 
                       final pendingNames = [
                         ...pendingClauses.map((c) => '${c.code} - ${c.name}'),
@@ -169,14 +174,13 @@ class _ContractReady extends StatelessWidget {
 
                       final message = pendingNames.join('\n');
 
-                      context.showTopSnackBar(
+                      context.showTopFlushbar(
                         Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Text('Pendências:', textAlign: TextAlign.center),
-                            Text(message),
+                            Text(message, style: TextStyle(color: Colors.white),),
                           ],
-                        ),
+                        ), 'Pendências:',
                       );
                     },
                     icon: const Icon(Icons.warning_amber_outlined, color: CustomColor.vividRed),
@@ -235,8 +239,10 @@ class _ContractReady extends StatelessWidget {
                 ),
                 padding: const EdgeInsets.all(10),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('Assinaturas', style: titleMedium),
+                    SizedBox(height: 8,),
                     ...List.generate(
                       state.contract.signatures.length,
                       (index) {

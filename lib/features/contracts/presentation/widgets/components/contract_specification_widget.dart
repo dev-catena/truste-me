@@ -52,11 +52,13 @@ class ContractSpecificationWidget extends StatelessWidget {
       ),
       padding: const EdgeInsets.all(10),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
           Text('Especificações', style: titleMedium),
-          const SizedBox(height: 6),
-          const Text('Práticas permitidas'),
+          //const SizedBox(height: 6),
+          const Text('Práticas permitidas:'),
+          SizedBox(height: 8,),
           ...List.generate(
             initialPractices.length,
             (index) {

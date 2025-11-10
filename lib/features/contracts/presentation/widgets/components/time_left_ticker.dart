@@ -60,7 +60,7 @@ class _TimeLeftTickerState extends State<TimeLeftTicker> {
 
     String display;
     if (widget.contract.status == ContractStatus.active) {
-      display = _timeLeft.inHours <= 1 ? '${_timeLeft.inMinutes}m' : '${_timeLeft.inHours}h';
+      display = _timeLeft.inHours <= 1 ? '${_timeLeft.inMinutes}m' : '${_timeLeft.inHours}h ${_timeLeft.inMinutes % 60}m';
     } else if (widget.contract.status == ContractStatus.pending) {
       display = '${_timeLeft.inMinutes}m';
     } else {

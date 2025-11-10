@@ -29,7 +29,8 @@ enum RefreshTokenResult {
 }
 
 class ApiProvider {
-  static const DEF_MAX_ATTEMPT = 5;
+  static const DEF_MAX_ATTEMPT = 3;
+  static const DEF_TIMEOUT_IN_SECONDS = kDebugMode ? 120 : 15;
 
   /// Use this object to prevent concurrent access to data
   static final _lock = Lock();
@@ -55,7 +56,7 @@ class ApiProvider {
   }
 
   // TODO: Catch exception on caller
-  Future<HttpResult> get(String endPoint, {bool useToken = true, bool checkErrors = false, int attempt = 0, Map<String, dynamic>? params}) async {
+  Future<HttpResult> get(String endPoint, {bool useToken = true, bool checkErrors = true, int attempt = 0, Map<String, dynamic>? params}) async {
     endPoint = 'api/$endPoint';
 
     final Uri url;
@@ -63,7 +64,7 @@ class ApiProvider {
     Log.d('$runtimeType', 'GET url $url');
 
     try {
-      final http.Response response = await http.get(url, headers: _getHeader(useToken)).timeout(const Duration(seconds: 10));
+      final http.Response response = await http.get(url, headers: _getHeader(useToken)).timeout(const Duration(seconds: DEF_TIMEOUT_IN_SECONDS));
       // Log.d('$runtimeType', 'GET response ${response.body}');
 
       final httpResult = handleHttpResponse(response);
@@ -85,6 +86,15 @@ class ApiProvider {
         }
       }
 
+      if([401, 403].contains(e.statusCode)) {
+        return HttpResult(
+          statusCode: e.statusCode,
+          success: false,
+          message: e.message,
+          result: e.details
+        );
+      }
+
       rethrow;
     } on ServerErrorException catch (e, s) {
       Log.e('$runtimeType', '🔥 Server error on GET method.', e, s);
@@ -99,7 +109,7 @@ class ApiProvider {
   }
 
   // TODO: Catch exception on caller
-  Future<HttpResult> post(String endPoint, String content, {bool useToken = true, bool checkErrors = false, int attempt = 0}) async {
+  Future<HttpResult> post(String endPoint, String content, {bool useToken = true, bool checkErrors = true, int attempt = 0}) async {
     endPoint = 'api/$endPoint';
     final Uri url;
     url = Uri.https(_host, endPoint);
@@ -108,7 +118,7 @@ class ApiProvider {
     Log.d('$runtimeType', 'POST url $url - content $content');
 
     try {
-      response = await http.post(url, body: content, headers: _getHeader(useToken)).timeout(const Duration(seconds: 7));
+      response = await http.post(url, body: content, headers: _getHeader(useToken)).timeout(const Duration(seconds: DEF_TIMEOUT_IN_SECONDS));
       Log.d('$runtimeType', 'POST response ${response.body}');
 
       final httpResult = handleHttpResponse(response);
@@ -130,6 +140,15 @@ class ApiProvider {
         }
       }
 
+      if([401, 403].contains(e.statusCode)) {
+        return HttpResult(
+            statusCode: e.statusCode,
+            success: false,
+            message: e.message,
+            result: e.details
+        );
+      }
+
       rethrow;
     } on ServerErrorException catch (e, s) {
       Log.e('$runtimeType', '🔥 Server error on POST method.', e, s);
@@ -144,7 +163,7 @@ class ApiProvider {
   }
 
   // TODO: Catch exception on caller
-  Future<HttpResult> patch(String endPoint, String content, {bool useToken = true, bool checkErrors = false, int attempt = 0}) async {
+  Future<HttpResult> patch(String endPoint, String content, {bool useToken = true, bool checkErrors = true, int attempt = 0}) async {
     endPoint = 'api/$endPoint';
     final Uri url;
     url = Uri.https(_host, endPoint);
@@ -153,7 +172,7 @@ class ApiProvider {
     Log.d('$runtimeType', 'PATCH url $url - content $content');
 
     try {
-      response = await http.patch(url, body: content, headers: _getHeader(useToken)).timeout(const Duration(seconds: 7));
+      response = await http.patch(url, body: content, headers: _getHeader(useToken)).timeout(const Duration(seconds: DEF_TIMEOUT_IN_SECONDS));
       // Log.d(TAG, '$runtimeType - PATCH response ${response.body}');
 
       final httpResult = handleHttpResponse(response);
@@ -175,6 +194,15 @@ class ApiProvider {
         }
       }
 
+      if([401, 403].contains(e.statusCode)) {
+        return HttpResult(
+            statusCode: e.statusCode,
+            success: false,
+            message: e.message,
+            result: e.details
+        );
+      }
+
       rethrow;
     } on ServerErrorException catch (e, s) {
       Log.e('$runtimeType', '🔥 Server error on PATCH method.', e, s);
@@ -189,14 +217,14 @@ class ApiProvider {
   }
 
   // TODO: Catch exception on caller
-  Future<HttpResult> put(String endPoint, String content, {bool useToken = true, bool checkErrors = false, int attempt = 0}) async {
+  Future<HttpResult> put(String endPoint, String content, {bool useToken = true, bool checkErrors = true, int attempt = 0}) async {
     endPoint = 'api/$endPoint';
     final Uri url;
     url = Uri.https(_host, endPoint);
     final http.Response response;
 
     try {
-      response = await http.put(url, body: content, headers: _getHeader(useToken),).timeout(const Duration(seconds: 10));
+      response = await http.put(url, body: content, headers: _getHeader(useToken),).timeout(const Duration(seconds: DEF_TIMEOUT_IN_SECONDS));
       // Log.d(TAG, '$runtimeType - PUT response ${response.body}');
 
       final httpResult = handleHttpResponse(response);
@@ -218,6 +246,15 @@ class ApiProvider {
         }
       }
 
+      if([401, 403].contains(e.statusCode)) {
+        return HttpResult(
+            statusCode: e.statusCode,
+            success: false,
+            message: e.message,
+            result: e.details
+        );
+      }
+
       rethrow;
     } on ServerErrorException catch (e, s) {
       Log.e('$runtimeType', '🔥 Server error on PUT method.', e, s);
@@ -232,7 +269,7 @@ class ApiProvider {
   }
 
   // TODO: Catch exception on caller
-  Future<HttpResult> delete(String endPoint, {bool useToken = true, bool checkErrors = false, int attempt = 0, String? content}) async {
+  Future<HttpResult> delete(String endPoint, {bool useToken = true, bool checkErrors = true, int attempt = 0, String? content}) async {
     endPoint = 'api/$endPoint';
 
     final Uri url;
@@ -260,6 +297,15 @@ class ApiProvider {
         }
       }
 
+      if([401, 403].contains(e.statusCode)) {
+        return HttpResult(
+            statusCode: e.statusCode,
+            success: false,
+            message: e.message,
+            result: e.details
+        );
+      }
+
       rethrow;
     } on ServerErrorException catch (e, s) {
       Log.e('$runtimeType', '🔥 Server error on DELETE method.', e, s);
@@ -274,7 +320,7 @@ class ApiProvider {
   }
 
   // TODO: Catch exception on caller
-  Future<HttpResult> postWithFiles(String endPoint, List<File> files, {bool useToken = true, bool checkErrors = false, int attempt = 0, Map<String, dynamic>? otherFields}) async {
+  Future<HttpResult> postWithFiles(String endPoint, List<File> files, {bool useToken = true, bool checkErrors = true, int attempt = 0, Map<String, dynamic>? otherFields}) async {
     endPoint = 'api/$endPoint';
 
     final Uri url;
@@ -299,7 +345,7 @@ class ApiProvider {
     }
 
     try {
-      final http.StreamedResponse streamedResponse = await request.send().timeout(const Duration(seconds: 10));
+      final http.StreamedResponse streamedResponse = await request.send().timeout(const Duration(seconds: DEF_TIMEOUT_IN_SECONDS));
       final response = await http.Response.fromStream(streamedResponse);
 
       final httpResult = handleHttpResponse(response);
@@ -320,6 +366,15 @@ class ApiProvider {
             otherFields: otherFields,
           );
         }
+      }
+
+      if([401, 403].contains(e.statusCode)) {
+        return HttpResult(
+            statusCode: e.statusCode,
+            success: false,
+            message: e.message,
+            result: e.details
+        );
       }
 
       rethrow;

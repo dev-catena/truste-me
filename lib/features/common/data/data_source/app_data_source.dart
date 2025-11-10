@@ -1,5 +1,6 @@
 
 import 'package:trustme/core/api_provider.dart';
+import 'package:trustme/core/utils/http/custom_http_result.dart';
 import 'package:trustme/core/utils/log/log.dart';
 import 'package:trustme/features/contracts/domain/entities/contract_type.dart';
 import 'package:trustme/features/common/domain/entities/seal.dart';
@@ -16,27 +17,37 @@ class AppDataSource {
   // }
 
   Future<List<ContractType>> getContractTypes() async {
-    final rawData = await _apiProvider.get('contrato-tipos/listar');
-    final List<ContractType> types = [];
+    final HttpResult httpResult = await _apiProvider.get('contrato-tipos/listar');
 
-    for (final ele in rawData.result['data']) {
-      types.add(ContractType.fromJson(ele));
+    if(httpResult.success) {
+      final List<ContractType> types = [];
+
+      for (final ele in httpResult.result['data']) {
+        types.add(ContractType.fromJson(ele));
+      }
+
+      return types;
+    } else {
+      return [];
     }
-
-    return types;
   }
 
   Future<List<Seal>> getSeals() async {
-    final rawData = await _apiProvider.get('selos/listar');
-    final List<Seal> seals = [];
+    final HttpResult httpResult = await _apiProvider.get('selos/listar');
 
-    Log.d('$runtimeType', 'rawData $rawData');
+    if(httpResult.success) {
+      final List<Seal> seals = [];
 
-    for(final ele in rawData.result['data']){
-      // seals.add(SealModel.fromJson(ele..['status'] = ele['id']== 1 ? 'Ausente' :'Indisponível').toEntity());
-      seals.add(SealModel.fromJson(ele..['status'] = ele['id']== 1 ? 'Ausente' :'Indisponível').toEntity());
+      Log.d('$runtimeType', 'httpResult $httpResult');
+
+      for(final ele in httpResult.result['data']){
+        // seals.add(SealModel.fromJson(ele..['status'] = ele['id']== 1 ? 'Ausente' :'Indisponível').toEntity());
+        seals.add(SealModel.fromJson(ele..['status'] = ele['id']== 1 ? 'Ausente' :'Indisponível').toEntity());
+      }
+
+      return seals;
+    } else {
+      return [];
     }
-
-    return seals;
   }
 }

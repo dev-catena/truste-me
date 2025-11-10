@@ -8,16 +8,20 @@ class GenericErrorComponent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        children: [
-          const Text('Ocorreu um erro!', textAlign: TextAlign.center),
-          Text(message, textAlign: TextAlign.center),
-          IconButton(
-            onPressed: onRefresh,
-            icon: const Icon(Icons.refresh),
-          ),
-        ],
+    return SingleChildScrollView(
+      child: Center(
+        child: Column(
+          children: [
+            SizedBox(height: 16,),
+            const Text('Ocorreu um erro!', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),),
+            SizedBox(height: 16,),
+            Text(message, textAlign: TextAlign.center),
+            IconButton(
+              onPressed: onRefresh,
+              icon: const Icon(Icons.refresh),
+            ),
+          ],
+        ),
       ),
     );
   }

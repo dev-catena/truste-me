@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import '../../../../core/api_provider.dart';
-import '../../../../core/utils/preferences/app_preferences.dart';
-import '../../../common/domain/entities/auth.dart';
+import 'package:trustme/core/api_provider.dart';
+import 'package:trustme/core/utils/preferences/app_preferences.dart';
+import 'package:trustme/features/common/domain/entities/auth.dart';
 
 class LogoutDataSource {
   LogoutDataSource();
@@ -10,7 +10,7 @@ class LogoutDataSource {
   late final ApiProvider _apiProvider = ApiProvider();
 
   Future<void> logout() async {
-    await _apiProvider.post('logout', jsonEncode({}));
+    await _apiProvider.post('logout', jsonEncode({}), checkErrors: false);
 
     final prefs = AppPreferences();
     await prefs.remove(KeyPrefs.AUTH_TOKEN);

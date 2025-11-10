@@ -10,19 +10,19 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:trustme/core/global/global_variables.dart';
 import 'package:trustme/core/utils/firebase/crashlytics_util.dart';
 
-import 'core/app_theme.dart';
-import 'core/providers/app_data_cubit.dart';
-import 'core/providers/user_data_cubit.dart';
-import 'core/routes.dart';
-import 'core/services/app_lifecycle_service.dart';
-import 'core/utils/globals.dart';
-import 'core/utils/preferences/app_preferences.dart';
-import 'features/common/data/data_source/app_data_source.dart';
-import 'features/common/data/data_source/user_data_source.dart';
-import 'features/common/domain/entities/auth.dart';
-import 'features/connection/data/data_source/connection_datasource.dart';
-import 'features/contracts/data/data_source/contract_datasource.dart';
-import 'features/login/data/data_source/logout_datasource.dart';
+import 'package:trustme/core/app_theme.dart';
+import 'package:trustme/core/providers/app_data_cubit.dart';
+import 'package:trustme/core/providers/user_data_cubit.dart';
+import 'package:trustme/core/routes.dart';
+import 'package:trustme/core/services/app_lifecycle_service.dart';
+import 'package:trustme/core/utils/globals.dart';
+import 'package:trustme/core/utils/preferences/app_preferences.dart';
+import 'package:trustme/features/common/data/data_source/app_data_source.dart';
+import 'package:trustme/features/common/data/data_source/user_data_source.dart';
+import 'package:trustme/features/common/domain/entities/auth.dart';
+import 'package:trustme/features/connection/data/data_source/connection_datasource.dart';
+import 'package:trustme/features/contracts/data/data_source/contract_datasource.dart';
+import 'package:trustme/features/login/data/data_source/logout_datasource.dart';
 
 // windows cmd
 // mkdir home\data\data_source && mkdir home\data\models && mkdir home\data\repositories && mkdir home\domain\entities && mkdir home\domain\repositories && mkdir home\domain\usecases && mkdir home\presentation\blocs && mkdir home\presentation\widgets

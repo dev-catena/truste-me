@@ -61,13 +61,16 @@ class ApiProvider {
 
     final Uri url;
     url = Uri.https(_host, endPoint, params);
-    Log.d('$runtimeType', 'GET url $url');
+
+    if(GlobalVariables.DEF_PRINT_HTTP_REQUEST) {
+      Log.d('$runtimeType', 'REQUEST GET $url');
+    }
 
     try {
       final http.Response response = await http.get(url, headers: _getHeader(useToken)).timeout(const Duration(seconds: DEF_TIMEOUT_IN_SECONDS));
       // Log.d('$runtimeType', 'GET response ${response.body}');
 
-      final httpResult = handleHttpResponse(response);
+      final httpResult = handleHttpResponse(url, response);
       return httpResult;
     } on ClientErrorException catch (e, s) {
       Log.e('$runtimeType', '❌ Client error on GET method.', e, s);
@@ -115,13 +118,15 @@ class ApiProvider {
     url = Uri.https(_host, endPoint);
     final http.Response response;
 
-    Log.d('$runtimeType', 'POST url $url - content $content');
+    if(GlobalVariables.DEF_PRINT_HTTP_REQUEST) {
+      Log.d('$runtimeType', 'REQUEST POST $url - content $content');
+    }
 
     try {
       response = await http.post(url, body: content, headers: _getHeader(useToken)).timeout(const Duration(seconds: DEF_TIMEOUT_IN_SECONDS));
-      Log.d('$runtimeType', 'POST response ${response.body}');
+      //Log.d('$runtimeType', 'POST response ${response.body}');
 
-      final httpResult = handleHttpResponse(response);
+      final httpResult = handleHttpResponse(url, response);
       return httpResult;
     } on ClientErrorException catch (e, s) {
       Log.e('$runtimeType', '❌ Client error on POST method.', e, s);
@@ -169,13 +174,15 @@ class ApiProvider {
     url = Uri.https(_host, endPoint);
     final http.Response response;
 
-    Log.d('$runtimeType', 'PATCH url $url - content $content');
+    if(GlobalVariables.DEF_PRINT_HTTP_REQUEST) {
+      Log.d('$runtimeType', 'REQUEST PATCH $url - content $content');
+    }
 
     try {
       response = await http.patch(url, body: content, headers: _getHeader(useToken)).timeout(const Duration(seconds: DEF_TIMEOUT_IN_SECONDS));
       // Log.d(TAG, '$runtimeType - PATCH response ${response.body}');
 
-      final httpResult = handleHttpResponse(response);
+      final httpResult = handleHttpResponse(url, response);
       return httpResult;
     } on ClientErrorException catch (e, s) {
       Log.e('$runtimeType', '❌ Client error on PATCH method.', e, s);
@@ -223,11 +230,15 @@ class ApiProvider {
     url = Uri.https(_host, endPoint);
     final http.Response response;
 
+    if(GlobalVariables.DEF_PRINT_HTTP_REQUEST) {
+      Log.d('$runtimeType', 'REQUEST PUT $url - content $content');
+    }
+
     try {
       response = await http.put(url, body: content, headers: _getHeader(useToken),).timeout(const Duration(seconds: DEF_TIMEOUT_IN_SECONDS));
       // Log.d(TAG, '$runtimeType - PUT response ${response.body}');
 
-      final httpResult = handleHttpResponse(response);
+      final httpResult = handleHttpResponse(url, response);
       return httpResult;
     } on ClientErrorException catch (e, s) {
       Log.e('$runtimeType', '❌ Client error on PUT method.', e, s);
@@ -274,12 +285,15 @@ class ApiProvider {
 
     final Uri url;
     url = Uri.https(_host, endPoint);
-    Log.d('$runtimeType', 'DELETE url $url');
+
+    if(GlobalVariables.DEF_PRINT_HTTP_REQUEST) {
+      Log.d('$runtimeType', 'REQUEST DELETE $url');
+    }
 
     try {
       final http.Response response = await http.delete(url, headers: _getHeader(useToken), body: content);
 
-      final httpResult = handleHttpResponse(response);
+      final httpResult = handleHttpResponse(url, response);
       return httpResult;
     } on ClientErrorException catch (e, s) {
       Log.e('$runtimeType', '❌ Client error on DELETE method.', e, s);
@@ -344,11 +358,15 @@ class ApiProvider {
       }
     }
 
+    if(GlobalVariables.DEF_PRINT_HTTP_REQUEST) {
+      Log.d('$runtimeType', 'REQUEST POST_WITH_FILES $url - files count ${files.length}');
+    }
+
     try {
       final http.StreamedResponse streamedResponse = await request.send().timeout(const Duration(seconds: DEF_TIMEOUT_IN_SECONDS));
       final response = await http.Response.fromStream(streamedResponse);
 
-      final httpResult = handleHttpResponse(response);
+      final httpResult = handleHttpResponse(url, response);
       return httpResult;
     } on ClientErrorException catch (e, s) {
       Log.e('$runtimeType', '❌ Client error on POST_WITH_FILES method.', e, s);
@@ -391,8 +409,12 @@ class ApiProvider {
   }
 
   //region ## AUX METHODS
-  HttpResult handleHttpResponse(http.Response response) {
+  HttpResult handleHttpResponse(Uri url, http.Response response) {
     final status = response.statusCode;
+
+    if(GlobalVariables.DEF_PRINT_HTTP_RESPONSES) {
+      Log.d(runtimeType.toString(), 'RESPONSE (${response.statusCode}) $url - ${response.body}');
+    }
 
     // try to decode JSON if possible
     dynamic body;
@@ -415,7 +437,7 @@ class ApiProvider {
         responseData = body['result']?? body;
       }
 
-      return HttpResult(
+      final httpResult = HttpResult(
           statusCode: status,
           success: true,
           message: (body is Map)
@@ -423,8 +445,13 @@ class ApiProvider {
               : null,
           result: responseData
       );
+
+      if(GlobalVariables.DEF_PRINT_HTTP_RESPONSES_FORMATTED) {
+        Log.d(runtimeType.toString(), 'HttpResult for ($url): ${httpResult.toString()}');
+      }
+      return httpResult;
     } else if (status >= 400 && status < 500) {
-      throw ClientErrorException(
+      final ex = ClientErrorException(
           statusCode: status,
           message: body is Map && body['message'] != null
               ? body['message']
@@ -433,8 +460,10 @@ class ApiProvider {
           success: body['success']?? false,
           stackTrace: body['stack']
       );
+      Log.e(runtimeType.toString(), 'Error on request (${url}):', ex);
+      throw ex;
     } else if (status >= 500 && status < 600) {
-      throw ServerErrorException(
+      final ex = ServerErrorException(
           statusCode: status,
           message: body is Map && body['message'] != null
               ? body['message']
@@ -443,14 +472,18 @@ class ApiProvider {
           success: body['success']?? false,
           stackTrace: body['stack']
       );
+      Log.e(runtimeType.toString(), 'Error on request (${url}):', ex);
+      throw ex;
     } else {
-      throw HttpRequestException(
+      final ex = HttpRequestException(
           statusCode: status,
           message: 'Erro inesperado (${status})',
           details: body,
           success: body['success']?? false,
           stackTrace: body['stack']
       );
+      Log.e(runtimeType.toString(), 'Error on request (${url}):', ex);
+      throw ex;
     }
   }
 

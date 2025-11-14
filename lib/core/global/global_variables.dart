@@ -7,6 +7,10 @@ class GlobalVariables {
   static Level DEF_LOG_LEVEL = kDebugMode ? Level.trace : Level.error;
   static bool DEF_CHECK_AUTH_ERRORS = true;
 
+  static bool DEF_PRINT_HTTP_REQUEST = false || !kDebugMode;
+  static bool DEF_PRINT_HTTP_RESPONSES = true && kDebugMode;
+  static bool DEF_PRINT_HTTP_RESPONSES_FORMATTED = false && kDebugMode;
+
   // TODO: Don't use it for PRODUCTION deploy
   static bool DEF_USE_DEV_ENVIRONMENT = true;
 

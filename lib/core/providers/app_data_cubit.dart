@@ -28,6 +28,7 @@ class AppDataCubit extends Cubit<AppDataState> {
     return internState.seals;
   }
 
+  // FIXME: catch errors properly
   Future<void> initialize() async {
     final List<ContractType> types = [];
     final List<Seal> seals = [];

@@ -6,14 +6,18 @@ import 'package:trustme/core/utils/custom_colors.dart';
 extension SnackBarExtension on BuildContext {
   void showSnack(String message) {
     if(this.mounted) {
-      ScaffoldMessenger.of(this).showSnackBar(SnackBar(content: Text(message)),);
+      ScaffoldMessenger.of(this)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(message)),);
     }
   }
 
   // Deprecated, use showTopFlushbar instead
   void showTopSnackBar(Widget child) {
     if(this.mounted) {
-      ScaffoldMessenger.of(this).showSnackBar(SnackBar(
+      ScaffoldMessenger.of(this)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(
         content: child,
         dismissDirection: DismissDirection.horizontal,
         behavior: SnackBarBehavior.floating,

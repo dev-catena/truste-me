@@ -27,6 +27,7 @@ class _SealInspectionDialogState extends State<SealInspectionDialog> {
     return strDate;
   }
 
+  // FIXME: catch errors properly
   Future<void> requestSeal() async {
     isProcessing = true;
     setState(() {});

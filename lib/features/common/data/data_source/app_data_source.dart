@@ -10,8 +10,8 @@ class AppDataSource {
   final _apiProvider = ApiProvider();
 
   // Future<List<SexualPractice>> getSexualPractices() async {
-  //   final rawData = _MockData().practices;
-  //   final practices = rawData.map((e)=> SexualPractice.fromJson(e)).toList();
+  //   final httpResult = _MockData().practices;
+  //   final practices = httpResult.map((e)=> SexualPractice.fromJson(e)).toList();
   //
   //   return practices;
   // }
@@ -38,7 +38,7 @@ class AppDataSource {
     if(httpResult.success) {
       final List<Seal> seals = [];
 
-      Log.d('$runtimeType', 'httpResult $httpResult');
+      //Log.d('$runtimeType', 'httpResult $httpResult');
 
       for(final ele in httpResult.result['data']){
         // seals.add(SealModel.fromJson(ele..['status'] = ele['id']== 1 ? 'Ausente' :'Indisponível').toEntity());

@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/foundation.dart';
+import 'package:trustme/core/providers/user_data_event.dart';
 import 'package:trustme/core/utils/firebase/crashlytics_util.dart';
 import 'package:trustme/core/utils/http/custom_http_error.dart';
 import 'package:trustme/core/utils/preferences/app_preferences.dart';
@@ -34,6 +35,7 @@ class UserDataCubit extends Cubit<UserDataState> {
 
   List<Connection> get getConnections => (state as UserDataReady).connections;
 
+  // FIXME: catch errors properly
   Future<void> initialize(User user) async {
     final List<Contract> contracts = [];
     final List<Connection> connections = [];
@@ -72,6 +74,7 @@ class UserDataCubit extends Cubit<UserDataState> {
     ));
   }
 
+  // FIXME: catch errors properly
   Future<void> refreshUserInfo() async {
     final internState = state as UserDataReady;
     final info = await userDataSource.getGeneralInfo();
@@ -79,9 +82,17 @@ class UserDataCubit extends Cubit<UserDataState> {
     emit(internState.copyWith(userInfo: info));
   }
 
+  // FIXME: catch errors properly
   Future<void> establishConnection(final Connection connection, final bool accepted) async {
     final internState = state as UserDataReady;
 
+    // try {
+    //
+    // } on HttpRequestException catch (e, s) {
+    //   emit(internState.copyWith(connectionRequestStatus: ConnectionRequestStatus.failure, message: e.message));
+    // } on Exception catch(e, s) {
+    //   emit(internState.copyWith(connectionRequestStatus: ConnectionRequestStatus.failure));
+    // }
     await connectionDataSource.acceptConnection(connection, accepted);
     final connectionIndex = internState.connections.indexOf(connection);
     final updatedConnections = List<Connection>.of(internState.connections);
@@ -95,28 +106,39 @@ class UserDataCubit extends Cubit<UserDataState> {
     emit(internState.copyWith(connections: updatedConnections));
   }
 
+  // CHECKED
   Future<void> requestConnection(int userCode) async {
     final internState = state as UserDataReady;
 
     try {
-      final resp = await connectionDataSource.requestConnection(userCode);
-
-      // TODO: Check if it can be changed by emit(internState.copyWith(connectionRequestStatus: ConnectionRequestStatus.success));
-      if (resp.containsKey('error')) {
-        emit(internState.copyWith(connectionRequestStatus: ConnectionRequestStatus.failure, message: (resp['error'] as String)));
-      } else {
-        emit(internState.copyWith(connectionRequestStatus: ConnectionRequestStatus.success));
-      }
-      //
-
-      emit(internState.copyWith(connectionRequestStatus: ConnectionRequestStatus.initial));
+      final httpResult = await connectionDataSource.requestConnection(userCode);
+      emit(internState.copyWith(
+        connectionRequestStatus: ConnectionRequestStatus.success,
+        event: ConnectionRequestResult(isSuccess: true, message: httpResult.message ?? 'Requisição de conexão realizada com sucesso!'),
+      ));
     } on HttpRequestException catch (e, s) {
-      emit(internState.copyWith(connectionRequestStatus: ConnectionRequestStatus.failure, message: e.message));
+      emit(internState.copyWith(
+        connectionRequestStatus: ConnectionRequestStatus.failure,
+        event: ConnectionRequestResult(isSuccess: false, message: e.message),
+      ));
     } on Exception catch(e, s) {
-      emit(internState.copyWith(connectionRequestStatus: ConnectionRequestStatus.failure));
+      emit(internState.copyWith(
+        connectionRequestStatus: ConnectionRequestStatus.failure,
+        event: ConnectionRequestResult(isSuccess: false, message: e.toString()),
+      ));
     }
   }
 
+  /// Method used to clear event after one shot event
+  void clearEvent() {
+    final internState = state as UserDataReady;
+    emit(internState.copyWith(
+      event: null,
+      connectionRequestStatus: ConnectionRequestStatus.initial,
+    ));
+  }
+
+  // FIXME: catch errors properly
   Future<void> deleteConnection(Connection connection) async {
     final internState = state as UserDataReady;
 
@@ -144,7 +166,7 @@ class UserDataCubit extends Cubit<UserDataState> {
   //   emit(internState.copyWith(contracts: updatedContracts, userInfo: updatedInfo));
   // }
 
-
+  // FIXME: catch errors properly
   Future<void> createContract(Contract contract) async {
     final internState = state as UserDataReady;
 
@@ -156,6 +178,7 @@ class UserDataCubit extends Cubit<UserDataState> {
     emit(internState.copyWith(contracts: updatedContracts));
   }
 
+  // FIXME: catch errors properly
   Future<void> refreshContracts() async {
     final internState = state as UserDataReady;
     final newContracts = await contractDataSource.getContractsForUser();
@@ -163,6 +186,7 @@ class UserDataCubit extends Cubit<UserDataState> {
     emit(internState.copyWith(contracts: newContracts));
   }
 
+  // FIXME: catch errors properly
   Future<void> refreshConnections(User user) async {
     final internState = state as UserDataReady;
 

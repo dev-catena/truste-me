@@ -28,6 +28,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     add(HomeStarted());
   }
 
+  // FIXME: catch errors properly
   Future<void> _onStarted(HomeStarted event, Emitter<HomeState> emit) async {
     emit(HomeLoadInProgress());
     try {

@@ -161,6 +161,7 @@ class _ConnectionDetailScreenState extends State<ConnectionDetailScreen> {
     }
   }
 
+  // FIXME: catch errors properly
   @override
   void initState() {
     userData = context.read<UserDataCubit>();

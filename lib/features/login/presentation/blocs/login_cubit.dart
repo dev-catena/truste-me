@@ -51,6 +51,7 @@ class LoginCubit extends Cubit<LoginState> {
     emit(internalState.copyWith(isPwdObscure: !internalState.isPwdObscure, error: false, errorMsg: null));
   }
 
+  // FIXME: catch errors properly
   Future<void> loginSubmitted() async {
     final internalState = state as LoginReady;
 

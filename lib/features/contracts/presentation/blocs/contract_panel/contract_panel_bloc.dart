@@ -19,6 +19,7 @@ class ContractPanelBloc extends Bloc<ContractPanelEvent, ContractPanelState> {
     on<ContractPanelStarted>(_onStarted);
   }
 
+  // FIXME: catch errors properly
   Future<void> _onStarted(ContractPanelEvent event, Emitter<ContractPanelState> emit) async {
     // try {
       emit(ContractPanelLoadInProgress());

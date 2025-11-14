@@ -48,6 +48,7 @@ class _NewContractScreenState extends State<NewContractScreen> {
     setState(() {});
   }
 
+  // FIXME: catch errors properly
   Future<void> _setType(ContractType type) async {
     currentClauses.clear();
     practicesTaken.clear();

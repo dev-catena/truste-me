@@ -5,15 +5,15 @@ class HomeDataSource {
   final ApiProvider _apiProvider = ApiProvider();
 
   Future<UserModel> getUserData() async {
-    final rawData = await _apiProvider.get('usuario/dados');
+    final httpResult = await _apiProvider.get('usuario/dados');
 
-    return UserModel.fromJson(rawData.result);
+    return UserModel.fromJson(httpResult.result);
   }
 
   Future<GeneralUserInfo> getGeneralInfo() async {
-    final rawData = await _apiProvider.get('usuario/info');
+    final httpResult = await _apiProvider.get('usuario/info');
 
-    return GeneralUserInfo.fromJson(rawData.result);
+    return GeneralUserInfo.fromJson(httpResult.result);
   }
 }
 

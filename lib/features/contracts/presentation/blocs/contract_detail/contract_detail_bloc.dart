@@ -44,6 +44,7 @@ class ContractDetailBloc extends Bloc<ContractDetailEvent, ContractDetailState> 
     }
   }
 
+  // FIXME: catch errors properly
   Future<void> _onStarted(ContractDetailStarted event, Emitter<ContractDetailState> emit) async {
     emit(ContractDetailLoadInProgress());
 
@@ -106,6 +107,7 @@ class ContractDetailBloc extends Bloc<ContractDetailEvent, ContractDetailState> 
     emit(internState.copyWith(contract: updatedContract));
   }
 
+  // FIXME: catch errors properly
   Future<void> _onClauseSet(ContractDetailClauseSet event, Emitter<ContractDetailState> emit) async {
     if (state is! ContractDetailReady) return;
     final internState = state as ContractDetailReady;
@@ -175,6 +177,7 @@ class ContractDetailBloc extends Bloc<ContractDetailEvent, ContractDetailState> 
     emit(internState.copyWith(contract: updatedContract));
   }
 
+  // FIXME: catch errors properly
   Future<void> _onPracticeSet(ContractDetailPracticeSet event, Emitter<ContractDetailState> emit) async {
     if (state is! ContractDetailReady) return;
     final internState = state as ContractDetailReady;
@@ -226,6 +229,7 @@ class ContractDetailBloc extends Bloc<ContractDetailEvent, ContractDetailState> 
     return allClauses;
   }
 
+  // FIXME: catch errors properly
   Future<void> _onContractFinished(ContractDetailContractFinished event, Emitter<ContractDetailState> emit) async {
     if (state is! ContractDetailReady) return;
     final internState = state as ContractDetailReady;
@@ -238,6 +242,7 @@ class ContractDetailBloc extends Bloc<ContractDetailEvent, ContractDetailState> 
     emit(internState.copyWith(contract: evenNewer));
   }
 
+  // FIXME: catch errors properly
   Future<void> _onContractSigned(ContractDetailContractSigned event, Emitter<ContractDetailState> emit) async {
     if (state is! ContractDetailReady) return;
     final internState = state as ContractDetailReady;
@@ -261,6 +266,7 @@ class ContractDetailBloc extends Bloc<ContractDetailEvent, ContractDetailState> 
     emit(internState.copyWith(contract: updatedContract));
   }
 
+  // FIXME: catch errors properly
   Future<void> _onQuestionAnswered(
     ContractDetailContractQuestionAnswered event,
     Emitter<ContractDetailState> emit,

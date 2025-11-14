@@ -9,6 +9,7 @@ class LogoutDataSource {
 
   late final ApiProvider _apiProvider = ApiProvider();
 
+  // FIXME: catch errors properly
   Future<void> logout() async {
     await _apiProvider.post('logout', jsonEncode({}), checkErrors: false);
 

@@ -460,7 +460,7 @@ class ApiProvider {
           success: body['success']?? false,
           stackTrace: body['stack']
       );
-      Log.e(runtimeType.toString(), 'Error on request (${url}):', ex);
+      //Log.e(runtimeType.toString(), 'Error on request (${url}):', ex);
       throw ex;
     } else if (status >= 500 && status < 600) {
       final ex = ServerErrorException(
@@ -472,7 +472,7 @@ class ApiProvider {
           success: body['success']?? false,
           stackTrace: body['stack']
       );
-      Log.e(runtimeType.toString(), 'Error on request (${url}):', ex);
+      //Log.e(runtimeType.toString(), 'Error on request (${url}):', ex);
       throw ex;
     } else {
       final ex = HttpRequestException(
@@ -482,7 +482,7 @@ class ApiProvider {
           success: body['success']?? false,
           stackTrace: body['stack']
       );
-      Log.e(runtimeType.toString(), 'Error on request (${url}):', ex);
+      //Log.e(runtimeType.toString(), 'Error on request (${url}):', ex);
       throw ex;
     }
   }
@@ -574,9 +574,9 @@ class ApiProvider {
         });
 
         try {
-          final rawData = await post('refresh', body, useToken: false, checkErrors: false);
+          final httpResult = await post('refresh', body, useToken: false, checkErrors: false);
 
-          final auth = AuthModel.fromJson(rawData.result).toEntity();
+          final auth = AuthModel.fromJson(httpResult.result).toEntity();
           await setAuthData(auth);
           return RefreshTokenResult.TOKEN_REFRESHED;
         } catch(e) {

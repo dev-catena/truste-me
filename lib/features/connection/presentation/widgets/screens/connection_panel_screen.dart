@@ -5,6 +5,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:trustme/core/enums/connection_status.dart';
 import 'package:trustme/core/extensions/context_extensions.dart';
 import 'package:trustme/core/providers/user_data_cubit.dart';
+import 'package:trustme/core/providers/user_data_event.dart';
 import 'package:trustme/features/common/presentation/widgets/components/custom_scaffold.dart';
 import 'package:trustme/features/common/presentation/widgets/components/header_line.dart';
 import 'package:trustme/features/common/presentation/widgets/components/stateful_filter_chips.dart';
@@ -55,11 +56,15 @@ class _ConnectionPanelScreenState extends State<ConnectionPanelScreen> {
       child: BlocConsumer<UserDataCubit, UserDataState>(
         bloc: userData,
         listener: (context, state) {
-          if (state is UserDataReady) {
+          if (state is UserDataReady && state.event is ConnectionRequestResult) {
+            final event = state.event as ConnectionRequestResult;
+
             if (state.connectionRequestStatus == ConnectionRequestStatus.failure) {
-              context.showSnack(state.message);
+              context.showSnack(event.message);
+              userData.clearEvent();
             } else if (state.connectionRequestStatus == ConnectionRequestStatus.success) {
               context.showSnack('Conexão solicitada!');
+              userData.clearEvent();
             }
           }
         },

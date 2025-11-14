@@ -526,7 +526,7 @@ class ApiProvider {
           try {
             tokenRefreshed = await refreshAuthToken();
           } catch(e, stack) {
-            Log.e('$runtimeType', 'Tokiuz could not be refreshed! (ERROR)', e);
+            Log.e('$runtimeType', 'Tokiuz could not be refreshed! (ERROR)', e, stack);
             //CrashlyticsUtil.reportError("$TAG: Tokiuz could not be refreshed! (ERROR)", e, stack);
           }
 

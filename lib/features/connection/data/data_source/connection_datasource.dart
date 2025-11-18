@@ -40,16 +40,21 @@ class ConnectionDataSource {
   }
 
   // CHECKED
-  Future<void> acceptConnection(Connection connection, bool hasAccepted)async  {
+  Future<HttpResult> acceptConnection(Connection connection, bool hasAccepted)async  {
     final content = {
       'conexao_id': connection.id,
       'aceito': hasAccepted ? 1 : 0,
     };
 
     final httpResult = await _apiProvider.post('conexao/responder', jsonEncode(content));
+
+    return httpResult;
   }
 
-  Future<void> deleteConnection(Connection user) async {
-    await _apiProvider.delete('conexao/excluir/${user.id}');
+  // CHECKED
+  Future<HttpResult> deleteConnection(Connection user) async {
+    final httpResult = await _apiProvider.delete('conexao/excluir/${user.id}');
+
+    return httpResult;
   }
 }

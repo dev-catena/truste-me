@@ -138,18 +138,32 @@ class UserDataCubit extends Cubit<UserDataState> {
     ));
   }
 
-  // FIXME: catch errors properly
+  // CHECKED
   Future<void> deleteConnection(Connection connection) async {
     final internState = state as UserDataReady;
 
-    await connectionDataSource.deleteConnection(connection);
+    try {
+      final httpResult = await connectionDataSource.deleteConnection(connection);
 
-    final connectionIndex = internState.connections.indexOf(connection);
-    final updatedConnections = List<Connection>.of(internState.connections);
+      final updatedConnections = List<Connection>.of(internState.connections)
+        ..remove(connection);
 
-    updatedConnections.removeAt(connectionIndex);
-
-    emit(internState.copyWith(connections: updatedConnections));
+      emit(internState.copyWith(
+        connections: updatedConnections,
+        connectionRequestStatus: ConnectionRequestStatus.success,
+        event: ConnectionRequestResult(isSuccess: true, message: httpResult.message ?? 'Conexão removida com sucesso!'),
+      ));
+    } on HttpRequestException catch (e) {
+      emit(internState.copyWith(
+        connectionRequestStatus: ConnectionRequestStatus.failure,
+        event: ConnectionRequestResult(isSuccess: false, message: e.message),
+      ));
+    } on Exception catch (e) {
+      emit(internState.copyWith(
+        connectionRequestStatus: ConnectionRequestStatus.failure,
+        event: ConnectionRequestResult(isSuccess: false, message: e.toString()),
+      ));
+    }
   }
 
   // Future<void> createContract(User user, ContractType type, List<Clause> clauses, List<SexualPractice> practicesTaken) async {

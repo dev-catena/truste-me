@@ -4,6 +4,7 @@ import 'package:trustme/core/providers/user_data_event.dart';
 import 'package:trustme/core/utils/firebase/crashlytics_util.dart';
 import 'package:trustme/core/utils/http/custom_http_error.dart';
 import 'package:trustme/core/utils/preferences/app_preferences.dart';
+import 'package:trustme/features/home/data/data_source/home_datasource.dart';
 
 import 'package:trustme/features/common/data/data_source/user_data_source.dart';
 import 'package:trustme/features/common/domain/entities/seal.dart';
@@ -20,8 +21,6 @@ class UserDataCubit extends Cubit<UserDataState> {
   final UserDataSource userDataSource;
   final ContractDataSource contractDataSource;
   final ConnectionDataSource connectionDataSource;
-
-  // late GeneralUserInfo _userInfo;
 
   UserDataCubit(
     this.userDataSource,
@@ -42,11 +41,12 @@ class UserDataCubit extends Cubit<UserDataState> {
       final List<Contract> contracts = [];
       final List<Connection> connections = [];
       final List<Seal> seals = [];
+      late final GeneralUserInfo userInfo;
 
-      // TODO: This function is not defined in the class. Assuming it is a global function.
-      // setLoggedInUser(user);
+      setLoggedInUser(user);
 
       await Future.wait([
+        userDataSource.getGeneralInfo().then((value) => userInfo = value),
         userDataSource.getSeals(user).then((value) => seals.addAll(value)),
         contractDataSource.getContractsForUser().then((value) => contracts.addAll(value)),
         connectionDataSource.getConnectionsForUser().then((value) => connections.addAll(value)),
@@ -69,6 +69,7 @@ class UserDataCubit extends Cubit<UserDataState> {
 
       emit(UserDataReady(
         user: user,
+        userInfo: userInfo,
         contracts: contracts,
         connections: connections,
       ));
@@ -79,12 +80,24 @@ class UserDataCubit extends Cubit<UserDataState> {
     }
   }
 
-  // FIXME: catch errors properly
+  // CHECKED
   Future<void> refreshUserInfo() async {
     final internState = state as UserDataReady;
-    final info = await userDataSource.getGeneralInfo();
-
-    emit(internState.copyWith(userInfo: info));
+    try {
+      final info = await userDataSource.getGeneralInfo();
+      emit(internState.copyWith(
+        userInfo: info,
+        event: RefreshResult(isSuccess: true, message: 'Informações atualizadas com sucesso!'),
+      ));
+    } on HttpRequestException catch (e) {
+      emit(internState.copyWith(
+        event: RefreshResult(isSuccess: false, message: e.message),
+      ));
+    } on Exception catch (e) {
+      emit(internState.copyWith(
+        event: RefreshResult(isSuccess: false, message: e.toString()),
+      ));
+    }
   }
 
   // CHECKED

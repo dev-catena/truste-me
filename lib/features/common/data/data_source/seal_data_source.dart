@@ -6,7 +6,7 @@ class SealDataSource {
 
   // CHECKED: 1
   Future<Map<String, dynamic>> requestSeal(Seal seal) async {
-    if(seal.id == 1){
+    if(seal.id == 1) { // Only email seal is enabled
       return (await _apiProvider.post('usuario/enviar-verificacao', '')).result;
     } else {
       return {};

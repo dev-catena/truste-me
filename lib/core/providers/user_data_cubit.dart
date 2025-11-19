@@ -4,6 +4,7 @@ import 'package:trustme/core/providers/user_data_event.dart';
 import 'package:trustme/core/utils/firebase/crashlytics_util.dart';
 import 'package:trustme/core/utils/http/custom_http_error.dart';
 import 'package:trustme/core/utils/preferences/app_preferences.dart';
+import 'package:trustme/features/common/data/data_source/seal_data_source.dart';
 import 'package:trustme/features/home/data/data_source/home_datasource.dart';
 
 import 'package:trustme/features/common/data/data_source/user_data_source.dart';
@@ -21,11 +22,13 @@ class UserDataCubit extends Cubit<UserDataState> {
   final UserDataSource userDataSource;
   final ContractDataSource contractDataSource;
   final ConnectionDataSource connectionDataSource;
+  final SealDataSource sealDataSource;
 
   UserDataCubit(
     this.userDataSource,
     this.contractDataSource,
     this.connectionDataSource,
+    this.sealDataSource,
   ) : super(UserDataInitial());
 
   User get getUser => (state as UserDataReady).user;
@@ -84,6 +87,27 @@ class UserDataCubit extends Cubit<UserDataState> {
       emit(UserDataError('Erro ao carregar os dados do usuário: ${e.message}'));
     } on Exception catch (e) {
       emit(UserDataError('Ocorreu um erro inesperado ao carregar os dados: ${e.toString()}'));
+    }
+  }
+
+  Future<void> requestSeal(Seal seal) async {
+    final internState = state as UserDataReady;
+    try {
+      final result = await sealDataSource.requestSeal(seal);
+      emit(internState.copyWith(
+        event: SealRequestResult(
+          isSuccess: true,
+          message: result['message'] ?? 'Solicitação de selo realizada com sucesso!',
+        ),
+      ));
+    } on HttpRequestException catch (e) {
+      emit(internState.copyWith(
+        event: SealRequestResult(isSuccess: false, message: e.message),
+      ));
+    } on Exception catch (e) {
+      emit(internState.copyWith(
+        event: SealRequestResult(isSuccess: false, message: e.toString()),
+      ));
     }
   }
 

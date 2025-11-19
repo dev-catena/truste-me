@@ -18,6 +18,7 @@ import 'package:trustme/core/services/app_lifecycle_service.dart';
 import 'package:trustme/core/utils/globals.dart';
 import 'package:trustme/core/utils/preferences/app_preferences.dart';
 import 'package:trustme/features/common/data/data_source/app_data_source.dart';
+import 'package:trustme/features/common/data/data_source/seal_data_source.dart';
 import 'package:trustme/features/common/data/data_source/user_data_source.dart';
 import 'package:trustme/features/common/domain/entities/auth.dart';
 import 'package:trustme/features/connection/data/data_source/connection_datasource.dart';
@@ -114,7 +115,7 @@ class _TrustMeAppState extends State<TrustMeApp> {
     return MultiBlocProvider(
       providers: [
         BlocProvider<UserDataCubit>(
-          create: (_) => UserDataCubit(UserDataSource(), ContractDataSource(), ConnectionDataSource()),
+          create: (_) => UserDataCubit(UserDataSource(), ContractDataSource(), ConnectionDataSource(), SealDataSource()),
         ),
         BlocProvider<AppDataCubit>(
           create: (_) => AppDataCubit(AppDataSource()),

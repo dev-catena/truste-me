@@ -27,3 +27,10 @@ class ContractCreationResult extends UserDataEvent {
     this.contract,
   });
 }
+
+class SealRequestResult extends UserDataEvent {
+  final bool isSuccess;
+  final String message;
+
+  SealRequestResult({required this.isSuccess, required this.message});
+}

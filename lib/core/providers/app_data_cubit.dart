@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
+import 'package:trustme/core/utils/http/custom_http_error.dart';
 
 import 'package:trustme/features/common/data/data_source/app_data_source.dart';
 import 'package:trustme/features/common/domain/entities/seal.dart';
@@ -12,32 +13,34 @@ class AppDataCubit extends Cubit<AppDataState> {
 
   AppDataCubit(this._appDataSource) : super(AppDataInitial());
 
-  // List<SexualPractice> get getPractices {
-  //   final internState = state as AppDataReady;
-  //
-  //   return internState.sexualPractices;
-  // }
   List<ContractType> get getContractTypes {
     final internState = state as AppDataReady;
 
     return internState.contractTypes;
   }
+
   List<Seal> get getSeals {
     final internState = state as AppDataReady;
 
     return internState.seals;
   }
 
-  // FIXME: catch errors properly
   Future<void> initialize() async {
-    final List<ContractType> types = [];
-    final List<Seal> seals = [];
+    emit(AppDataLoading());
+    try {
+      final List<ContractType> types = [];
+      final List<Seal> seals = [];
 
-    await Future.wait([
-      _appDataSource.getContractTypes().then((value) => types.addAll(value)),
-      _appDataSource.getSeals().then((value) => seals.addAll(value)),
-    ]);
+      await Future.wait([
+        _appDataSource.getContractTypes().then((value) => types.addAll(value)),
+        _appDataSource.getSeals().then((value) => seals.addAll(value)),
+      ]);
 
-    emit(AppDataReady(contractTypes: types, seals: seals));
+      emit(AppDataReady(contractTypes: types, seals: seals));
+    } on HttpRequestException catch (e) {
+      emit(AppDataError('Erro ao carregar os dados do aplicativo: ${e.message}'));
+    } on Exception catch (e) {
+      emit(AppDataError('Ocorreu um erro inesperado: ${e.toString()}'));
+    }
   }
 }

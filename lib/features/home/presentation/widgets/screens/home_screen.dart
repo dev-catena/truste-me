@@ -15,8 +15,6 @@ import 'package:trustme/features/home/presentation/widgets/components/user_home_
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
 
-  //final bloc = HomeBloc(HomeDataSource());
-
   @override
   Widget build(BuildContext context) {
     final userData = context.read<UserDataCubit>();
@@ -26,17 +24,16 @@ class HomeScreen extends StatelessWidget {
     final List<FeatureData> features = [
       FeatureData(name: 'Conexões', icon: Symbols.partner_exchange, destinationRoute: AppRoutes.connectionPanelScreen),
       FeatureData(name: 'Selos', icon: Symbols.asterisk, destinationRoute: AppRoutes.sealsScreen),
-      // FeatureData(name: 'Carteira', icon: Symbols.account_balance_wallet, destinationRoute: AppRoutes.contractsScreen),
     ];
 
     return BlocProvider(
       create: (_) => HomeBloc(HomeDataSource(), userData, appData),
       child: CustomScaffold(
         child: BlocBuilder<HomeBloc, HomeState>(
-          builder: (blocCtx, state) {
+          builder: (blocCtx, homeState) {
             final bloc = blocCtx.read<HomeBloc>();
 
-            if(state is HomeReady) {
+            if (homeState is HomeReady) {
               return RefreshIndicator(
                 onRefresh: () async => bloc.add(HomeStarted()),
                 child: SingleChildScrollView(
@@ -55,7 +52,7 @@ class HomeScreen extends StatelessWidget {
                         runSpacing: 5,
                         children: List.generate(
                           features.length,
-                              (index) {
+                          (index) {
                             return features[index].buildCard();
                           },
                         ),
@@ -64,14 +61,15 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
               );
-            } else if(state is HomeLoadInProgress) {
-              return Center(child: const CircularProgressIndicator());
-            } else if(state is HomeError) {
-              return GenericErrorComponent(state.msg, onRefresh: () async => bloc.add(HomeStarted()));
+            } else if (homeState is HomeLoadInProgress) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (homeState is HomeError) {
+              return GenericErrorComponent(homeState.msg, onRefresh: () async => bloc.add(HomeStarted()));
             } else {
-              return const Text("Invalid state");
+              // Initial State
+              return const Center(child: CircularProgressIndicator());
             }
-          }
+          },
         ),
       ),
     );

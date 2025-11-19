@@ -49,7 +49,7 @@ class _ConnectionPanelScreenState extends State<ConnectionPanelScreen> {
               context: context,
               builder: (_) {
                 return RequestConnectionDialog(onRequested: userData.requestConnection);
-              }).then((value) { userData.refreshConnections(userData.getUser); });
+              }).then((value) { userData.refreshConnections(); });
         },
         child: const Icon(Icons.add),
       ),
@@ -95,14 +95,14 @@ class _ConnectionPanelScreenState extends State<ConnectionPanelScreen> {
                         children: [
                           const Text('Nenhuma conexão'),
                           IconButton(
-                            onPressed: () => userData.refreshConnections(userData.getUser),
+                            onPressed: () => userData.refreshConnections(),
                             icon: const Icon(Icons.refresh_outlined),
                           ),
                         ],
                       )
                     : Expanded(
                         child: RefreshIndicator(
-                          onRefresh: () async => await userData.refreshConnections(userData.getUser),
+                          onRefresh: () async => await userData.refreshConnections(),
                           child: ListView.separated(
                             shrinkWrap: true,
                             separatorBuilder: (_, __) {
@@ -113,7 +113,7 @@ class _ConnectionPanelScreenState extends State<ConnectionPanelScreen> {
                               if (index == filteredConnections.length) {
                                 return IconButton(
                                   onPressed: () {
-                                    userData.refreshConnections(userData.getUser);
+                                    userData.refreshConnections();
                                   },
                                   icon: const Icon(Icons.refresh_outlined),
                                 );

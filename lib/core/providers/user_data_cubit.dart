@@ -210,38 +210,71 @@ class UserDataCubit extends Cubit<UserDataState> {
         internState.copyWith(
           contracts: updatedContracts,
           userInfo: updatedInfo,
-          event: ContractCreationResult(isSuccess: true, message: 'Contrato criado com sucesso!', contract: newContract,),
+          event: ContractCreationResult(
+            isSuccess: true,
+            message: 'Contrato criado com sucesso!',
+            contract: newContract,
+          ),
         ),
       );
     } on HttpRequestException catch (e) {
       emit(
         internState.copyWith(
-          event: ContractCreationResult(isSuccess: false, message: e.message,),
+          event: ContractCreationResult(
+            isSuccess: false,
+            message: e.message,
+          ),
         ),
       );
     } on Exception catch (e) {
       emit(
         internState.copyWith(
-          event: ContractCreationResult(isSuccess: false, message: e.toString(),),
+          event: ContractCreationResult(
+            isSuccess: false,
+            message: e.toString(),
+          ),
         ),
       );
     }
   }
 
-  // FIXME: catch errors properly
+  // CHECKED
   Future<void> refreshContracts() async {
     final internState = state as UserDataReady;
-    final newContracts = await contractDataSource.getContractsForUser();
-
-    emit(internState.copyWith(contracts: newContracts));
+    try {
+      final newContracts = await contractDataSource.getContractsForUser();
+      emit(internState.copyWith(
+        contracts: newContracts,
+        event: RefreshResult(isSuccess: true, message: 'Contratos atualizados com sucesso!'),
+      ));
+    } on HttpRequestException catch (e) {
+      emit(internState.copyWith(
+        event: RefreshResult(isSuccess: false, message: e.message),
+      ));
+    } on Exception catch (e) {
+      emit(internState.copyWith(
+        event: RefreshResult(isSuccess: false, message: e.toString()),
+      ));
+    }
   }
 
-  // FIXME: catch errors properly
-  Future<void> refreshConnections(User user) async {
+  // CHECKED
+  Future<void> refreshConnections() async {
     final internState = state as UserDataReady;
-
-    final updatedConnections = await connectionDataSource.getConnectionsForUser();
-
-    emit(internState.copyWith(connections: updatedConnections));
+    try {
+      final updatedConnections = await connectionDataSource.getConnectionsForUser();
+      emit(internState.copyWith(
+        connections: updatedConnections,
+        event: RefreshResult(isSuccess: true, message: 'Conexões atualizadas com sucesso!'),
+      ));
+    } on HttpRequestException catch (e) {
+      emit(internState.copyWith(
+        event: RefreshResult(isSuccess: false, message: e.message),
+      ));
+    } on Exception catch (e) {
+      emit(internState.copyWith(
+        event: RefreshResult(isSuccess: false, message: e.toString()),
+      ));
+    }
   }
 }

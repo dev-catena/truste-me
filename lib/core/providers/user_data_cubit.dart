@@ -196,30 +196,36 @@ class UserDataCubit extends Cubit<UserDataState> {
     }
   }
 
-  // Future<void> createContract(User user, ContractType type, List<Clause> clauses, List<SexualPractice> practicesTaken) async {
-  //   final internState = state as UserDataReady;
-  //
-  //   final clausesId = clauses.map((e) => e.id).toList();
-  //   clausesId.addAll(practicesTaken.map((e) => e.id));
-  //
-  //   final newContract = await contractDataSource.createContract(type, [user], clausesId);
-  //   final updatedContracts = List<Contract>.of(internState.contracts)..insert(0, newContract);
-  //   final updatedQuantity = internState.userInfo.pendingContracts + 1;
-  //   final updatedInfo = internState.userInfo.copyWith(pendingContracts: updatedQuantity);
-  //
-  //   emit(internState.copyWith(contracts: updatedContracts, userInfo: updatedInfo));
-  // }
-
-  // FIXME: catch errors properly
+  // CHECKED
   Future<void> createContract(Contract contract) async {
     final internState = state as UserDataReady;
+    try {
+      final model = contract.toModel();
+      final newContract = await contractDataSource.createContract(model);
+      final updatedContracts = List<Contract>.of(internState.contracts)
+        ..insert(0, newContract);
+      final updatedInfo = internState.userInfo.copyWith(pendingContracts: internState.userInfo.pendingContracts + 1);
 
-    final model = contract.toModel();
-
-    final newContract = await contractDataSource.createContract(model);
-    final updatedContracts = List<Contract>.of(internState.contracts)..insert(0, newContract);
-
-    emit(internState.copyWith(contracts: updatedContracts));
+      emit(
+        internState.copyWith(
+          contracts: updatedContracts,
+          userInfo: updatedInfo,
+          event: ContractCreationResult(isSuccess: true, message: 'Contrato criado com sucesso!', contract: newContract,),
+        ),
+      );
+    } on HttpRequestException catch (e) {
+      emit(
+        internState.copyWith(
+          event: ContractCreationResult(isSuccess: false, message: e.message,),
+        ),
+      );
+    } on Exception catch (e) {
+      emit(
+        internState.copyWith(
+          event: ContractCreationResult(isSuccess: false, message: e.toString(),),
+        ),
+      );
+    }
   }
 
   // FIXME: catch errors properly

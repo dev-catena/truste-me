@@ -82,28 +82,40 @@ class UserDataCubit extends Cubit<UserDataState> {
     emit(internState.copyWith(userInfo: info));
   }
 
-  // FIXME: catch errors properly
+  // CHECKED
   Future<void> establishConnection(final Connection connection, final bool accepted) async {
     final internState = state as UserDataReady;
+    try {
+      final httpResult = await connectionDataSource.acceptConnection(connection, accepted);
 
-    // try {
-    //
-    // } on HttpRequestException catch (e, s) {
-    //   emit(internState.copyWith(connectionRequestStatus: ConnectionRequestStatus.failure, message: e.message));
-    // } on Exception catch(e, s) {
-    //   emit(internState.copyWith(connectionRequestStatus: ConnectionRequestStatus.failure));
-    // }
-    await connectionDataSource.acceptConnection(connection, accepted);
-    final connectionIndex = internState.connections.indexOf(connection);
-    final updatedConnections = List<Connection>.of(internState.connections);
+      final updatedConnections = List<Connection>.of(internState.connections);
+      final connectionIndex = updatedConnections.indexOf(connection);
 
-    updatedConnections.removeAt(connectionIndex);
+      if (connectionIndex != -1) {
+        updatedConnections.removeAt(connectionIndex);
+        if (accepted) {
+          updatedConnections.insert(connectionIndex, connection.copyWith(status: ConnectionStatus.accepted));
+        }
+      }
 
-    if (accepted) {
-      updatedConnections.insert(connectionIndex, connection.copyWith(status: ConnectionStatus.accepted));
+      final message = accepted ? 'Conexão aceita com sucesso!' : 'Conexão recusada com sucesso!';
+
+      emit(internState.copyWith(
+        connections: updatedConnections,
+        connectionRequestStatus: ConnectionRequestStatus.success,
+        event: ConnectionRequestResult(isSuccess: true, message: httpResult.message ?? message),
+      ));
+    } on HttpRequestException catch (e) {
+      emit(internState.copyWith(
+        connectionRequestStatus: ConnectionRequestStatus.failure,
+        event: ConnectionRequestResult(isSuccess: false, message: e.message),
+      ));
+    } on Exception catch (e) {
+      emit(internState.copyWith(
+        connectionRequestStatus: ConnectionRequestStatus.failure,
+        event: ConnectionRequestResult(isSuccess: false, message: e.toString()),
+      ));
     }
-
-    emit(internState.copyWith(connections: updatedConnections));
   }
 
   // CHECKED

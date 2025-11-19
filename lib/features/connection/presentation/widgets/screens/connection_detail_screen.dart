@@ -5,7 +5,6 @@ import 'package:trustme/core/extensions/context_extensions.dart';
 import 'package:trustme/core/providers/user_data_cubit.dart';
 import 'package:trustme/core/providers/user_data_event.dart';
 import 'package:trustme/core/utils/date_parser.dart';
-import 'package:trustme/core/utils/http/custom_http_error.dart';
 import 'package:trustme/features/common/domain/entities/seal.dart';
 import 'package:trustme/features/common/presentation/widgets/components/custom_scaffold.dart';
 import 'package:trustme/features/connection/domain/entities/connection.dart';
@@ -27,30 +26,11 @@ class _ConnectionDetailScreenState extends State<ConnectionDetailScreen> {
   final List<Seal> seals = [];
   bool loadingSeals = true;
 
-  Future<void> acceptConnection(bool hasAccepted) async {
+  void acceptConnection(bool hasAccepted) {
     setState(() {
       acceptInProgress = true;
     });
-
-    try {
-      await userData.establishConnection(widget.connection, hasAccepted);
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Conexão ${hasAccepted ? 'aceita' : 'recusada'}!'),
-        ));
-        context.pop();
-      }
-    } on HttpRequestException catch (e) {
-      if(context.mounted) context.showSnack('Erro ao estabelecer conexão. ${e.message}');
-    } on Exception catch (e) {
-      if(context.mounted) context.showSnack('Erro ao estabelecer conexão. ${e.toString()}');
-    } finally {
-      if (mounted) {
-        setState(() {
-          acceptInProgress = false;
-        });
-      }
-    }
+    userData.establishConnection(widget.connection, hasAccepted);
   }
 
   Widget getAcceptButton() {
@@ -167,9 +147,10 @@ class _ConnectionDetailScreenState extends State<ConnectionDetailScreen> {
         listener: (context, state) {
           if (state is UserDataReady && state.event is ConnectionRequestResult) {
             final event = state.event as ConnectionRequestResult;
-            if (deleteInProgress) {
+            if (deleteInProgress || acceptInProgress) {
               setState(() {
                 deleteInProgress = false;
+                acceptInProgress = false;
               });
 
               if (context.mounted) {

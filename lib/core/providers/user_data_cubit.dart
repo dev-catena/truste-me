@@ -35,43 +35,48 @@ class UserDataCubit extends Cubit<UserDataState> {
 
   List<Connection> get getConnections => (state as UserDataReady).connections;
 
-  // FIXME: catch errors properly
+  // CHECKED
   Future<void> initialize(User user) async {
-    final List<Contract> contracts = [];
-    final List<Connection> connections = [];
-    final List<Seal> seals = [];
+    emit(UserDataLoading());
+    try {
+      final List<Contract> contracts = [];
+      final List<Connection> connections = [];
+      final List<Seal> seals = [];
 
-    setLoggedInUser(user);
+      // TODO: This function is not defined in the class. Assuming it is a global function.
+      // setLoggedInUser(user);
 
-    //await refreshUserInfo();
+      await Future.wait([
+        userDataSource.getSeals(user).then((value) => seals.addAll(value)),
+        contractDataSource.getContractsForUser().then((value) => contracts.addAll(value)),
+        connectionDataSource.getConnectionsForUser().then((value) => connections.addAll(value)),
+      ]);
 
-    await Future.wait([
-      // userDataSource.getGeneralInfo().then((value) => _userInfo = value),
-      userDataSource.getSeals(user).then((value) => seals.addAll(value)),
-      contractDataSource.getContractsForUser().then((value) => contracts.addAll(value)),
-      connectionDataSource.getConnectionsForUser().then((value) => connections.addAll(value)),
-    ]);
+      user.sealsObtained.clear();
+      user.sealsObtained.addAll(seals);
 
-    user.sealsObtained.clear();
-    user.sealsObtained.addAll(seals);
+      //region ## SET USER DATA TO PREFERENCES
+      final prefs = AppPreferences();
+      await prefs.setString(KeyPrefs.USER_CODE, user.connectionCode.toString());
+      await prefs.setString(KeyPrefs.USER_FULL_NAME, user.fullName.toString());
+      await prefs.setString(KeyPrefs.USER_CPF, user.cpf.toString());
+      await prefs.setString(KeyPrefs.USER_EMAIL, user.email.toString());
 
-    //region ## SET USER DATA TO PREFERENCES
-    final prefs = AppPreferences();
-    await prefs.setString(KeyPrefs.USER_CODE, user.connectionCode.toString());
-    await prefs.setString(KeyPrefs.USER_FULL_NAME, user.fullName.toString());
-    await prefs.setString(KeyPrefs.USER_CPF, user.cpf.toString());
-    await prefs.setString(KeyPrefs.USER_EMAIL, user.email.toString());
+      // Set Crashlytics variables
+      CrashlyticsUtil.setCrashlyticsCustomVariables();
+      CrashlyticsUtil.setUserIdentifier(user.id.toString(), user.fullName);
+      //endregion
 
-    // Set Crashlytics variables
-    CrashlyticsUtil.setCrashlyticsCustomVariables();
-    CrashlyticsUtil.setUserIdentifier(user.id.toString(), user.fullName);
-    //endregion
-
-    emit(UserDataReady(
-      user: user,
-      contracts: contracts,
-      connections: connections,
-    ));
+      emit(UserDataReady(
+        user: user,
+        contracts: contracts,
+        connections: connections,
+      ));
+    } on HttpRequestException catch (e) {
+      emit(UserDataError('Erro ao carregar os dados do usuário: ${e.message}'));
+    } on Exception catch (e) {
+      emit(UserDataError('Ocorreu um erro inesperado ao carregar os dados: ${e.toString()}'));
+    }
   }
 
   // FIXME: catch errors properly

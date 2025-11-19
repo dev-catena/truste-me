@@ -5,6 +5,14 @@ sealed class UserDataState {}
 
 final class UserDataInitial extends UserDataState {}
 
+final class UserDataLoading extends UserDataState {}
+
+final class UserDataError extends UserDataState {
+  final String message;
+
+  UserDataError(this.message);
+}
+
 final class UserDataReady extends UserDataState {
   final User user;
   final List<Contract> contracts;

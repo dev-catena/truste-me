@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:trustme/core/extensions/context_extensions.dart';
 
 import 'package:trustme/core/providers/user_data_cubit.dart';
 import 'package:trustme/core/routes.dart';
@@ -56,11 +57,7 @@ class CustomScaffold extends StatelessWidget {
                     context.pushNamed(AppRoutes.profileScreen, extra: {'showEditButton': true, 'showSealsInfo': true});
                   }
                 } else {
-                  ScaffoldMessenger.of(context)
-                    ..hideCurrentSnackBar()
-                    ..showSnackBar(
-                      SnackBar(content: Text(homeState is HomeError ? 'Erro ao carregar os dados. Tente carregá-los' : 'Aguarde o carregamento dos dados...'))
-                    );
+                  context.showSnack(homeState is HomeError ? 'Erro ao carregar os dados. Tente carregá-los' : 'Aguarde o carregamento dos dados...');
                 }
               },
               child: const CircleAvatar(

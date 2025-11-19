@@ -90,6 +90,19 @@ class UserDataCubit extends Cubit<UserDataState> {
     }
   }
 
+  void updateLocalContract(Contract updatedContract) {
+    if (state is! UserDataReady) return;
+    final internState = state as UserDataReady;
+
+    final contractIndex = internState.contracts.indexWhere((c) => c.id == updatedContract.id);
+
+    if (contractIndex != -1) {
+      final updatedContracts = List<Contract>.of(internState.contracts);
+      updatedContracts[contractIndex] = updatedContract;
+      emit(internState.copyWith(contracts: updatedContracts));
+    }
+  }
+
   Future<void> requestSeal(Seal seal) async {
     final internState = state as UserDataReady;
     try {
@@ -270,21 +283,22 @@ class UserDataCubit extends Cubit<UserDataState> {
   }
 
   // CHECKED
-  Future<void> refreshContracts() async {
+  Future<void> refreshContracts({bool showSnackbar = true}) async {
+    if (state is! UserDataReady) return;
     final internState = state as UserDataReady;
     try {
       final newContracts = await contractDataSource.getContractsForUser();
       emit(internState.copyWith(
         contracts: newContracts,
-        event: RefreshResult(isSuccess: true, message: 'Contratos atualizados com sucesso!'),
+        event: showSnackbar ? RefreshResult(isSuccess: true, message: 'Contratos atualizados com sucesso!') : null,
       ));
     } on HttpRequestException catch (e) {
       emit(internState.copyWith(
-        event: RefreshResult(isSuccess: false, message: e.message),
+        event: showSnackbar ? RefreshResult(isSuccess: false, message: e.message) : null,
       ));
     } on Exception catch (e) {
       emit(internState.copyWith(
-        event: RefreshResult(isSuccess: false, message: e.toString()),
+        event: showSnackbar ? RefreshResult(isSuccess: false, message: e.toString()) : null,
       ));
     }
   }

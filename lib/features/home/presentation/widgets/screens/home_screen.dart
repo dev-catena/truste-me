@@ -17,8 +17,6 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userData = context.read<UserDataCubit>();
-    final appData = context.read<AppDataCubit>();
     final titleLarge = Theme.of(context).textTheme.titleLarge!;
 
     final List<FeatureData> features = [
@@ -26,51 +24,48 @@ class HomeScreen extends StatelessWidget {
       FeatureData(name: 'Selos', icon: Symbols.asterisk, destinationRoute: AppRoutes.sealsScreen),
     ];
 
-    return BlocProvider(
-      create: (_) => HomeBloc(HomeDataSource(), userData, appData),
-      child: CustomScaffold(
-        child: BlocBuilder<HomeBloc, HomeState>(
-          builder: (blocCtx, homeState) {
-            final bloc = blocCtx.read<HomeBloc>();
+    return CustomScaffold(
+      child: BlocBuilder<HomeBloc, HomeState>(
+        builder: (blocCtx, homeState) {
+          final bloc = blocCtx.read<HomeBloc>();
 
-            if (homeState is HomeReady) {
-              return RefreshIndicator(
-                onRefresh: () async => bloc.add(HomeStarted()),
-                child: SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Informações gerais', style: titleLarge, textAlign: TextAlign.start),
-                      const SizedBox(height: 10),
-                      const UserHomeInfoComponent(),
-                      const SizedBox(height: 20),
-                      Text('Serviços', style: titleLarge, textAlign: TextAlign.start),
-                      const SizedBox(height: 10),
-                      Wrap(
-                        spacing: 5,
-                        runSpacing: 5,
-                        children: List.generate(
-                          features.length,
-                          (index) {
-                            return features[index].buildCard();
-                          },
-                        ),
+          if (homeState is HomeReady) {
+            return RefreshIndicator(
+              onRefresh: () async => bloc.add(HomeStarted()),
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Informações gerais', style: titleLarge, textAlign: TextAlign.start),
+                    const SizedBox(height: 10),
+                    const UserHomeInfoComponent(),
+                    const SizedBox(height: 20),
+                    Text('Serviços', style: titleLarge, textAlign: TextAlign.start),
+                    const SizedBox(height: 10),
+                    Wrap(
+                      spacing: 5,
+                      runSpacing: 5,
+                      children: List.generate(
+                        features.length,
+                        (index) {
+                          return features[index].buildCard();
+                        },
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              );
-            } else if (homeState is HomeLoadInProgress) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (homeState is HomeError) {
-              return GenericErrorComponent(homeState.msg, onRefresh: () async => bloc.add(HomeStarted()));
-            } else {
-              // Initial State
-              return const Center(child: CircularProgressIndicator());
-            }
-          },
-        ),
+              ),
+            );
+          } else if (homeState is HomeLoadInProgress) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (homeState is HomeError) {
+            return GenericErrorComponent(homeState.msg, onRefresh: () async => bloc.add(HomeStarted()));
+          } else {
+            // Initial State
+            return const Center(child: CircularProgressIndicator());
+          }
+        },
       ),
     );
   }

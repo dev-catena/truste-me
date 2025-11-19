@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:trustme/core/providers/user_data_cubit.dart';
 import 'package:trustme/core/routes.dart';
 import 'package:trustme/core/utils/custom_colors.dart';
+import 'package:trustme/features/home/presentation/blocs/home_bloc.dart';
 
 class CustomScaffold extends StatelessWidget {
   const CustomScaffold({
@@ -23,7 +24,6 @@ class CustomScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final headlineMedium = Theme.of(context).textTheme.headlineMedium!;
-    final userData = context.read<UserDataCubit>();
 
     return Scaffold(
       floatingActionButton: floatingActionButton,
@@ -50,8 +50,17 @@ class CustomScaffold extends StatelessWidget {
             visible: showAvatar,
             child: InkWell(
               onTap: () {
-                if (GoRouter.of(context).state.name != AppRoutes.profileScreen) {
-                  context.pushNamed(AppRoutes.profileScreen, extra: { 'showEditButton': true, 'showSealsInfo': true });
+                final homeState = context.read<HomeBloc>().state;
+                if (homeState is HomeReady) {
+                  if (GoRouter.of(context).routerDelegate.currentConfiguration.fullPath != AppRoutes.profileScreen) {
+                    context.pushNamed(AppRoutes.profileScreen, extra: {'showEditButton': true, 'showSealsInfo': true});
+                  }
+                } else {
+                  ScaffoldMessenger.of(context)
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(
+                      SnackBar(content: Text(homeState is HomeError ? 'Erro ao carregar os dados. Tente carregá-los' : 'Aguarde o carregamento dos dados...'))
+                    );
                 }
               },
               child: const CircleAvatar(

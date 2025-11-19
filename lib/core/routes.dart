@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:trustme/features/home/data/data_source/home_datasource.dart';
+import 'package:trustme/features/home/presentation/blocs/home_bloc.dart';
 
 import 'package:trustme/features/common/domain/entities/auth.dart';
 import 'package:trustme/features/connection/domain/entities/connection.dart';
@@ -58,7 +61,15 @@ final GoRouter _routes = GoRouter(
   routes: [
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
-        return ScaffoldWithNestedNavigation(navigationShell: navigationShell);
+        // The HomeBloc is provided here to be available to all shell branches
+        return BlocProvider(
+          create: (context) => HomeBloc(
+            HomeDataSource(),
+            context.read(), // Reads UserDataCubit
+            context.read(), // Reads AppDataCubit
+          ),
+          child: ScaffoldWithNestedNavigation(navigationShell: navigationShell),
+        );
       },
       branches: [
         StatefulShellBranch(

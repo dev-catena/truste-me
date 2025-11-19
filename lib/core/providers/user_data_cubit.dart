@@ -146,12 +146,12 @@ class UserDataCubit extends Cubit<UserDataState> {
         connectionRequestStatus: ConnectionRequestStatus.success,
         event: ConnectionRequestResult(isSuccess: true, message: httpResult.message ?? 'Requisição de conexão realizada com sucesso!'),
       ));
-    } on HttpRequestException catch (e, s) {
+    } on HttpRequestException catch (e) {
       emit(internState.copyWith(
         connectionRequestStatus: ConnectionRequestStatus.failure,
         event: ConnectionRequestResult(isSuccess: false, message: e.message),
       ));
-    } on Exception catch(e, s) {
+    } on Exception catch(e) {
       emit(internState.copyWith(
         connectionRequestStatus: ConnectionRequestStatus.failure,
         event: ConnectionRequestResult(isSuccess: false, message: e.toString()),

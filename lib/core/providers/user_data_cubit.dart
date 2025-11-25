@@ -5,6 +5,7 @@ import 'package:trustme/core/utils/firebase/crashlytics_util.dart';
 import 'package:trustme/core/utils/http/custom_http_error.dart';
 import 'package:trustme/core/utils/preferences/app_preferences.dart';
 import 'package:trustme/features/common/data/data_source/seal_data_source.dart';
+import 'package:trustme/features/contracts/domain/entities/contract_type.dart';
 import 'package:trustme/features/home/data/data_source/home_datasource.dart';
 
 import 'package:trustme/features/common/data/data_source/user_data_source.dart';
@@ -100,6 +101,28 @@ class UserDataCubit extends Cubit<UserDataState> {
       final updatedContracts = List<Contract>.of(internState.contracts);
       updatedContracts[contractIndex] = updatedContract;
       emit(internState.copyWith(contracts: updatedContracts));
+    }
+  }
+
+  Future<void> fetchClausesForType(ContractType type) async {
+    final internState = state as UserDataReady;
+    try {
+      final clausesFetched = await contractDataSource.getClausesForContractType(type);
+      emit(internState.copyWith(
+        event: ClausesFetchResult(
+          isSuccess: true,
+          clauses: clausesFetched.clauses,
+          practices: clausesFetched.practices,
+        ),
+      ));
+    } on HttpRequestException catch (e) {
+      emit(internState.copyWith(
+        event: ClausesFetchResult(isSuccess: false, message: e.message),
+      ));
+    } on Exception catch (e) {
+      emit(internState.copyWith(
+        event: ClausesFetchResult(isSuccess: false, message: e.toString()),
+      ));
     }
   }
 

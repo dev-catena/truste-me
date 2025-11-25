@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:trustme/core/extensions/context_extensions.dart';
 
 import 'package:trustme/core/enums/contract_status.dart';
 import 'package:trustme/core/providers/user_data_cubit.dart';
+import 'package:trustme/core/providers/user_data_event.dart';
 import 'package:trustme/features/common/domain/entities/user.dart';
 import 'package:trustme/features/common/presentation/widgets/components/custom_scaffold.dart';
 import 'package:trustme/features/common/presentation/widgets/components/header_line.dart';
-import 'package:trustme/features/contracts/data/data_source/contract_datasource.dart';
 import 'package:trustme/features/contracts/domain/entities/clause.dart';
 import 'package:trustme/features/contracts/domain/entities/contract.dart';
 import 'package:trustme/features/contracts/domain/entities/contract_type.dart';
@@ -36,6 +37,7 @@ class _NewContractScreenState extends State<NewContractScreen> {
 
   List<Clause> allClauses = [];
   List<SexualPractice> allPractices = [];
+  bool _isLoadingClauses = false;
 
   String periodicitySelected = 'Nunca';
 
@@ -48,33 +50,30 @@ class _NewContractScreenState extends State<NewContractScreen> {
     setState(() {});
   }
 
-  // FIXME: catch errors properly
-  Future<void> _setType(ContractType type) async {
-    currentClauses.clear();
-    practicesTaken.clear();
+  void _setType(ContractType type) {
+    setState(() {
+      currentClauses.clear();
+      practicesTaken.clear();
+      allClauses.clear();
+      allPractices.clear();
 
-    if (typeSelected == type) {
-      typeSelected = null;
-    } else {
-      typeSelected = type;
-      final clausesFetched = await ContractDataSource().getClausesForContractType(typeSelected!);
-      allClauses = clausesFetched.clauses;
-      allPractices = clausesFetched.practices;
-      currentClauses.addAll(clausesFetched.clauses);
-      practicesTaken.addAll(clausesFetched.practices);
-    }
-    setState(() {});
+      if (typeSelected == type) {
+        typeSelected = null;
+      } else {
+        typeSelected = type;
+        _isLoadingClauses = true;
+        context.read<UserDataCubit>().fetchClausesForType(typeSelected!);
+      }
+    });
   }
 
   void _addClause(Clause clause) {
     currentClauses.add(clause);
-
     setState(() {});
   }
 
   void _removeClause(Clause clause) {
     currentClauses.remove(clause);
-
     setState(() {});
   }
 
@@ -99,103 +98,109 @@ class _NewContractScreenState extends State<NewContractScreen> {
     final userData = context.read<UserDataCubit>();
 
     return CustomScaffold(
-      child: BlocBuilder<UserDataCubit, UserDataState>(
-        builder: (context, state) {
-          if (state is UserDataReady) {
-            return SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const HeaderLine('Criação de contrato', Symbols.contract),
-                  const SizedBox(height: 12),
-                  NewContractHeader(
-                    state.connections,
-                    onStakeHolderSelected: _setStakeHolder,
-                    onTypeSelected: (value) async => await _setType(value),
-                    currentStakeHolder: stakeHolderSelected,
-                    currentType: typeSelected,
-                    currentValidity: validity,
-                    onStartSet: (value) => startDate = value,
-                    onEndSet: (value) => endDate = value,
-                    onValiditySet: (value) => validity = value,
-                  ),
-                  const SizedBox(height: 16),
-                  if (allClauses.isNotEmpty)
-                    ClauseSelectionCard(
-                      // canEdit: true,
-                      canEdit: false,
-                      contractor: userData.getUser,
-                      stakeHolders: stakeHolderSelected != null ? [stakeHolderSelected!] : [],
-                      possibleClauses: allClauses,
-                      // clausesChosen: allClauses,
-                      clausesChosen: currentClauses,
-                      onClausePicked: _addClause,
-                      onRemove: _removeClause,
-                      onAcceptOrDeny: null,
-                    ),
-                  const SizedBox(height: 12),
-                  if (typeSelected != null && stakeHolderSelected != null && allPractices.isNotEmpty)
-                    ContractSpecificationWidget(
-                      // canEdit: true,
-                      canEdit: false,
-                      type: typeSelected!,
-                      practicesAvailable: allPractices,
-                      // initialPractices: allPractices,
-                      initialPractices: practicesTaken,
-                      // participants: userData.getConnections.map((e) => e.user).toList(),
-                      // participants: [userLoggedIn, stakeHolderSelected!],
-                      participants: [userLoggedIn],
-                      onPick: onPracticeChosen,
-                      // onRemove: onPracticeRemoved,
-                      onRemove: null,
-                      showStatusPerUser: false,
-                      onAcceptOrDeny: null,
-                      answers: const [],
-                      onQuestionAnswered: (question, answer) {},
-                    ),
-                  const SizedBox(height: 12),
-                  if (typeSelected != null && stakeHolderSelected != null)
-                    FilledButton(
-                      onPressed: () async {
-                        final newContract = Contract(
-                          id: 0,
-                          contractNumber: '',
-                          status: ContractStatus.pending,
-                          contractor: userLoggedIn,
-                          type: typeSelected!,
-                          stakeHolders: [stakeHolderSelected!],
-                          clauses: currentClauses,
-                          sexualPractices: practicesTaken,
-                          duration: validity,
-                          signatures: const [],
-                          answers: const [],
-                          startDt: DateTime.now(),
-                          endDt: DateTime.now(),
-                        );
+      child: BlocListener<UserDataCubit, UserDataState>(
+        listener: (context, state) {
+          if (state is UserDataReady && state.event is ClausesFetchResult) {
+            final event = state.event as ClausesFetchResult;
+            setState(() {
+              _isLoadingClauses = false;
+            });
 
-                        await userData.createContract(newContract);
-
-                        // await userData.createContract(
-                        //     stakeHolderSelected!, typeSelected!, currentClauses, practicesTaken);
-                        context.pop();
-                        // final Contract contract = Contract(
-                        //   id: 0,
-                        //   contractNumber: 'x',
-                        //   status: 'Pendente',
-                        //   type: typeSelected!,
-                        //   stakeHolders: stakeHolders,
-                        //   clauses: clauses,
-                        // );
-                      },
-                      child: const Text('Criar contrato'),
-                    )
-                ],
-              ),
-            );
-          } else {
-            return Container();
+            if (event.isSuccess) {
+              setState(() {
+                allClauses = event.clauses ?? [];
+                allPractices = event.practices ?? [];
+                currentClauses.addAll(allClauses);
+                practicesTaken.addAll(allPractices);
+              });
+            } else {
+              context.showSnack(event.message ?? 'Falha ao buscar cláusulas.');
+            }
+            userData.clearEvent();
           }
         },
+        child: BlocBuilder<UserDataCubit, UserDataState>(
+          builder: (context, state) {
+            if (state is UserDataReady) {
+              return SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const HeaderLine('Criação de contrato', Symbols.contract),
+                    const SizedBox(height: 12),
+                    NewContractHeader(
+                      state.connections,
+                      onStakeHolderSelected: _setStakeHolder,
+                      onTypeSelected: (value) => _setType(value),
+                      currentStakeHolder: stakeHolderSelected,
+                      currentType: typeSelected,
+                      currentValidity: validity,
+                      onStartSet: (value) => startDate = value,
+                      onEndSet: (value) => endDate = value,
+                      onValiditySet: (value) => validity = value,
+                    ),
+                    const SizedBox(height: 16),
+                    if (_isLoadingClauses)
+                      const Center(child: CircularProgressIndicator())
+                    else if (allClauses.isNotEmpty)
+                      ClauseSelectionCard(
+                        canEdit: false,
+                        contractor: userData.getUser,
+                        stakeHolders: stakeHolderSelected != null ? [stakeHolderSelected!] : [],
+                        possibleClauses: allClauses,
+                        clausesChosen: currentClauses,
+                        onClausePicked: _addClause,
+                        onRemove: _removeClause,
+                        onAcceptOrDeny: null,
+                      ),
+                    const SizedBox(height: 12),
+                    if (typeSelected != null && stakeHolderSelected != null && allPractices.isNotEmpty)
+                      ContractSpecificationWidget(
+                        canEdit: false,
+                        type: typeSelected!,
+                        practicesAvailable: allPractices,
+                        initialPractices: practicesTaken,
+                        participants: [userLoggedIn],
+                        onPick: onPracticeChosen,
+                        onRemove: null,
+                        showStatusPerUser: false,
+                        onAcceptOrDeny: null,
+                        answers: const [],
+                        onQuestionAnswered: (question, answer) {},
+                      ),
+                    const SizedBox(height: 12),
+                    if (typeSelected != null && stakeHolderSelected != null)
+                      FilledButton(
+                        onPressed: () async {
+                          final newContract = Contract(
+                            id: 0,
+                            contractNumber: '',
+                            status: ContractStatus.pending,
+                            contractor: userLoggedIn,
+                            type: typeSelected!,
+                            stakeHolders: [stakeHolderSelected!],
+                            clauses: currentClauses,
+                            sexualPractices: practicesTaken,
+                            duration: validity,
+                            signatures: const [],
+                            answers: const [],
+                            startDt: DateTime.now(),
+                            endDt: DateTime.now(),
+                          );
+
+                          await userData.createContract(newContract);
+                          context.pop();
+                        },
+                        child: const Text('Criar contrato'),
+                      )
+                  ],
+                ),
+              );
+            }
+            // Should ideally show a loading or error state based on UserDataCubit state
+            return const Center(child: CircularProgressIndicator());
+          },
+        ),
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:flutter/foundation.dart';
+import 'package:trustme/core/utils/http/custom_http_error.dart';
 
 import '../../../../../core/enums/contract_status.dart';
 import '../../../../../core/utils/log/log.dart';
@@ -44,35 +45,36 @@ class ContractDetailBloc extends Bloc<ContractDetailEvent, ContractDetailState> 
     }
   }
 
-  // FIXME: catch errors properly
+  // CHECKED
   Future<void> _onStarted(ContractDetailStarted event, Emitter<ContractDetailState> emit) async {
     emit(ContractDetailLoadInProgress());
+    try {
+      List<Clause> possibleClauses = [];
+      List<SexualPractice> possiblePracs = [];
+      late final Contract contract;
 
-    List<Clause> possibleClauses = [];
-    List<SexualPractice> possiblePracs = [];
-    late final Contract contract;
+      await Future.wait([
+        datasource.getClausesForContractType(preliminaryContract.type).then((value) {
+          possibleClauses = value.clauses;
+          possiblePracs = value.practices;
+        }),
+        datasource.getContractFullInfo(preliminaryContract).then((value) => contract = value),
+      ]);
 
-    // try {
-    await Future.wait([
-      datasource.getClausesForContractType(preliminaryContract.type).then((value) {
-        possibleClauses = value.clauses;
-        possiblePracs = value.practices;
-      }),
-      datasource.getContractFullInfo(preliminaryContract).then((value) => contract = value),
-    ]);
+      final List<Clause> contractClauses = List<Clause>.of(contract.clauses);
 
-    final List<Clause> contractClauses = List<Clause>.of(contract.clauses);
+      final filteredClauses = _removeCurrentClausesFromAll(possibleClauses, contractClauses);
 
-    final filteredClauses = _removeCurrentClausesFromAll(possibleClauses, contractClauses);
-
-    emit(ContractDetailReady(
-      contract: contract,
-      possibleClauses: filteredClauses,
-      possiblePractices: possiblePracs,
-    ));
-    // } catch(e, s){
-    //   emit(ContractDetailError(e.toString()));
-    // }
+      emit(ContractDetailReady(
+        contract: contract,
+        possibleClauses: filteredClauses,
+        possiblePractices: possiblePracs,
+      ));
+    } on HttpRequestException catch (e) {
+      emit(ContractDetailError('Falha ao carregar o contrato: ${e.message}'));
+    } catch (e) {
+      emit(ContractDetailError('Ocorreu um erro inesperado: ${e.toString()}'));
+    }
   }
 
   Future<void> _onClauseAdded(ContractDetailClauseAdded event, Emitter<ContractDetailState> emit) async {

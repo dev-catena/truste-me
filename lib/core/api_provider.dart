@@ -31,15 +31,20 @@ enum RefreshTokenResult {
 class ApiProvider {
   static const DEF_MAX_ATTEMPT = 3;
   static const DEF_TIMEOUT_IN_SECONDS = kDebugMode ? 120 : 15;
+  static const DEF_USE_HTTPS = false;
 
   /// Use this object to prevent concurrent access to data
   static final _lock = Lock();
 
   ApiProvider();
 
+  // final String _host = GlobalVariables.DEF_USE_DEV_ENVIRONMENT
+  //     ? 'api-trustme-dev.catenasystem.com.br:8443'
+  //     : 'api-trustme.catenasystem.com.br';
+
   final String _host = GlobalVariables.DEF_USE_DEV_ENVIRONMENT
-      ? 'api-trustme-dev.catenasystem.com.br:8443'
-      : 'api-trustme.catenasystem.com.br';
+      ? '10.102.0.11:8011'
+      : 'api-trustme.dyndns.org:7980';
 
   Map<String, String> _getHeader(bool useToken) {
     final tokenizedHeader = {
@@ -60,7 +65,7 @@ class ApiProvider {
     endPoint = 'api/$endPoint';
 
     final Uri url;
-    url = Uri.https(_host, endPoint, params);
+    url = DEF_USE_HTTPS ? Uri.https(_host, endPoint, params) : Uri.http(_host, endPoint, params);
 
     if(GlobalVariables.DEF_PRINT_HTTP_REQUEST) {
       Log.d('$runtimeType', 'REQUEST GET $url');
@@ -115,7 +120,7 @@ class ApiProvider {
   Future<HttpResult> post(String endPoint, String content, {bool useToken = true, bool checkErrors = true, int attempt = 0}) async {
     endPoint = 'api/$endPoint';
     final Uri url;
-    url = Uri.https(_host, endPoint);
+    url = DEF_USE_HTTPS ? Uri.https(_host, endPoint) : Uri.http(_host, endPoint);
     final http.Response response;
 
     if(GlobalVariables.DEF_PRINT_HTTP_REQUEST) {
@@ -171,7 +176,7 @@ class ApiProvider {
   Future<HttpResult> patch(String endPoint, String content, {bool useToken = true, bool checkErrors = true, int attempt = 0}) async {
     endPoint = 'api/$endPoint';
     final Uri url;
-    url = Uri.https(_host, endPoint);
+    url = DEF_USE_HTTPS ? Uri.https(_host, endPoint) : Uri.http(_host, endPoint);
     final http.Response response;
 
     if(GlobalVariables.DEF_PRINT_HTTP_REQUEST) {
@@ -227,7 +232,7 @@ class ApiProvider {
   Future<HttpResult> put(String endPoint, String content, {bool useToken = true, bool checkErrors = true, int attempt = 0}) async {
     endPoint = 'api/$endPoint';
     final Uri url;
-    url = Uri.https(_host, endPoint);
+    url = DEF_USE_HTTPS ? Uri.https(_host, endPoint) : Uri.http(_host, endPoint);
     final http.Response response;
 
     if(GlobalVariables.DEF_PRINT_HTTP_REQUEST) {
@@ -284,7 +289,7 @@ class ApiProvider {
     endPoint = 'api/$endPoint';
 
     final Uri url;
-    url = Uri.https(_host, endPoint);
+    url = DEF_USE_HTTPS ? Uri.https(_host, endPoint) : Uri.http(_host, endPoint);
 
     if(GlobalVariables.DEF_PRINT_HTTP_REQUEST) {
       Log.d('$runtimeType', 'REQUEST DELETE $url');
@@ -338,11 +343,7 @@ class ApiProvider {
     endPoint = 'api/$endPoint';
 
     final Uri url;
-    if (kReleaseMode) {
-      url = Uri.https(_host, endPoint);
-    } else {
-      url = Uri.https(_host, endPoint);
-    }
+    url = DEF_USE_HTTPS ? Uri.https(_host, endPoint) : Uri.http(_host, endPoint);
 
     final http.MultipartRequest request = http.MultipartRequest('POST', url);
 

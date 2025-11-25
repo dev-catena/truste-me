@@ -5,6 +5,8 @@ sealed class ContractDetailEvent {}
 
 class ContractDetailStarted extends ContractDetailEvent {}
 
+class ContractDetailClearEvent extends ContractDetailEvent {}
+
 class ContractDetailClauseAdded extends ContractDetailEvent {
   final Clause selectedClause;
 
@@ -47,3 +49,11 @@ class ContractDetailContractQuestionAnswered extends ContractDetailEvent {
 }
 
 class ContractDetailContractSigned extends ContractDetailEvent {}
+
+/// Event to carry the result of an action performed within the contract detail screen.
+class ContractDetailActionResult extends ContractDetailEvent {
+  final bool isSuccess;
+  final String message;
+
+  ContractDetailActionResult({required this.isSuccess, required this.message});
+}

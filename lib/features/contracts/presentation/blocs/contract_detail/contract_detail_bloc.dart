@@ -32,12 +32,19 @@ class ContractDetailBloc extends Bloc<ContractDetailEvent, ContractDetailState> 
     on<ContractDetailClauseSet>(_onClauseSet);
     on<ContractDetailPracticeAdded>(_onPracticeAdded);
     on<ContractDetailPracticeSet>(_onPracticeSet);
-    on<ContractDetailContractFinished>(_onContractFinished);
+    on<ContractDetailContractFinished>(_onContractFinished); // TODO: Check it... it is not used?
     on<ContractDetailContractSigned>(_onContractSigned);
     on<ContractDetailContractQuestionAnswered>(_onQuestionAnswered);
+    on<ContractDetailClearEvent>(_onClearEvent); // Register the handler
   }
 
-
+  // Handler to clear the event
+  void _onClearEvent(ContractDetailClearEvent event, Emitter<ContractDetailState> emit) {
+    if (state is ContractDetailReady) {
+      final internState = state as ContractDetailReady;
+      emit(internState.copyWith(event: null));
+    }
+  }
 
   void _validateModification(ContractDetailReady internState) {
     if (internState.contract.signatures.isNotEmpty) {
@@ -231,17 +238,27 @@ class ContractDetailBloc extends Bloc<ContractDetailEvent, ContractDetailState> 
     return allClauses;
   }
 
-  // FIXME: catch errors properly
+  // CHECKED
+  // TODO: Check it... it is not used?
   Future<void> _onContractFinished(ContractDetailContractFinished event, Emitter<ContractDetailState> emit) async {
     if (state is! ContractDetailReady) return;
     final internState = state as ContractDetailReady;
-    final refreshedContract = await datasource.getContractFullInfo(internState.contract);
-    final updatedContract = refreshedContract.copyWith(status: ContractStatus.active);
+    try {
+      final refreshedContract = await datasource.getContractFullInfo(internState.contract);
+      final updatedContract = refreshedContract.copyWith(status: ContractStatus.active);
 
-    await datasource.updateContract(updatedContract);
-    final evenNewer = await datasource.getContractFullInfo(internState.contract);
+      await datasource.updateContract(updatedContract);
+      final finalContractState = await datasource.getContractFullInfo(internState.contract);
 
-    emit(internState.copyWith(contract: evenNewer));
+      emit(internState.copyWith(
+        contract: finalContractState,
+        event: ContractDetailActionResult(isSuccess: true, message: 'Contrato finalizado com sucesso!'),
+      ));
+    } on HttpRequestException catch (e) {
+      emit(internState.copyWith(event: ContractDetailActionResult(isSuccess: false, message: e.message)));
+    } catch (e) {
+      emit(internState.copyWith(event: ContractDetailActionResult(isSuccess: false, message: 'Ocorreu um erro: ${e.toString()}')));
+    }
   }
 
   // FIXME: catch errors properly

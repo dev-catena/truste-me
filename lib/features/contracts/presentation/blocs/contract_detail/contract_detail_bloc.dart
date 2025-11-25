@@ -278,14 +278,14 @@ class ContractDetailBloc extends Bloc<ContractDetailEvent, ContractDetailState> 
     //
     // await datasource.updateContract(updatedContract);
     // final evenNewer = await datasource.signContract(internState.contract);
-    if (_isFullSigned(updatedContract)) {
+    if (updatedContract.signatures.every((element) => element.hasAccepted)) {
       updatedContract = updatedContract.copyWith(status: ContractStatus.active);
       await datasource.finishContract(updatedContract);
     }
     emit(internState.copyWith(contract: updatedContract));
   }
 
-  // FIXME: catch errors properly
+  // CHECKED
   Future<void> _onQuestionAnswered(
     ContractDetailContractQuestionAnswered event,
     Emitter<ContractDetailState> emit,
@@ -299,22 +299,39 @@ class ContractDetailBloc extends Bloc<ContractDetailEvent, ContractDetailState> 
       userId: userLoggedIn.id,
     );
 
+    // 2. Optimistic Update: Update the UI immediately for a responsive feel.
     final updatedAnswers = List.of(internState.contract.answers);
+    final oldAnswersBK = List.of(internState.contract.answers);
+
     for (final ele in updatedAnswers) {
       Log.d('$runtimeType', 'updatedAnswers question id ${ele.questionId} - ${ele.answer}');
     }
     updatedAnswers.removeWhere((element) => element.questionId == event.question.id && element.userId == userLoggedIn.id);
     updatedAnswers.add(newAnswer);
 
-    await datasource.answerQuestion(internState.contract, [newAnswer]);
     final updatedContract = internState.contract.copyWith(answers: updatedAnswers);
-
     emit(internState.copyWith(contract: updatedContract));
-  }
 
-  bool _isFullSigned(Contract contract) {
-    final isSigned = contract.signatures.every((element) => element.hasAccepted);
-
-    return isSigned;
+    try {
+      // 3. Perform the network call.
+      await datasource.answerQuestion(internState.contract, [newAnswer]);
+      // On success, we can optionally emit a success event. The UI is already correct.
+      emit(internState.copyWith(
+        contract: updatedContract, // Keep the optimistic state
+        event: ContractDetailActionResult(isSuccess: true, message: 'Resposta enviada!'),
+      ));
+    } on HttpRequestException catch (e) {
+      // 4. ON FAILURE: Revert the UI state and notify the user.
+      final oldContract = internState.contract.copyWith(answers: oldAnswersBK);
+      emit(internState.copyWith(contract: oldContract));
+      // with an event, we roll back the optimistic UI change and show a SnackBar.
+      emit(internState.copyWith(event: ContractDetailActionResult(isSuccess: false, message: e.message)));
+    } catch (e) {
+      // Also handle other potential errors.
+      // 4. ON FAILURE: Revert the UI state and notify the user.
+      final oldContract = internState.contract.copyWith(answers: oldAnswersBK);
+      emit(internState.copyWith(contract: oldContract));
+      emit(internState.copyWith(event: ContractDetailActionResult(isSuccess: false, message: 'Ocorreu um erro: ${e.toString()}')));
+    }
   }
 }

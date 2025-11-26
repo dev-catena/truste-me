@@ -37,7 +37,7 @@ class AppTheme {
         backgroundColor: Colors.white,
       ),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
-        backgroundColor: CustomColor.activeColor,
+        backgroundColor: CustomColor.primaryColor,
         foregroundColor: Colors.white,
       ),
       navigationBarTheme: NavigationBarThemeData(
@@ -52,7 +52,7 @@ class AppTheme {
       ),
       filledButtonTheme: const FilledButtonThemeData(
         style: ButtonStyle(
-          backgroundColor: WidgetStatePropertyAll<Color>(CustomColor.activeColor),
+          backgroundColor: WidgetStatePropertyAll<Color>(CustomColor.primaryColor),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
@@ -71,7 +71,7 @@ class AppTheme {
         style: ButtonStyle(
           backgroundColor: WidgetStateProperty.resolveWith((states) {
             if (states.contains(WidgetState.selected)) {
-              return CustomColor.activeColor;
+              return CustomColor.primaryColor;
             }
             return null;
           }),
@@ -87,7 +87,7 @@ class AppTheme {
         checkColor: WidgetStateProperty.all(Colors.black),
         fillColor: WidgetStateProperty.resolveWith<Color>((Set<WidgetState> states) {
           if (states.contains(WidgetState.selected)) {
-            return CustomColor.activeColor;
+            return CustomColor.primaryColor;
           }
           return Colors.transparent;
         }),
@@ -96,9 +96,9 @@ class AppTheme {
         fillColor: WidgetStateProperty.resolveWith<Color>((Set<WidgetState> states) {
           if (states.contains(WidgetState.selected)) {
             if (states.contains(WidgetState.disabled)) {
-              return CustomColor.activeColor.withAlpha(120);
+              return CustomColor.primaryColor.withAlpha(120);
             } else {
-              return CustomColor.activeColor;
+              return CustomColor.primaryColor;
             }
           }
 
@@ -112,15 +112,15 @@ class AppTheme {
       chipTheme: ChipThemeData(
         color: WidgetStateProperty.resolveWith<Color>((Set<WidgetState> states) {
           if (states.contains(WidgetState.selected)) {
-            return CustomColor.activeColor;
+            return CustomColor.primaryColor;
           } else {
-            return CustomColor.activeColor.withAlpha(20);
+            return CustomColor.primaryColor.withAlpha(20);
           }
         }),
         checkmarkColor: Colors.white,
       ),
       progressIndicatorTheme: const ProgressIndicatorThemeData(
-        color: CustomColor.activeColor,
+        color: CustomColor.primaryColor,
       )
     );
   }

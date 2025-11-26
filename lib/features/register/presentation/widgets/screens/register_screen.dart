@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:trustme/core/extensions/context_extensions.dart';
+import 'package:trustme/core/global/global_variables.dart';
 import 'package:trustme/core/providers/user_data_cubit.dart';
 
 import 'package:trustme/core/utils/custom_colors.dart';
@@ -75,7 +76,7 @@ class RegisterView extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('TrustMe', style: Theme.of(context).textTheme.displayMedium),
+                    Text(GlobalVariables.DEF_APP_NAME, style: Theme.of(context).textTheme.displayMedium),
                     Image.asset('assets/imgs/trustme-logo.png', height: 100),
                     const SizedBox(height: 20),
                     Flexible(
@@ -90,7 +91,7 @@ class RegisterView extends StatelessWidget {
                             padding: const EdgeInsets.all(20),
                             decoration: BoxDecoration(
                               color: Colors.white,
-                              border: Border.all(color: CustomColor.activeColor),
+                              border: Border.all(color: CustomColor.primaryColor),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             // Call the top-level function here

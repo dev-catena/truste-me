@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:trustme/core/global/global_variables.dart';
 import 'package:trustme/core/providers/app_data_cubit.dart';
 import 'package:trustme/core/providers/user_data_cubit.dart';
 import 'package:trustme/core/routes.dart';
@@ -53,7 +54,7 @@ class LoginScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       const SizedBox(height: 60),
-                      Text('TrustMe', style: displayMedium),
+                      Text(GlobalVariables.DEF_APP_NAME, style: displayMedium),
                       const SizedBox(height: 16),
                       Image.asset('assets/imgs/trustme-logo.png', height: 100),
                       const SizedBox(height: 24),
@@ -61,7 +62,7 @@ class LoginScreen extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: CustomColor.activeColor),
+                          border: Border.all(color: CustomColor.primaryColor),
                         ),
                         padding: const EdgeInsets.only(left: 40, right: 40, bottom: 20, top: 20),
                         child: Padding(

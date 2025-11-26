@@ -160,7 +160,7 @@ class User extends Equatable {
     return Container(
       padding: EdgeInsets.zero,
       decoration: BoxDecoration(
-        border: showBorder! ? Border.all(color: CustomColor.activeColor, width: 2) : null,
+        border: showBorder! ? Border.all(color: CustomColor.primaryColor, width: 2) : null,
         borderRadius: BorderRadius.circular(radius != null ? radius * 2 : 70),
       ),
       child: CircleAvatar(

@@ -137,7 +137,7 @@ class ProfileDetailScreen extends StatelessWidget {
       //         size: 40,
       //       ),
       //     ),
-      //     Text('TrustMe', style: headlineMedium.copyWith(color: Colors.white)),
+      //     Text(GlobalVariables.DEF_APP_NAME, style: headlineMedium.copyWith(color: Colors.white)),
       //   ],
       // ),
       actions: [
@@ -161,7 +161,7 @@ class ProfileDetailScreen extends StatelessWidget {
         ),
         const SizedBox(width: 10),
       ],
-      backgroundColor: CustomColor.activeColor,
+      backgroundColor: CustomColor.primaryColor,
     );
   }
 }

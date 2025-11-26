@@ -60,7 +60,6 @@ class ApiProvider {
     }
   }
 
-  // TODO: Catch exception on caller
   Future<HttpResult> get(String endPoint, {bool useToken = true, bool checkErrors = true, int attempt = 0, Map<String, dynamic>? params}) async {
     endPoint = 'api/$endPoint';
 
@@ -116,7 +115,6 @@ class ApiProvider {
     }
   }
 
-  // TODO: Catch exception on caller
   Future<HttpResult> post(String endPoint, String content, {bool useToken = true, bool checkErrors = true, int attempt = 0}) async {
     endPoint = 'api/$endPoint';
     final Uri url;

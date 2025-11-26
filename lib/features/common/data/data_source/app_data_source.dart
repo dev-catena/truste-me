@@ -1,4 +1,6 @@
 
+import 'dart:convert';
+
 import 'package:trustme/core/api_provider.dart';
 import 'package:trustme/core/utils/http/custom_http_result.dart';
 import 'package:trustme/core/utils/log/log.dart';
@@ -8,6 +10,30 @@ import 'package:trustme/features/common/data/models/seal_model.dart';
 
 class AppDataSource {
   final _apiProvider = ApiProvider();
+
+  Future<bool> checkIfEmailExists(String email, {int? id}) async {
+    try {
+      final response = await _apiProvider.post('cadastro/verificar-dados', jsonEncode({'email': email}), useToken: id != null && id > 0,);
+      if (response.success) {
+        return response.result['email_exists'] == true;
+      }
+      return true;
+    } catch (e) {
+      return true;
+    }
+  }
+
+  Future<bool> checkIfCpfExists(String cpf, {int? id}) async {
+    try {
+      final response = await _apiProvider.post('cadastro/verificar-dados', jsonEncode({'CPF': cpf}), useToken: id != null && id > 0,);
+      if (response.success) {
+        return response.result['cpf_exists'] == true;
+      }
+      return true;
+    } catch (e) {
+      return true;
+    }
+  }
 
   // Future<List<SexualPractice>> getSexualPractices() async {
   //   final httpResult = _MockData().practices;

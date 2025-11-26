@@ -116,7 +116,7 @@ class ProfileDetailBloc extends Bloc<ProfileDetailEvent, ProfileDetailState> {
       // TODO: Change it to updateUser2 and call await userData.initialize(updatedUser); properly
       await datasource.updateUser(userDataUpdated);
 
-      // Manuel reconstruction to call initialize() method
+      // Manual reconstruction to call initialize() method
       final currentUser = userData.getUser;
 
       final updatedUser = currentUser.copyWith(

@@ -172,7 +172,6 @@ class ApiProvider {
     }
   }
 
-  // TODO: Catch exception on caller
   Future<HttpResult> patch(String endPoint, String content, {bool useToken = true, bool checkErrors = true, int attempt = 0}) async {
     endPoint = 'api/$endPoint';
     final Uri url;
@@ -228,7 +227,6 @@ class ApiProvider {
     }
   }
 
-  // TODO: Catch exception on caller
   Future<HttpResult> put(String endPoint, String content, {bool useToken = true, bool checkErrors = true, int attempt = 0}) async {
     endPoint = 'api/$endPoint';
     final Uri url;
@@ -284,7 +282,6 @@ class ApiProvider {
     }
   }
 
-  // TODO: Catch exception on caller
   Future<HttpResult> delete(String endPoint, {bool useToken = true, bool checkErrors = true, int attempt = 0, String? content}) async {
     endPoint = 'api/$endPoint';
 
@@ -338,7 +335,6 @@ class ApiProvider {
     }
   }
 
-  // TODO: Catch exception on caller
   Future<HttpResult> postWithFiles(String endPoint, List<File> files, {bool useToken = true, bool checkErrors = true, int attempt = 0, Map<String, dynamic>? otherFields}) async {
     endPoint = 'api/$endPoint';
 

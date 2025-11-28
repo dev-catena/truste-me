@@ -23,6 +23,7 @@ class ConnectionTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         onTap: () {
           // if(connection.status.description == 'Aguardando aceitação') return;
+          //context.pushNamed(AppRoutes.connectionDetailScreen, extra: connection);
           context.pushNamed(AppRoutes.connectionDetailScreen, extra: connection);
         },
         child: Container(

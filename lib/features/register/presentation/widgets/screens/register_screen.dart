@@ -76,7 +76,7 @@ class RegisterView extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(GlobalVariables.DEF_APP_NAME, style: Theme.of(context).textTheme.displayMedium),
+                    Text('${GlobalVariables.DEF_APP_NAME}${GlobalVariables.DEF_USE_DEV_ENVIRONMENT ? ' - HML' : ''}', style: Theme.of(context).textTheme.displayMedium),
                     Image.asset('assets/imgs/trustme-logo.png', height: 100),
                     const SizedBox(height: 20),
                     Flexible(

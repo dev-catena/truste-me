@@ -33,14 +33,14 @@ class NewPasswordScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: CustomColor.backgroundPrimaryColor,
       appBar: AppBar(
-        title: Text(GlobalVariables.DEF_APP_NAME, style: TextStyle(color: Colors.white)),
+        title: Text('${GlobalVariables.DEF_APP_NAME}${GlobalVariables.DEF_USE_DEV_ENVIRONMENT ? ' - HML' : ''}', style: TextStyle(color: Colors.white)),
         backgroundColor: CustomColor.primaryColor,
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
             const SizedBox(height: 60),
-            Text(GlobalVariables.DEF_APP_NAME, style: displayMedium),
+            Text('${GlobalVariables.DEF_APP_NAME}${GlobalVariables.DEF_USE_DEV_ENVIRONMENT ? ' - HML' : ''}', style: displayMedium),
             const SizedBox(height: 10),
             Image.asset('assets/imgs/trustme-logo.png', height: 100),
             const SizedBox(height: 20),

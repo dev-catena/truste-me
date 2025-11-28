@@ -52,7 +52,7 @@ class CustomScaffold extends StatelessWidget {
                 padding: EdgeInsets.only(right: 8),
                 child: Image.asset('assets/imgs/trustme-logo-white.png'),
               ),
-            Text(GlobalVariables.DEF_APP_NAME, style: headlineMedium.copyWith(color: Colors.white)),
+            Text('${GlobalVariables.DEF_APP_NAME}${GlobalVariables.DEF_USE_DEV_ENVIRONMENT ? ' - HML' : ''}', style: headlineMedium.copyWith(color: Colors.white)),
           ],
         ),
         actions: [

@@ -46,15 +46,16 @@ class LoginScreen extends StatelessWidget {
               } else if (state is LoginReady) {
 
                 if(DEF_TEST && kDebugMode) {
-                  state.emailController.text = "069.091.440-74";
-                  state.pwdController.text = "123123";
+                  //state.emailController.text = '069.091.440-74';
+                  state.emailController.text = '370.175.700-30';
+                  state.pwdController.text = '123123';
                 }
 
                 return SingleChildScrollView(
                   child: Column(
                     children: [
                       const SizedBox(height: 60),
-                      Text(GlobalVariables.DEF_APP_NAME, style: displayMedium),
+                      Text('${GlobalVariables.DEF_APP_NAME}${GlobalVariables.DEF_USE_DEV_ENVIRONMENT ? ' - HML' : ''}', style: displayMedium),
                       const SizedBox(height: 16),
                       Image.asset('assets/imgs/trustme-logo.png', height: 100),
                       const SizedBox(height: 24),

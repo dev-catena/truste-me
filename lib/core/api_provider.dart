@@ -448,9 +448,7 @@ class ApiProvider {
     } else if (status >= 400 && status < 500) {
       final ex = ClientErrorException(
           statusCode: status,
-          message: body is Map && body['message'] != null
-              ? body['message']
-              : 'Erro na requisição (${status})',
+          message: _getErrorMessage(body, 'Erro na requisição (${status})'),
           details: body,
           success: body['success']?? false,
           stackTrace: body['stack']
@@ -460,9 +458,7 @@ class ApiProvider {
     } else if (status >= 500 && status < 600) {
       final ex = ServerErrorException(
           statusCode: status,
-          message: body is Map && body['message'] != null
-              ? body['message']
-              : 'Erro no servidor (${status})',
+          message: _getErrorMessage(body, 'Erro no servidor (${status})'),
           details: body,
           success: body['success']?? false,
           stackTrace: body['stack']
@@ -480,6 +476,21 @@ class ApiProvider {
       //Log.e(runtimeType.toString(), 'Error on request (${url}):', ex);
       throw ex;
     }
+  }
+
+  String _getErrorMessage(dynamic body, String defaultMessage) {
+
+    var message  = defaultMessage;
+
+    if(body is Map) {
+      if(body['message'] != null) {
+        message = body['message'];
+      } else if(body['error'] != null) {
+        message = body['error'];
+      }
+    }
+
+    return message;
   }
 
   Future<bool> _checkError403(Uri uri, int respStatusCode) async {

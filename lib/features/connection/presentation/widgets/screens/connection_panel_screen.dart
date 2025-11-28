@@ -65,6 +65,7 @@ class _ConnectionPanelScreenState extends State<ConnectionPanelScreen> {
             } else if (state.connectionRequestStatus == ConnectionRequestStatus.success) {
               context.showSnack('Conexão solicitada!');
               userData.clearEvent();
+              userData.refreshConnections();
             }
           }
         },

@@ -15,11 +15,11 @@ class ConnectionDataSource {
     final List<Connection> connectionList = [];
 
     for (final ele in httpResult.result['pendentes']) {
-      connectionList.add(ConnectionModel.fromJson(ele..['status'] = 'Solicitação Recebida').toEntity());
+      connectionList.add(ConnectionModel.fromJson(ele..['status'] = 'Pendente').toEntity());
     }
 
     for (final ele in httpResult.result['ativas']) {
-      connectionList.add(ConnectionModel.fromJson(ele..['status'] = 'Aceita').toEntity());
+      connectionList.add(ConnectionModel.fromJson(ele..['status'] = 'Ativa').toEntity());
     }
 
 

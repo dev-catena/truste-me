@@ -44,10 +44,10 @@ class Connection extends Equatable {
 }
 
 enum ConnectionStatus {
-  pending('Solicitação Recebida', 'Solicitação recebida', CustomColor.pendingYellow),
-  accepted('Aceita', 'Solicitação aceita', CustomColor.activeColor),
+  pending('Pendente', 'Solicitação recebida', CustomColor.pendingYellow),
+  accepted('Ativa', 'Solicitação aceita', CustomColor.activeColor),
   // cancelled('Aguardando aceitação', 'Aguardando aceitação', CustomColor.activeGreyed);
-  cancelled('Solicitação Enviada', 'Solicitação enviada', CustomColor.activeGreyed);
+  requested('Solicitação enviada', 'Solicitação enviada', CustomColor.activeGreyed);
 
   final String name;
   final String description;

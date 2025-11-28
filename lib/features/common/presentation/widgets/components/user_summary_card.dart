@@ -65,6 +65,7 @@ class UserSummaryCard extends StatelessWidget {
                               child: Text('Editar'),
                             ),
                           ),
+                          SizedBox(height: 8,),
                           Text(
                             'Perfil criado ${DateParser.formatDate(user.memberSince.toLocal(), showYear: true, prefix: "em ")}',
                             textAlign: TextAlign.end,

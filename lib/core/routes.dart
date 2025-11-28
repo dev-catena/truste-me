@@ -40,9 +40,9 @@ class AppRoutes {
 
   static const registerScreen = '/cadastro';
 
-  // Dentro de homeScreen
-  static const connectionPanelScreen = 'conexoes';
-  static const connectionDetailScreen = 'conexao-detalhes';
+  // Absolute paths for screens that should be displayed in full screen.
+  static const connectionPanelScreen = '/conexoes';
+  static const connectionDetailScreen = '/conexoes/conexao-detalhes';
 
   static const profileScreen = '/perfil';
 
@@ -118,29 +118,7 @@ final GoRouter _routes = GoRouter(
               name: 'home',
               pageBuilder: (context, state) => NoTransitionPage(child: HomeScreen()),
               routes: [
-                GoRoute(
-                  path: AppRoutes.connectionPanelScreen,
-                  name: AppRoutes.connectionPanelScreen,
-                  builder: (_, state) {
-                    final initialFilter = (state.extra as Map<String, dynamic>? ?? {})['initialFilter'] as ConnectionStatus?;
-
-                    return ConnectionPanelScreen(
-                      key: ValueKey(initialFilter),
-                      initialFilter: initialFilter?.name,
-                    );
-                  },
-                  routes: [
-                    GoRoute(
-                      path: AppRoutes.connectionDetailScreen,
-                      name: AppRoutes.connectionDetailScreen,
-                      builder: (context, state) {
-                        final connection = state.extra as Connection;
-
-                        return ConnectionDetailScreen(connection);
-                      },
-                    )
-                  ],
-                ),
+                // The connectionPanelScreen and connectionDetailScreen routes have been moved to the top level.
               ],
             ),
           ],
@@ -169,6 +147,30 @@ final GoRouter _routes = GoRouter(
       path: AppRoutes.registerScreen,
       name: AppRoutes.registerScreen,
       builder: (_, __) => const RegisterScreen(),
+    ),
+    // Top-level routes for connectionPanelScreen and connectionDetailScreen
+    GoRoute(
+      path: AppRoutes.connectionPanelScreen,
+      name: AppRoutes.connectionPanelScreen,
+      parentNavigatorKey: _rootNavigatorKey,
+      builder: (_, state) {
+        final initialFilter = (state.extra as Map<String, dynamic>? ?? {})['initialFilter'] as ConnectionStatus?;
+
+        return ConnectionPanelScreen(
+          key: ValueKey(initialFilter),
+          initialFilter: initialFilter?.name,
+        );
+      },
+    ),
+    GoRoute(
+      path: AppRoutes.connectionDetailScreen,
+      name: AppRoutes.connectionDetailScreen,
+      parentNavigatorKey: _rootNavigatorKey,
+      builder: (context, state) {
+        final connection = state.extra as Connection;
+
+        return ConnectionDetailScreen(connection);
+      },
     ),
     GoRoute(
       path: AppRoutes.profileScreen,

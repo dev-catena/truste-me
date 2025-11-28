@@ -98,7 +98,7 @@ class _ConnectionDetailScreenState extends State<ConnectionDetailScreen> {
             ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator())
             : const Text('Desfazer conexão'),
       );
-    } else if (widget.connection.status == ConnectionStatus.cancelled) {
+    } else if (widget.connection.status == ConnectionStatus.requested) {
       return OutlinedButton(
         onPressed: deleteInProgress
             ? null

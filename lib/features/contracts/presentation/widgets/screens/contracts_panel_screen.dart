@@ -91,7 +91,7 @@ class _ContractsScreenState extends State<ContractsScreen> {
                       height: 50,
                       width: size.width * 0.95,
                       child: StatefulFilterChips(
-                        filtersLabel: ContractStatus.values.map((e) => e.description).toList()..insert(0, 'Todos'),
+                        filtersLabel: ContractStatus.values.map((e) => e.description).toList()..add('Todos'),
                         initialFilter: activeFilter,
                         onSelected: setFilter,
                       ),

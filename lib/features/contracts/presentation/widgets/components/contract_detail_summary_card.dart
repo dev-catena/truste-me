@@ -115,7 +115,7 @@ class ContractDetailSummaryCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                if ([ContractStatus.active, ContractStatus.completed].contains(contract.status))
+                if ([ContractStatus.active, ContractStatus.completed, ContractStatus.pending].contains(contract.status))
                   Column(
                     children: [
                       const Text('Duração do contrato', style: TextStyle(fontWeight: FontWeight.w600)),

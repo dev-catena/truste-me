@@ -5,10 +5,11 @@ import 'package:trustme/features/common/domain/entities/seal.dart';
 import 'package:trustme/features/common/presentation/widgets/dialogs/seal_inspection_dialog.dart';
 
 class SealCard extends StatelessWidget {
-  const SealCard(this.seal, {required this.canGetSeal, super.key});
-
   final Seal seal;
   final bool canGetSeal;
+  final bool onlyPendingSeals;
+
+  const SealCard(this.seal, {required this.canGetSeal, super.key, this.onlyPendingSeals = false});
 
   @override
   Widget build(BuildContext context) {

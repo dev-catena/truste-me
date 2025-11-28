@@ -8,7 +8,7 @@ extension SnackBarExtension on BuildContext {
     if(this.mounted) {
       ScaffoldMessenger.of(this)
         ..hideCurrentSnackBar()
-        ..showSnackBar(SnackBar(content: Text(message)),);
+        ..showSnackBar(SnackBar(content: Text(message), action: SnackBarAction(label: 'OK', onPressed: () => ScaffoldMessenger.of(this).hideCurrentSnackBar()),),);
     }
   }
 

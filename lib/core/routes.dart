@@ -195,8 +195,14 @@ final GoRouter _routes = GoRouter(
     GoRoute(
       path: AppRoutes.sealsScreen,
       name: AppRoutes.sealsScreen,
-      builder: (context, __) {
-        return const SealsScreen();
+      builder: (context, state) {
+        Map<String, dynamic>? params;
+
+        if(state.extra != null) {
+          params = state.extra as Map<String, dynamic>;
+        }
+
+        return SealsScreen(onlyPendingSeals: params?['onlyPendingSeals'] ?? false);
       },
     ),
   ],

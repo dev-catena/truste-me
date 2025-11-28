@@ -8,8 +8,9 @@ import 'package:trustme/features/common/presentation/widgets/components/header_l
 import 'package:trustme/features/connection/presentation/widgets/components/seals_board.dart';
 
 class SealsScreen extends StatelessWidget {
+  final bool onlyPendingSeals;
 
-  const SealsScreen({super.key,});
+  const SealsScreen({super.key, this.onlyPendingSeals = false,});
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +32,7 @@ class SealsScreen extends StatelessWidget {
                     //const SizedBox(height: 12),
                     Padding(
                       padding: const EdgeInsets.only(top: 16),
-                      child: SealsBoard(state.user.sealsObtained, canGetSeal: true, showTitle: false,),
+                      child: SealsBoard(state.user.sealsObtained, canGetSeal: true, showTitle: false, onlyPendingSeals: onlyPendingSeals),
                     ),
                   ],
                 ),

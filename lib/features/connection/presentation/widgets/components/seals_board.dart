@@ -8,8 +8,9 @@ class SealsBoard extends StatelessWidget {
   final List<Seal> _sealsObtained;
   final bool canGetSeal;
   final bool showTitle;
+  final bool onlyPendingSeals;
 
-  const SealsBoard(this._sealsObtained, {super.key, required this.canGetSeal, this.showTitle = true});
+  const SealsBoard(this._sealsObtained, {super.key, required this.canGetSeal, this.showTitle = true, this.onlyPendingSeals = false});
 
   @override
   Widget build(BuildContext context) {
@@ -19,9 +20,13 @@ class SealsBoard extends StatelessWidget {
     final userSealsById = {for (var s in _sealsObtained) s.id: s};
 
     // Replace system seal with user seal if user has it
-    final mergedSeals = systemSeals.map((seal) {
+    var mergedSeals = systemSeals.map((seal) {
       return userSealsById[seal.id] ?? seal;
     }).toList();
+
+    if(onlyPendingSeals) {
+      mergedSeals = mergedSeals.where((seal) => seal.status != SealStatus.active).toList();
+    }
 
     return Column(
       children: [

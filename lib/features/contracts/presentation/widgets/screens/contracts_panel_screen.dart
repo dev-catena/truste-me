@@ -97,38 +97,44 @@ class _ContractsScreenState extends State<ContractsScreen> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    filteredContracts.isEmpty
-                        ? const Text('Nenhum contrato existente')
-                        : GridView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 5,
-                              mainAxisSpacing: 5,
-                              childAspectRatio: 0.7,
-                            ),
-                            itemCount: filteredContracts.length,
-                            itemBuilder: (_, index) {
-                              final contract = filteredContracts[index];
+                    if (filteredContracts.isEmpty)
+                      const Text('Nenhum contrato'),
+                    if (filteredContracts.isEmpty)
+                      IconButton(
+                        onPressed: () => userData.refreshContracts(),
+                        icon: const Icon(Icons.refresh_outlined),
+                      ),
+                    if (!filteredContracts.isEmpty)
+                      GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 5,
+                          mainAxisSpacing: 5,
+                          childAspectRatio: 0.7,
+                        ),
+                        itemCount: filteredContracts.length,
+                        itemBuilder: (_, index) {
+                          final contract = filteredContracts[index];
 
-                              return contract.buildCard(
-                                onExpire: (expiredContract) {
-                                  // Based on the old logic, a pending contract becomes completed.
-                                  // Let's follow that, but using the Cubit to manage the state.
-                                  if (expiredContract.status == ContractStatus.pending) {
-                                    userData.updateLocalContract(expiredContract.copyWith(status: ContractStatus.completed));
-                                  } else {
-                                    // For other statuses (like active), we'll mark as expired.
-                                    userData.updateLocalContract(expiredContract.copyWith(status: ContractStatus.expired));
-                                  }
-                                },
-                                onReloadList: () {
-                                  userData.refreshContracts(showSnackbar: false);
-                                },
-                              );
+                          return contract.buildCard(
+                            onExpire: (expiredContract) {
+                              // Based on the old logic, a pending contract becomes completed.
+                              // Let's follow that, but using the Cubit to manage the state.
+                              if (expiredContract.status == ContractStatus.pending) {
+                                userData.updateLocalContract(expiredContract.copyWith(status: ContractStatus.completed));
+                              } else {
+                                // For other statuses (like active), we'll mark as expired.
+                                userData.updateLocalContract(expiredContract.copyWith(status: ContractStatus.expired));
+                              }
                             },
-                          ),
+                            onReloadList: () {
+                              userData.refreshContracts(showSnackbar: false);
+                            },
+                          );
+                        },
+                      ),
                   ],
                 ),
               ),

@@ -40,7 +40,7 @@ class UserHomeInfoComponent extends StatelessWidget {
               'Selos pendentes',
               0,
               emphasizeQuantity: true,
-              onTap: () => context.push(AppRoutes.profileScreen),
+              onTap: () => context.push(AppRoutes.sealsScreen, extra: {'onlyPendingSeals': true}),
             ),
             SummaryData(
               'Conexões ativas',

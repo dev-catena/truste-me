@@ -46,8 +46,8 @@ class LoginScreen extends StatelessWidget {
               } else if (state is LoginReady) {
 
                 if(DEF_TEST && kDebugMode) {
-                  //state.emailController.text = '069.091.440-74';
-                  state.emailController.text = '370.175.700-30';
+                  state.emailController.text = '069.091.440-74';
+                  //state.emailController.text = '370.175.700-30';
                   state.pwdController.text = '123123';
                 }
 

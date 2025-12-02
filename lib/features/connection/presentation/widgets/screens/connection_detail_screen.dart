@@ -154,9 +154,7 @@ class _ConnectionDetailScreenState extends State<ConnectionDetailScreen> {
               });
 
               if (context.mounted) {
-                ScaffoldMessenger.of(context)
-                  ..hideCurrentSnackBar()
-                  ..showSnackBar(SnackBar(content: Text(event.message)));
+                context.showSnack(event.message);
               }
 
               if (event.isSuccess && context.mounted) {

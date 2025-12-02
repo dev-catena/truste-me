@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:trustme/core/extensions/context_extensions.dart';
 import 'package:trustme/core/global/global_variables.dart';
 import 'package:trustme/core/providers/app_data_cubit.dart';
 import 'package:trustme/core/providers/user_data_cubit.dart';
@@ -32,7 +33,7 @@ class LoginScreen extends StatelessWidget {
             listener: (_, state) {
               if (state is LoginReady) {
                 if (state.error) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.errorMsg!)));
+                  context.showSnack(state.errorMsg!);
                 } else if (state.loginSuccess) {
                   context.goNamed('home');
                 }

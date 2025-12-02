@@ -13,7 +13,7 @@ class UserDataSource {
   final ApiProvider _apiProvider = ApiProvider();
 
   // CHECKED: 1
-  Future<User?> createUser(Map<String, dynamic> usr) async { // TODO: Change to User entity
+  Future<User?> createUser(Map<String, dynamic> usr) async {
     //final content = usr.toModel().toJson();
     final httpResult = await ApiProvider().post('usuario/gravar', jsonEncode(usr), useToken: false);
     final converted = UserModel.fromJson(httpResult.result).toEntity();
@@ -21,7 +21,8 @@ class UserDataSource {
     return converted;
   }
 
-  Future<HttpResult> updateUser(Map<String, dynamic> usr) async { // TODO: Change to User entity
+  // Deprecated: Use updateUser2
+  Future<HttpResult> updateUser(Map<String, dynamic> usr) async {
     //final content = cont.toModel().toJson();
     final httpResult = await _apiProvider.put('usuario/atualizar', jsonEncode(usr));
     //final converted = UserModel.fromJson(httpResult).toEntity();

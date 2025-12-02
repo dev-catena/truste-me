@@ -40,9 +40,7 @@ class RegisterView extends StatelessWidget {
           if (event is ShowMessageEvent) {
             context.showSnack(event.message);
           } else if (event is RegistrationSuccessEvent) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Usuário cadastrado com sucesso!'), backgroundColor: Colors.green),
-            );
+            context.showSnack('Usuário cadastrado com sucesso!',);
             Navigator.of(context).pop();
           } else if (event is PopFlowEvent) {
             Navigator.of(context).pop();

@@ -42,6 +42,7 @@ class _ConnectionPanelScreenState extends State<ConnectionPanelScreen> {
     final userData = context.read<UserDataCubit>();
 
     return CustomScaffold(
+      showAvatar: false,
       floatingActionButton: FloatingActionButton(
         heroTag: 'btn1',
         onPressed: () {

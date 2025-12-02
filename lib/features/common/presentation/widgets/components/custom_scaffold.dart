@@ -63,7 +63,7 @@ class CustomScaffold extends StatelessWidget {
                 final homeState = context.read<HomeBloc>().state;
                 if (homeState is HomeReady) {
                   if (GoRouter.of(context).routerDelegate.currentConfiguration.fullPath != AppRoutes.profileScreen) {
-                    context.pushNamed(AppRoutes.profileScreen, extra: {'showEditButton': true, 'showSealsInfo': false});
+                    context.pushNamed(AppRoutes.profileScreen, extra: { 'showEditButton': true, 'showSealsInfo': false, 'showPrivacyPoliceLink': true, 'showDeleteAccountLink': true, 'showChildSafetyLink': true, });
                   }
                 } else {
                   context.showSnack(homeState is HomeError ? 'Erro ao carregar os dados. Tente carregá-los' : 'Aguarde o carregamento dos dados...');

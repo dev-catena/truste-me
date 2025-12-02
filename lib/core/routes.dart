@@ -17,6 +17,7 @@ import 'package:trustme/features/login/presentation/widgets/login_screen.dart';
 import 'package:trustme/features/new_password/widgets/screens/new_password_screen.dart';
 import 'package:trustme/features/profile/presentation/widgets/screens/profile_detail_screen.dart';
 import 'package:trustme/features/profile/presentation/widgets/screens/profile_screen.dart';
+import 'package:trustme/features/profile/presentation/widgets/screens/child_safety_screen.dart';
 import 'package:trustme/features/register/presentation/widgets/screens/register_screen.dart';
 import 'package:trustme/core/enums/contract_status.dart';
 import 'package:trustme/core/scaffold_with_nested_navigation.dart';
@@ -45,8 +46,8 @@ class AppRoutes {
   static const connectionDetailScreen = '/conexoes/conexao-detalhes';
 
   static const profileScreen = '/perfil';
-
   static const profileDetailScreen = '/perfil-detalhes';
+  static const childSafetyScreen = '/seguranca-infantil';
 
   static const sealsScreen = '/selos';
 
@@ -182,7 +183,7 @@ final GoRouter _routes = GoRouter(
           params = state.extra as Map<String, dynamic>;
         }
 
-        return ProfileScreen(showEditButton: params?['showEditButton'] ?? true, showSealsInfo: params?['showSealsInfo'] ?? true);
+        return ProfileScreen(showEditButton: params?['showEditButton'] ?? true, showSealsInfo: params?['showSealsInfo'] ?? true, showPrivacyPoliceLink: params?['showPrivacyPoliceLink'] ?? false, showDeleteAccountLink: params?['showDeleteAccountLink'] ?? false, showChildSafetyLink: params?['showChildSafetyLink'] ?? false);
       },
     ),
     GoRoute(
@@ -190,6 +191,14 @@ final GoRouter _routes = GoRouter(
       name: AppRoutes.profileDetailScreen,
       builder: (context, __) {
         return const ProfileDetailScreen();
+      },
+    ),
+    GoRoute(
+      path: AppRoutes.childSafetyScreen,
+      name: AppRoutes.childSafetyScreen,
+      parentNavigatorKey: _rootNavigatorKey,
+      builder: (context, __) {
+        return const ChildSafetyScreen();
       },
     ),
     GoRoute(

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:trustme/core/extensions/context_extensions.dart';
+import 'package:trustme/core/global/global_variables.dart';
 import 'package:trustme/core/providers/user_data_cubit.dart';
 import 'package:trustme/core/providers/user_data_event.dart';
 import 'package:trustme/core/utils/custom_colors.dart';
@@ -36,10 +37,11 @@ class ScaffoldWithNestedNavigation extends StatelessWidget {
               return NavigationBar(
                 selectedIndex: navigationShell.currentIndex,
                 indicatorColor: CustomColor.activeColor,
-                destinations: const [
+                destinations: [
                   NavigationDestination(label: 'Contratos', icon: Icon(Symbols.list_alt_rounded)),
                   NavigationDestination(label: 'Home', icon: Icon(Icons.home_outlined)),
-                  NavigationDestination(label: 'Notificações', icon: Icon(Icons.notifications_active_outlined)),
+                  if(!GlobalVariables.isFirebaseTestLab)
+                    NavigationDestination(label: 'Notificações', icon: Icon(Icons.notifications_active_outlined)),
                 ],
                 onDestinationSelected: (index) {
                   if (index == 2) {

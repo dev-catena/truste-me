@@ -42,7 +42,7 @@ class CustomScaffold extends StatelessWidget {
                 size: 40,
               ),
             ),
-            Text('TrustMe', style: headlineMedium.copyWith(color: Colors.white)),
+            Text('TrueConnect', style: headlineMedium.copyWith(color: Colors.white)),
           ],
         ),
         actions: [
@@ -51,7 +51,7 @@ class CustomScaffold extends StatelessWidget {
             child: InkWell(
               onTap: () {
                 if (GoRouter.of(context).state.name != AppRoutes.profileScreen) {
-                  context.pushNamed(AppRoutes.profileScreen, extra: { 'showEditButton': true, 'showSealsInfo': true });
+                  context.pushNamed(AppRoutes.profileScreen, extra: { 'showEditButton': true, 'showSealsInfo': false, 'showPrivacyPoliceLink': true, 'showDeleteAccountLink': true, 'showChildSafetyLink': true, });
                 }
               },
               child: const CircleAvatar(

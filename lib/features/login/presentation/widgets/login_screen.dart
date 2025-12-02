@@ -46,7 +46,7 @@ class LoginScreen extends StatelessWidget {
 
                 if(DEF_TEST && kDebugMode) {
                   //state.emailController.text = "069.091.440-74";
-                  state.pwdController.text = "123123";
+                  //state.pwdController.text = "12312345";
                   //state.pwdController.text = "dev@2025";
                 }
 
@@ -54,7 +54,7 @@ class LoginScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       const SizedBox(height: 60),
-                      Text('TrustMe', style: displayMedium),
+                      Text('TrueConnect', style: displayMedium),
                       const SizedBox(height: 16),
                       Image.asset('assets/imgs/trustme-logo.png', height: 100),
                       const SizedBox(height: 24),

@@ -137,7 +137,7 @@ class ProfileDetailScreen extends StatelessWidget {
       //         size: 40,
       //       ),
       //     ),
-      //     Text('TrustMe', style: headlineMedium.copyWith(color: Colors.white)),
+      //     Text('TrueConnect', style: headlineMedium.copyWith(color: Colors.white)),
       //   ],
       // ),
       actions: [

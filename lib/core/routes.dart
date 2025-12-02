@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:trustme/features/home/data/data_source/home_datasource.dart';
+import 'package:trustme/features/home/presentation/blocs/home_bloc.dart';
 
 import 'package:trustme/features/common/domain/entities/auth.dart';
 import 'package:trustme/features/connection/domain/entities/connection.dart';
@@ -14,6 +17,7 @@ import 'package:trustme/features/login/presentation/widgets/login_screen.dart';
 import 'package:trustme/features/new_password/widgets/screens/new_password_screen.dart';
 import 'package:trustme/features/profile/presentation/widgets/screens/profile_detail_screen.dart';
 import 'package:trustme/features/profile/presentation/widgets/screens/profile_screen.dart';
+import 'package:trustme/features/profile/presentation/widgets/screens/child_safety_screen.dart';
 import 'package:trustme/features/register/presentation/widgets/screens/register_screen.dart';
 import 'package:trustme/core/enums/contract_status.dart';
 import 'package:trustme/core/scaffold_with_nested_navigation.dart';
@@ -37,13 +41,12 @@ class AppRoutes {
 
   static const registerScreen = '/cadastro';
 
-  // Dentro de homeScreen
-  static const connectionPanelScreen = 'conexoes';
-  static const connectionDetailScreen = 'conexao-detalhes';
+  static const connectionPanelScreen = '/conexoes';
+  static const connectionDetailScreen = '/conexoes/conexao-detalhes';
 
   static const profileScreen = '/perfil';
-
   static const profileDetailScreen = '/perfil-detalhes';
+  static const childSafetyScreen = '/seguranca-infantil';
 
   static const sealsScreen = '/selos';
 
@@ -58,7 +61,15 @@ final GoRouter _routes = GoRouter(
   routes: [
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
-        return ScaffoldWithNestedNavigation(navigationShell: navigationShell);
+        // The HomeBloc is provided here to be available to all shell branches
+        return BlocProvider(
+          create: (context) => HomeBloc(
+            HomeDataSource(),
+            context.read(), // Reads UserDataCubit
+            context.read(), // Reads AppDataCubit
+          ),
+          child: ScaffoldWithNestedNavigation(navigationShell: navigationShell),
+        );
       },
       branches: [
         StatefulShellBranch(
@@ -107,29 +118,7 @@ final GoRouter _routes = GoRouter(
               name: 'home',
               pageBuilder: (context, state) => NoTransitionPage(child: HomeScreen()),
               routes: [
-                GoRoute(
-                  path: AppRoutes.connectionPanelScreen,
-                  name: AppRoutes.connectionPanelScreen,
-                  builder: (_, state) {
-                    final initialFilter = (state.extra as Map<String, dynamic>? ?? {})['initialFilter'] as ConnectionStatus?;
-
-                    return ConnectionPanelScreen(
-                      key: ValueKey(initialFilter),
-                      initialFilter: initialFilter?.name,
-                    );
-                  },
-                  routes: [
-                    GoRoute(
-                      path: AppRoutes.connectionDetailScreen,
-                      name: AppRoutes.connectionDetailScreen,
-                      builder: (context, state) {
-                        final connection = state.extra as Connection;
-
-                        return ConnectionDetailScreen(connection);
-                      },
-                    )
-                  ],
-                ),
+                // As rotas connectionPanelScreen e connectionDetailScreen foram movidas para o nível superior
               ],
             ),
           ],
@@ -159,6 +148,30 @@ final GoRouter _routes = GoRouter(
       name: AppRoutes.registerScreen,
       builder: (_, __) => const RegisterScreen(),
     ),
+    // Top-level routes for connectionPanelScreen and connectionDetailScreen
+    GoRoute(
+      path: AppRoutes.connectionPanelScreen,
+      name: AppRoutes.connectionPanelScreen,
+      parentNavigatorKey: _rootNavigatorKey,
+      builder: (_, state) {
+        final initialFilter = (state.extra as Map<String, dynamic>? ?? {})['initialFilter'] as ConnectionStatus?;
+
+        return ConnectionPanelScreen(
+          key: ValueKey(initialFilter),
+          initialFilter: initialFilter?.name,
+        );
+      },
+    ),
+    GoRoute(
+      path: AppRoutes.connectionDetailScreen,
+      name: AppRoutes.connectionDetailScreen,
+      parentNavigatorKey: _rootNavigatorKey,
+      builder: (context, state) {
+        final connection = state.extra as Connection;
+
+        return ConnectionDetailScreen(connection);
+      },
+    ),
     GoRoute(
       path: AppRoutes.profileScreen,
       name: AppRoutes.profileScreen,
@@ -169,7 +182,7 @@ final GoRouter _routes = GoRouter(
           params = state.extra as Map<String, dynamic>;
         }
 
-        return ProfileScreen(showEditButton: params?['showEditButton'] ?? true, showSealsInfo: params?['showSealsInfo'] ?? true);
+        return ProfileScreen(showEditButton: params?['showEditButton'] ?? true, showSealsInfo: params?['showSealsInfo'] ?? true, showPrivacyPoliceLink: params?['showPrivacyPoliceLink'] ?? false, showDeleteAccountLink: params?['showDeleteAccountLink'] ?? false, showChildSafetyLink: params?['showChildSafetyLink'] ?? false);
       },
     ),
     GoRoute(
@@ -177,6 +190,14 @@ final GoRouter _routes = GoRouter(
       name: AppRoutes.profileDetailScreen,
       builder: (context, __) {
         return const ProfileDetailScreen();
+      },
+    ),
+    GoRoute(
+      path: AppRoutes.childSafetyScreen,
+      name: AppRoutes.childSafetyScreen,
+      parentNavigatorKey: _rootNavigatorKey,
+      builder: (context, __) {
+        return const ChildSafetyScreen();
       },
     ),
     GoRoute(

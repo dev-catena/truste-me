@@ -32,14 +32,14 @@ class NewPasswordScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: CustomColor.backgroundPrimaryColor,
       appBar: AppBar(
-        title: const Text('TrustMe', style: TextStyle(color: Colors.white)),
+        title: const Text('TrueConnect', style: TextStyle(color: Colors.white)),
         backgroundColor: CustomColor.activeColor,
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
             const SizedBox(height: 60),
-            Text('TrustMe', style: displayMedium),
+            Text('TrueConnect', style: displayMedium),
             const SizedBox(height: 10),
             Image.asset('assets/imgs/trustme-logo.png', height: 100),
             const SizedBox(height: 20),

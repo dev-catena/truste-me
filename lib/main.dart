@@ -122,7 +122,7 @@ class _TrustMeAppState extends State<TrustMeApp> {
       ],
       child: MaterialApp.router(
         scaffoldMessengerKey: Globals.scaffoldMessengerKey,
-        title: 'TrustMe',
+        title: 'TrueConnect',
         localizationsDelegates: const [
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,

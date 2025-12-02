@@ -33,6 +33,18 @@ class AppTheme {
       ),
       //endregion
 
+      cardTheme: CardThemeData(
+        margin: EdgeInsets.all(0),
+        elevation: 0,
+        //color: AppColors.colorAlmostWhite, // ???
+        color: Colors.white,
+        shape:  RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          // side: BorderSide(
+          //   color: Colors.grey.shade200, //Colors.grey.shade200,
+          // ),
+        ),
+      ),
       dialogTheme: DialogThemeData(
         backgroundColor: Colors.white,
       ),

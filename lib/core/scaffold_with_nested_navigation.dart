@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
 import 'package:trustme/core/extensions/context_extensions.dart';
+import 'package:trustme/core/global/global_variables.dart';
 import 'package:trustme/core/utils/custom_colors.dart';
 
 final scaffoldKey = GlobalKey<ScaffoldState>();
@@ -36,10 +37,11 @@ class _ScaffoldWithNestedNavigationState extends State<ScaffoldWithNestedNavigat
         backgroundColor: CustomColor.bottomBarBg,
         selectedIndex: widget.navigationShell.currentIndex,
         indicatorColor: CustomColor.activeColor,
-        destinations: const [
+        destinations: [
           NavigationDestination(label: 'Contratos', icon: Icon(Symbols.contract_rounded)),
           NavigationDestination(label: 'Home', icon: Icon(Icons.home_outlined)),
-          NavigationDestination(label: 'Notificações', icon: Icon(Icons.notifications_active_outlined)),
+          if(!GlobalVariables.isFirebaseTestLab)
+            NavigationDestination(label: 'Notificações', icon: Icon(Icons.notifications_active_outlined)),
         ],
         onDestinationSelected: (index) {
           if(index == 2) {

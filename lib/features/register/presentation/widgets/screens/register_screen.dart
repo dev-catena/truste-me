@@ -75,7 +75,7 @@ class RegisterView extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('TrustMe', style: Theme.of(context).textTheme.displayMedium),
+                    Text('TrueConnect', style: Theme.of(context).textTheme.displayMedium),
                     Image.asset('assets/imgs/trustme-logo.png', height: 100),
                     const SizedBox(height: 20),
                     Flexible(

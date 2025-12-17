@@ -60,7 +60,7 @@ class ApiProvider {
   }
 
   // TODO: Catch exception on caller
-  Future<HttpResult> get(String endPoint, {bool useToken = true, bool checkErrors = false, int attempt = 0, Map<String, dynamic>? params}) async {
+  Future<HttpResult> get(String endPoint, {bool useToken = true, bool checkErrors = true, int attempt = 0, Map<String, dynamic>? params}) async {
     endPoint = 'api/$endPoint';
 
     final Uri url;
@@ -104,7 +104,7 @@ class ApiProvider {
   }
 
   // TODO: Catch exception on caller
-  Future<HttpResult> post(String endPoint, String content, {bool useToken = true, bool checkErrors = false, int attempt = 0}) async {
+  Future<HttpResult> post(String endPoint, String content, {bool useToken = true, bool checkErrors = true, int attempt = 0}) async {
     endPoint = 'api/$endPoint';
     final Uri url;
     url = DEF_USE_HTTPS ? Uri.https(_host, endPoint) : Uri.http(_host, endPoint);
@@ -149,7 +149,7 @@ class ApiProvider {
   }
 
   // TODO: Catch exception on caller
-  Future<HttpResult> patch(String endPoint, String content, {bool useToken = true, bool checkErrors = false, int attempt = 0}) async {
+  Future<HttpResult> patch(String endPoint, String content, {bool useToken = true, bool checkErrors = true, int attempt = 0}) async {
     endPoint = 'api/$endPoint';
     final Uri url;
     url = DEF_USE_HTTPS ? Uri.https(_host, endPoint) : Uri.http(_host, endPoint);
@@ -194,7 +194,7 @@ class ApiProvider {
   }
 
   // TODO: Catch exception on caller
-  Future<HttpResult> put(String endPoint, String content, {bool useToken = true, bool checkErrors = false, int attempt = 0}) async {
+  Future<HttpResult> put(String endPoint, String content, {bool useToken = true, bool checkErrors = true, int attempt = 0}) async {
     endPoint = 'api/$endPoint';
     final Uri url;
     url = DEF_USE_HTTPS ? Uri.https(_host, endPoint) : Uri.http(_host, endPoint);
@@ -237,7 +237,7 @@ class ApiProvider {
   }
 
   // TODO: Catch exception on caller
-  Future<HttpResult> delete(String endPoint, {bool useToken = true, bool checkErrors = false, int attempt = 0, String? content}) async {
+  Future<HttpResult> delete(String endPoint, {bool useToken = true, bool checkErrors = true, int attempt = 0, String? content}) async {
     endPoint = 'api/$endPoint';
 
     final Uri url;
@@ -279,7 +279,7 @@ class ApiProvider {
   }
 
   // TODO: Catch exception on caller
-  Future<HttpResult> postWithFiles(String endPoint, List<File> files, {bool useToken = true, bool checkErrors = false, int attempt = 0, Map<String, dynamic>? otherFields}) async {
+  Future<HttpResult> postWithFiles(String endPoint, List<File> files, {bool useToken = true, bool checkErrors = true, int attempt = 0, Map<String, dynamic>? otherFields}) async {
     endPoint = 'api/$endPoint';
 
     final Uri url;

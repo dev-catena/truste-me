@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:flutter/foundation.dart';
+import 'package:trustme/core/utils/http/custom_http_error.dart';
 
 import '../../../../../core/enums/contract_status.dart';
 import '../../../../../core/utils/log/log.dart';
@@ -31,12 +32,19 @@ class ContractDetailBloc extends Bloc<ContractDetailEvent, ContractDetailState> 
     on<ContractDetailClauseSet>(_onClauseSet);
     on<ContractDetailPracticeAdded>(_onPracticeAdded);
     on<ContractDetailPracticeSet>(_onPracticeSet);
-    on<ContractDetailContractFinished>(_onContractFinished);
+    on<ContractDetailContractFinished>(_onContractFinished); // TODO: Check it... it is not used?
     on<ContractDetailContractSigned>(_onContractSigned);
     on<ContractDetailContractQuestionAnswered>(_onQuestionAnswered);
+    on<ContractDetailClearEvent>(_onClearEvent); // Register the handler
   }
 
-
+  // Handler to clear the event
+  void _onClearEvent(ContractDetailClearEvent event, Emitter<ContractDetailState> emit) {
+    if (state is ContractDetailReady) {
+      final internState = state as ContractDetailReady;
+      emit(internState.copyWith(event: null));
+    }
+  }
 
   void _validateModification(ContractDetailReady internState) {
     if (internState.contract.signatures.isNotEmpty) {
@@ -44,34 +52,36 @@ class ContractDetailBloc extends Bloc<ContractDetailEvent, ContractDetailState> 
     }
   }
 
+  // CHECKED
   Future<void> _onStarted(ContractDetailStarted event, Emitter<ContractDetailState> emit) async {
     emit(ContractDetailLoadInProgress());
+    try {
+      List<Clause> possibleClauses = [];
+      List<SexualPractice> possiblePracs = [];
+      late final Contract contract;
 
-    List<Clause> possibleClauses = [];
-    List<SexualPractice> possiblePracs = [];
-    late final Contract contract;
+      await Future.wait([
+        datasource.getClausesForContractType(preliminaryContract.type).then((value) {
+          possibleClauses = value.clauses;
+          possiblePracs = value.practices;
+        }),
+        datasource.getContractFullInfo(preliminaryContract).then((value) => contract = value),
+      ]);
 
-    // try {
-    await Future.wait([
-      datasource.getClausesForContractType(preliminaryContract.type).then((value) {
-        possibleClauses = value.clauses;
-        possiblePracs = value.practices;
-      }),
-      datasource.getContractFullInfo(preliminaryContract).then((value) => contract = value),
-    ]);
+      final List<Clause> contractClauses = List<Clause>.of(contract.clauses);
 
-    final List<Clause> contractClauses = List<Clause>.of(contract.clauses);
+      final filteredClauses = _removeCurrentClausesFromAll(possibleClauses, contractClauses);
 
-    final filteredClauses = _removeCurrentClausesFromAll(possibleClauses, contractClauses);
-
-    emit(ContractDetailReady(
-      contract: contract,
-      possibleClauses: filteredClauses,
-      possiblePractices: possiblePracs,
-    ));
-    // } catch(e, s){
-    //   emit(ContractDetailError(e.toString()));
-    // }
+      emit(ContractDetailReady(
+        contract: contract,
+        possibleClauses: filteredClauses,
+        possiblePractices: possiblePracs,
+      ));
+    } on HttpRequestException catch (e) {
+      emit(ContractDetailError('Falha ao carregar o contrato: ${e.message}'));
+    } catch (e) {
+      emit(ContractDetailError('Ocorreu um erro inesperado: ${e.toString()}'));
+    }
   }
 
   Future<void> _onClauseAdded(ContractDetailClauseAdded event, Emitter<ContractDetailState> emit) async {
@@ -110,48 +120,54 @@ class ContractDetailBloc extends Bloc<ContractDetailEvent, ContractDetailState> 
     if (state is! ContractDetailReady) return;
     final internState = state as ContractDetailReady;
 
-
-    final clauseId = event.selectedClause.id; // Assuming it has an ID
+    final clauseId = event.selectedClause.id;
     if (_clausesBeingProcessed.contains(clauseId)) return;
 
+    final originalClauses = List<Clause>.of(internState.contract.clauses);
+    final clauseIndex = originalClauses.indexWhere((c) => c.id == event.selectedClause.id);
+    if (clauseIndex == -1) return;
+
+    final clauseToUpdate = originalClauses[clauseIndex];
+    final newPendingFor = List<int>.from(clauseToUpdate.pendingFor)..remove(userLoggedIn.id);
+    final newAcceptedBy = List<int>.from(clauseToUpdate.acceptedBy);
+    final newDeniedBy = List<int>.from(clauseToUpdate.deniedBy);
+
+    if (event.hasAccepted) {
+      if (!newAcceptedBy.contains(userLoggedIn.id)) newAcceptedBy.add(userLoggedIn.id);
+      newDeniedBy.remove(userLoggedIn.id);
+    } else {
+      if (!newDeniedBy.contains(userLoggedIn.id)) newDeniedBy.add(userLoggedIn.id);
+      newAcceptedBy.remove(userLoggedIn.id);
+    }
+
+    final updatedClause = clauseToUpdate.copyWith(
+      pendingFor: newPendingFor,
+      acceptedBy: newAcceptedBy,
+      deniedBy: newDeniedBy,
+    );
+
+    final updatedClauses = List<Clause>.from(originalClauses);
+    updatedClauses[clauseIndex] = updatedClause;
+
+    final optimisticContract = internState.contract.copyWith(clauses: updatedClauses);
+    emit(internState.copyWith(contract: optimisticContract));
+
     _clausesBeingProcessed.add(clauseId);
+
     try {
       await datasource.acceptOrDenyClause(internState.contract, event.selectedClause, event.hasAccepted);
-      final updatedClause = internState.contract.clauses.firstWhere((element) => element == event.selectedClause);
-
-      // late final Clause updatedClause;
-      // late final int clauseIndex;
-      //
-      // if (isSexual) {
-      //   updatedClause =
-      //       internState.contract.sexualPractices.firstWhere((element) => element == event.selectedClause).toClause();
-      //   clauseIndex = internState.contract.sexualPractices.indexOf(updatedClause);
-      // } else {
-      //   updatedClause = internState.contract.clauses.firstWhere((element) => element == event.selectedClause);
-      //   clauseIndex = internState.contract.clauses.indexOf(event.selectedClause);
-      // }
-
-      updatedClause.pendingFor.remove(userLoggedIn.id);
-
-      if (event.hasAccepted) {
-        updatedClause.deniedBy.remove(userLoggedIn.id);
-        updatedClause.acceptedBy.add(userLoggedIn.id);
-      } else {
-        updatedClause.acceptedBy.remove(userLoggedIn.id);
-        updatedClause.deniedBy.add(userLoggedIn.id);
-      }
-
-      final index = internState.contract.clauses.indexOf(event.selectedClause);
-      final updatedClauseList = List.of(internState.contract.clauses);
-
-      updatedClauseList.removeAt(index);
-      updatedClauseList.insert(index, updatedClause);
-
-      final updatedContract = internState.contract;
-      updatedContract.clauses.clear();
-      updatedContract.clauses.addAll(updatedClauseList);
-
-      emit(internState.copyWith(contract: updatedContract));
+      emit(internState.copyWith(
+        contract: optimisticContract,
+        event: ContractDetailActionResult(isSuccess: true, message: 'Cláusula atualizada com sucesso!'),
+      ));
+    } on HttpRequestException catch (e) {
+      final revertedContract = internState.contract.copyWith(clauses: originalClauses);
+      emit(internState.copyWith(contract: revertedContract));
+      emit(internState.copyWith(event: ContractDetailActionResult(isSuccess: false, message: e.message)));
+    } catch (e) {
+      final revertedContract = internState.contract.copyWith(clauses: originalClauses);
+      emit(internState.copyWith(contract: revertedContract));
+      emit(internState.copyWith(event: ContractDetailActionResult(isSuccess: false, message: 'Ocorreu um erro: ${e.toString()}')));
     } finally {
       _clausesBeingProcessed.remove(clauseId);
     }
@@ -168,10 +184,6 @@ class ContractDetailBloc extends Bloc<ContractDetailEvent, ContractDetailState> 
         ),
       );
 
-    // final possibleClauses = internState.possibleClauses..remove(event.selectedClause);
-    // final filteredClauses = List<Clause>.of(internState.possibleClauses);
-    // filteredClauses.remove(event.selectedPractice);
-
     emit(internState.copyWith(contract: updatedContract));
   }
 
@@ -179,42 +191,61 @@ class ContractDetailBloc extends Bloc<ContractDetailEvent, ContractDetailState> 
     if (state is! ContractDetailReady) return;
     final internState = state as ContractDetailReady;
 
-    final clauseId = event.selectedPractice.id; // Assuming it has an ID
-    if (_clausesBeingProcessed.contains(clauseId)) return;
+    final practiceId = event.selectedPractice.id;
+    if (_clausesBeingProcessed.contains(practiceId)) return;
 
-    _clausesBeingProcessed.add(clauseId);
+    final originalPractices = List<SexualPractice>.of(internState.contract.sexualPractices);
+    final practiceIndex = originalPractices.indexWhere((p) => p.id == event.selectedPractice.id);
+
+    if (practiceIndex == -1) return;
+
+    final practiceToUpdate = originalPractices[practiceIndex];
+    final newPendingFor = List<int>.from(practiceToUpdate.pendingFor ?? [])..remove(userLoggedIn.id);
+    final newAcceptedBy = List<int>.from(practiceToUpdate.acceptedBy ?? []);
+    final newDeniedBy = List<int>.from(practiceToUpdate.deniedBy ?? []);
+
+    if (event.hasAccepted) {
+      if (!newAcceptedBy.contains(userLoggedIn.id)) newAcceptedBy.add(userLoggedIn.id);
+      newDeniedBy.remove(userLoggedIn.id);
+    } else {
+      if (!newDeniedBy.contains(userLoggedIn.id)) newDeniedBy.add(userLoggedIn.id);
+      newAcceptedBy.remove(userLoggedIn.id);
+    }
+
+    final updatedPractice = practiceToUpdate.copyWith(
+      pendingFor: newPendingFor,
+      acceptedBy: newAcceptedBy,
+      deniedBy: newDeniedBy,
+    );
+
+    final updatedPractices = List<SexualPractice>.from(originalPractices);
+    updatedPractices[practiceIndex] = updatedPractice;
+
+    final optimisticContract = internState.contract.copyWith(sexualPractices: updatedPractices);
+    emit(internState.copyWith(contract: optimisticContract));
+
+    _clausesBeingProcessed.add(practiceId);
+
     try {
       await datasource.acceptOrDenyClause(
         internState.contract,
         event.selectedPractice.toClause(),
         event.hasAccepted,
       );
-
-      final updatedPractice = internState.contract.sexualPractices
-          .firstWhere((element) => element == event.selectedPractice);
-
-      updatedPractice.pendingFor!.remove(userLoggedIn.id);
-
-      if (event.hasAccepted) {
-        updatedPractice.deniedBy!.remove(userLoggedIn.id);
-        updatedPractice.acceptedBy!.add(userLoggedIn.id);
-      } else {
-        updatedPractice.acceptedBy!.remove(userLoggedIn.id);
-        updatedPractice.deniedBy!.add(userLoggedIn.id);
-      }
-
-      final index = internState.contract.sexualPractices.indexOf(event.selectedPractice);
-      final updatedClauseList = List.of(internState.contract.sexualPractices);
-      updatedClauseList[index] = updatedPractice;
-
-      final updatedContract = internState.contract;
-      updatedContract.sexualPractices
-        ..clear()
-        ..addAll(updatedClauseList);
-
-      emit(internState.copyWith(contract: updatedContract));
+      emit(internState.copyWith(
+        contract: optimisticContract,
+        event: ContractDetailActionResult(isSuccess: true, message: 'Prática atualizada com sucesso!'),
+      ));
+    } on HttpRequestException catch (e) {
+      final revertedContract = internState.contract.copyWith(sexualPractices: originalPractices);
+      emit(internState.copyWith(contract: revertedContract));
+      emit(internState.copyWith(event: ContractDetailActionResult(isSuccess: false, message: e.message)));
+    } catch (e) {
+      final revertedContract = internState.contract.copyWith(sexualPractices: originalPractices);
+      emit(internState.copyWith(contract: revertedContract));
+      emit(internState.copyWith(event: ContractDetailActionResult(isSuccess: false, message: 'Ocorreu um erro: ${e.toString()}')));
     } finally {
-      _clausesBeingProcessed.remove(clauseId);
+      _clausesBeingProcessed.remove(practiceId);
     }
   }
 
@@ -222,43 +253,71 @@ class ContractDetailBloc extends Bloc<ContractDetailEvent, ContractDetailState> 
     for (final ele in currentClauses) {
       allClauses.remove(ele);
     }
-
     return allClauses;
   }
 
   Future<void> _onContractFinished(ContractDetailContractFinished event, Emitter<ContractDetailState> emit) async {
     if (state is! ContractDetailReady) return;
     final internState = state as ContractDetailReady;
-    final refreshedContract = await datasource.getContractFullInfo(internState.contract);
-    final updatedContract = refreshedContract.copyWith(status: ContractStatus.active);
+    try {
+      final refreshedContract = await datasource.getContractFullInfo(internState.contract);
+      final updatedContract = refreshedContract.copyWith(status: ContractStatus.active);
 
-    await datasource.updateContract(updatedContract);
-    final evenNewer = await datasource.getContractFullInfo(internState.contract);
+      await datasource.updateContract(updatedContract);
+      final finalContractState = await datasource.getContractFullInfo(internState.contract);
 
-    emit(internState.copyWith(contract: evenNewer));
+      emit(internState.copyWith(
+        contract: finalContractState,
+        event: ContractDetailActionResult(isSuccess: true, message: 'Contrato finalizado com sucesso!'),
+      ));
+    } on HttpRequestException catch (e) {
+      emit(internState.copyWith(event: ContractDetailActionResult(isSuccess: false, message: e.message)));
+    } catch (e) {
+      emit(internState.copyWith(event: ContractDetailActionResult(isSuccess: false, message: 'Ocorreu um erro: ${e.toString()}')));
+    }
   }
 
   Future<void> _onContractSigned(ContractDetailContractSigned event, Emitter<ContractDetailState> emit) async {
     if (state is! ContractDetailReady) return;
     final internState = state as ContractDetailReady;
 
-    await datasource.signContract(internState.contract);
+    final originalSignatures = List<ContractSignature>.of(internState.contract.signatures);
+    final originalStatus = internState.contract.status;
+
     final newSignature = ContractSignature(userId: userLoggedIn.id, dateTime: DateTime.now(), hasAccepted: true);
-    final signaturesList = List.of(internState.contract.signatures)
+    final optimisticSignatures = List.of(originalSignatures)
       ..removeWhere((element) => element.userId == userLoggedIn.id)
       ..add(newSignature);
 
-    Contract updatedContract = internState.contract.copyWith(signatures: signaturesList);
-    // final refreshedContract = await datasource.getContractFullInfo(internState.contract);
-    // final updatedContract = refreshedContract.copyWith(status: ContractStatus.active);
-    //
-    // await datasource.updateContract(updatedContract);
-    // final evenNewer = await datasource.signContract(internState.contract);
-    if (_isFullSigned(updatedContract)) {
-      updatedContract = updatedContract.copyWith(status: ContractStatus.active);
-      await datasource.finishContract(updatedContract);
+    Contract optimisticContract = internState.contract.copyWith(signatures: optimisticSignatures);
+    final shouldFinishContract = optimisticSignatures.every((element) => element.hasAccepted);
+    if (shouldFinishContract) {
+      optimisticContract = optimisticContract.copyWith(status: ContractStatus.active);
     }
-    emit(internState.copyWith(contract: updatedContract));
+
+    emit(internState.copyWith(contract: optimisticContract));
+
+    try {
+      await datasource.signContract(internState.contract);
+      if (shouldFinishContract) {
+        await datasource.finishContract(optimisticContract);
+      }
+
+      emit(internState.copyWith(
+        contract: optimisticContract,
+        event: ContractDetailActionResult(isSuccess: true, message: 'Contrato assinado com sucesso!'),
+      ));
+    } on HttpRequestException catch (e) {
+      final revertedContract = internState.contract.copyWith(signatures: originalSignatures, status: originalStatus);
+      emit(internState.copyWith(
+          contract: revertedContract,
+          event: ContractDetailActionResult(isSuccess: false, message: e.message)));
+    } catch (e) {
+      final revertedContract = internState.contract.copyWith(signatures: originalSignatures, status: originalStatus);
+      emit(internState.copyWith(
+          contract: revertedContract,
+          event: ContractDetailActionResult(isSuccess: false, message: 'Ocorreu um erro: ${e.toString()}')));
+    }
   }
 
   Future<void> _onQuestionAnswered(
@@ -275,21 +334,31 @@ class ContractDetailBloc extends Bloc<ContractDetailEvent, ContractDetailState> 
     );
 
     final updatedAnswers = List.of(internState.contract.answers);
+    final oldAnswersBK = List.of(internState.contract.answers);
+
     for (final ele in updatedAnswers) {
       Log.d('$runtimeType', 'updatedAnswers question id ${ele.questionId} - ${ele.answer}');
     }
     updatedAnswers.removeWhere((element) => element.questionId == event.question.id && element.userId == userLoggedIn.id);
     updatedAnswers.add(newAnswer);
 
-    await datasource.answerQuestion(internState.contract, [newAnswer]);
     final updatedContract = internState.contract.copyWith(answers: updatedAnswers);
-
     emit(internState.copyWith(contract: updatedContract));
-  }
 
-  bool _isFullSigned(Contract contract) {
-    final isSigned = contract.signatures.every((element) => element.hasAccepted);
-
-    return isSigned;
+    try {
+      await datasource.answerQuestion(internState.contract, [newAnswer]);
+      emit(internState.copyWith(
+        contract: updatedContract,
+        event: ContractDetailActionResult(isSuccess: true, message: 'Resposta enviada!'),
+      ));
+    } on HttpRequestException catch (e) {
+      final oldContract = internState.contract.copyWith(answers: oldAnswersBK);
+      emit(internState.copyWith(contract: oldContract));
+      emit(internState.copyWith(event: ContractDetailActionResult(isSuccess: false, message: e.message)));
+    } catch (e) {
+      final oldContract = internState.contract.copyWith(answers: oldAnswersBK);
+      emit(internState.copyWith(contract: oldContract));
+      emit(internState.copyWith(event: ContractDetailActionResult(isSuccess: false, message: 'Ocorreu um erro: ${e.toString()}')));
+    }
   }
 }

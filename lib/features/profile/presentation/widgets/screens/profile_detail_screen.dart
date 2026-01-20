@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:trustme/core/extensions/context_extensions.dart';
 
 import 'package:trustme/core/providers/user_data_cubit.dart';
 import 'package:trustme/core/utils/custom_colors.dart';
@@ -29,12 +30,7 @@ class ProfileDetailScreen extends StatelessWidget {
                       final bloc = blocCtx.read<ProfileDetailBloc>();
 
                       if (state.message != null && state.message!.isNotEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(state.message!),
-                            //behavior: SnackBarBehavior.floating,
-                          ),
-                        );
+                        context.showSnack(state.message!);
 
                         // Clear message and state
                         bloc.add(ProfileDetailStarted());
@@ -137,7 +133,7 @@ class ProfileDetailScreen extends StatelessWidget {
       //         size: 40,
       //       ),
       //     ),
-      //     Text('TrueConnect', style: headlineMedium.copyWith(color: Colors.white)),
+      //     Text(GlobalVariables.DEF_APP_NAME, style: headlineMedium.copyWith(color: Colors.white)),
       //   ],
       // ),
       actions: [
@@ -161,7 +157,7 @@ class ProfileDetailScreen extends StatelessWidget {
         ),
         const SizedBox(width: 10),
       ],
-      backgroundColor: CustomColor.activeColor,
+      backgroundColor: CustomColor.primaryColor,
     );
   }
 }

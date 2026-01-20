@@ -13,30 +13,30 @@ class ContractDataSource {
   final _apiProvider = ApiProvider();
 
   Future<Contract> getContractFullInfo(Contract cont) async {
-    final rawData = await _apiProvider.get('contrato/buscar-completo/${cont.id}');
+    final httpResult = await _apiProvider.get('contrato/buscar-completo/${cont.id}');
 
-    final contract = ContractModel.fromJson(rawData.result).toEntity();
+    final contract = ContractModel.fromJson(httpResult.result).toEntity();
 
     return contract;
   }
 
   Future<Contract> updateContract(Contract cont) async {
     final content = cont.toModel().toJson();
-    final rawData = await _apiProvider.patch('contrato/atualizar/${cont.id}', jsonEncode(content));
-    final converted = ContractModel.fromJson(rawData.result).toEntity();
+    final httpResult = await _apiProvider.patch('contrato/atualizar/${cont.id}', jsonEncode(content));
+    final converted = ContractModel.fromJson(httpResult.result).toEntity();
 
     return converted;
   }
 
   Future<List<Contract>> getContractsForUser() async {
-    final rawData = await _apiProvider.get('usuario/contratos');
+    final httpResult = await _apiProvider.get('usuario/contratos');
     final List<Contract> convertedData = [];
 
-    for (final ele in rawData.result['contratos_como_contratante']) {
+    for (final ele in httpResult.result['contratos_como_contratante']) {
       convertedData.add(ContractModel.fromJson(ele).toEntity());
     }
 
-    for (final ele in rawData.result['contratos_como_participante']) {
+    for (final ele in httpResult.result['contratos_como_participante']) {
       convertedData.add(ContractModel.fromJson(ele).toEntity());
     }
 
@@ -44,12 +44,12 @@ class ContractDataSource {
   }
 
   Future<ClauseAndPractice> getClausesForContractType(ContractType type) async {
-    final rawData = await _apiProvider.get('contrato-tipos/${type.id}/clausulas-perguntas');
+    final httpResult = await _apiProvider.get('contrato-tipos/${type.id}/clausulas-perguntas');
 
     final List<Clause> clau = [];
     final List<SexualPractice> pract = [];
 
-    for (final ele in rawData.result['clausulas'] as List? ?? []) {
+    for (final ele in httpResult.result['clausulas'] as List? ?? []) {
       if (ele['sexual'] != null) {
         if (ele['sexual'] == 0) {
           clau.add(ClauseModel.fromJson(ele).toEntity());
@@ -81,9 +81,9 @@ class ContractDataSource {
   // }
 
   Future<Contract> createContract(ContractModel contract) async {
-    final rawData = await _apiProvider.post('contrato/gravar', jsonEncode(contract.toJson()));
+    final httpResult = await _apiProvider.post('contrato/gravar', jsonEncode(contract.toJson()));
 
-    final newContract = ContractModel.fromJson(rawData.result).toEntity();
+    final newContract = ContractModel.fromJson(httpResult.result).toEntity();
 
     return newContract;
   }
@@ -113,7 +113,7 @@ class ContractDataSource {
     await _apiProvider.post('contrato/pergunta/responder', jsonEncode(content));
   }
 
-  Future<void> finishContract (Contract contract) async {
+  Future<void> finishContract(Contract contract) async {
     final content = {'status': 'Ativo'};
     await _apiProvider.patch('contrato/atualizar/${contract.id}', jsonEncode(content));
   }

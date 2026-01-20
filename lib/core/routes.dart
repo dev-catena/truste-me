@@ -41,6 +41,7 @@ class AppRoutes {
 
   static const registerScreen = '/cadastro';
 
+  // Absolute paths for screens that should be displayed in full screen.
   static const connectionPanelScreen = '/conexoes';
   static const connectionDetailScreen = '/conexoes/conexao-detalhes';
 
@@ -118,7 +119,7 @@ final GoRouter _routes = GoRouter(
               name: 'home',
               pageBuilder: (context, state) => NoTransitionPage(child: HomeScreen()),
               routes: [
-                // As rotas connectionPanelScreen e connectionDetailScreen foram movidas para o nível superior
+                // The connectionPanelScreen and connectionDetailScreen routes have been moved to the top level.
               ],
             ),
           ],
@@ -203,8 +204,14 @@ final GoRouter _routes = GoRouter(
     GoRoute(
       path: AppRoutes.sealsScreen,
       name: AppRoutes.sealsScreen,
-      builder: (context, __) {
-        return const SealsScreen();
+      builder: (context, state) {
+        Map<String, dynamic>? params;
+
+        if(state.extra != null) {
+          params = state.extra as Map<String, dynamic>;
+        }
+
+        return SealsScreen(onlyPendingSeals: params?['onlyPendingSeals'] ?? false);
       },
     ),
   ],

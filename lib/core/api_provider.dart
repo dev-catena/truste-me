@@ -29,7 +29,8 @@ enum RefreshTokenResult {
 }
 
 class ApiProvider {
-  static const DEF_MAX_ATTEMPT = 5;
+  static const DEF_MAX_ATTEMPT = 3;
+  static const DEF_TIMEOUT_IN_SECONDS = kDebugMode ? 120 : 15;
   static const DEF_USE_HTTPS = false;
 
   /// Use this object to prevent concurrent access to data
@@ -59,19 +60,21 @@ class ApiProvider {
     }
   }
 
-  // TODO: Catch exception on caller
   Future<HttpResult> get(String endPoint, {bool useToken = true, bool checkErrors = true, int attempt = 0, Map<String, dynamic>? params}) async {
     endPoint = 'api/$endPoint';
 
     final Uri url;
     url = DEF_USE_HTTPS ? Uri.https(_host, endPoint, params) : Uri.http(_host, endPoint, params);
-    Log.d('$runtimeType', 'GET url $url');
+
+    if(GlobalVariables.DEF_PRINT_HTTP_REQUEST) {
+      Log.d('$runtimeType', 'REQUEST GET $url');
+    }
 
     try {
-      final http.Response response = await http.get(url, headers: _getHeader(useToken)).timeout(const Duration(seconds: 10));
+      final http.Response response = await http.get(url, headers: _getHeader(useToken)).timeout(const Duration(seconds: DEF_TIMEOUT_IN_SECONDS));
       // Log.d('$runtimeType', 'GET response ${response.body}');
 
-      final httpResult = handleHttpResponse(response);
+      final httpResult = handleHttpResponse(url, response);
       return httpResult;
     } on ClientErrorException catch (e, s) {
       Log.e('$runtimeType', '❌ Client error on GET method.', e, s);
@@ -90,6 +93,15 @@ class ApiProvider {
         }
       }
 
+      if([401, 403].contains(e.statusCode)) {
+        return HttpResult(
+          statusCode: e.statusCode,
+          success: false,
+          message: e.message,
+          result: e.details
+        );
+      }
+
       rethrow;
     } on ServerErrorException catch (e, s) {
       Log.e('$runtimeType', '🔥 Server error on GET method.', e, s);
@@ -103,20 +115,21 @@ class ApiProvider {
     }
   }
 
-  // TODO: Catch exception on caller
   Future<HttpResult> post(String endPoint, String content, {bool useToken = true, bool checkErrors = true, int attempt = 0}) async {
     endPoint = 'api/$endPoint';
     final Uri url;
     url = DEF_USE_HTTPS ? Uri.https(_host, endPoint) : Uri.http(_host, endPoint);
     final http.Response response;
 
-    Log.d('$runtimeType', 'POST url $url - content $content');
+    if(GlobalVariables.DEF_PRINT_HTTP_REQUEST) {
+      Log.d('$runtimeType', 'REQUEST POST $url - content $content');
+    }
 
     try {
-      response = await http.post(url, body: content, headers: _getHeader(useToken)).timeout(const Duration(seconds: 7));
-      Log.d('$runtimeType', 'POST response ${response.body}');
+      response = await http.post(url, body: content, headers: _getHeader(useToken)).timeout(const Duration(seconds: DEF_TIMEOUT_IN_SECONDS));
+      //Log.d('$runtimeType', 'POST response ${response.body}');
 
-      final httpResult = handleHttpResponse(response);
+      final httpResult = handleHttpResponse(url, response);
       return httpResult;
     } on ClientErrorException catch (e, s) {
       Log.e('$runtimeType', '❌ Client error on POST method.', e, s);
@@ -135,6 +148,15 @@ class ApiProvider {
         }
       }
 
+      if([401, 403].contains(e.statusCode)) {
+        return HttpResult(
+            statusCode: e.statusCode,
+            success: false,
+            message: e.message,
+            result: e.details
+        );
+      }
+
       rethrow;
     } on ServerErrorException catch (e, s) {
       Log.e('$runtimeType', '🔥 Server error on POST method.', e, s);
@@ -148,20 +170,21 @@ class ApiProvider {
     }
   }
 
-  // TODO: Catch exception on caller
   Future<HttpResult> patch(String endPoint, String content, {bool useToken = true, bool checkErrors = true, int attempt = 0}) async {
     endPoint = 'api/$endPoint';
     final Uri url;
     url = DEF_USE_HTTPS ? Uri.https(_host, endPoint) : Uri.http(_host, endPoint);
     final http.Response response;
 
-    Log.d('$runtimeType', 'PATCH url $url - content $content');
+    if(GlobalVariables.DEF_PRINT_HTTP_REQUEST) {
+      Log.d('$runtimeType', 'REQUEST PATCH $url - content $content');
+    }
 
     try {
-      response = await http.patch(url, body: content, headers: _getHeader(useToken)).timeout(const Duration(seconds: 7));
+      response = await http.patch(url, body: content, headers: _getHeader(useToken)).timeout(const Duration(seconds: DEF_TIMEOUT_IN_SECONDS));
       // Log.d(TAG, '$runtimeType - PATCH response ${response.body}');
 
-      final httpResult = handleHttpResponse(response);
+      final httpResult = handleHttpResponse(url, response);
       return httpResult;
     } on ClientErrorException catch (e, s) {
       Log.e('$runtimeType', '❌ Client error on PATCH method.', e, s);
@@ -180,6 +203,15 @@ class ApiProvider {
         }
       }
 
+      if([401, 403].contains(e.statusCode)) {
+        return HttpResult(
+            statusCode: e.statusCode,
+            success: false,
+            message: e.message,
+            result: e.details
+        );
+      }
+
       rethrow;
     } on ServerErrorException catch (e, s) {
       Log.e('$runtimeType', '🔥 Server error on PATCH method.', e, s);
@@ -193,18 +225,21 @@ class ApiProvider {
     }
   }
 
-  // TODO: Catch exception on caller
   Future<HttpResult> put(String endPoint, String content, {bool useToken = true, bool checkErrors = true, int attempt = 0}) async {
     endPoint = 'api/$endPoint';
     final Uri url;
     url = DEF_USE_HTTPS ? Uri.https(_host, endPoint) : Uri.http(_host, endPoint);
     final http.Response response;
 
+    if(GlobalVariables.DEF_PRINT_HTTP_REQUEST) {
+      Log.d('$runtimeType', 'REQUEST PUT $url - content $content');
+    }
+
     try {
-      response = await http.put(url, body: content, headers: _getHeader(useToken),).timeout(const Duration(seconds: 10));
+      response = await http.put(url, body: content, headers: _getHeader(useToken),).timeout(const Duration(seconds: DEF_TIMEOUT_IN_SECONDS));
       // Log.d(TAG, '$runtimeType - PUT response ${response.body}');
 
-      final httpResult = handleHttpResponse(response);
+      final httpResult = handleHttpResponse(url, response);
       return httpResult;
     } on ClientErrorException catch (e, s) {
       Log.e('$runtimeType', '❌ Client error on PUT method.', e, s);
@@ -223,6 +258,15 @@ class ApiProvider {
         }
       }
 
+      if([401, 403].contains(e.statusCode)) {
+        return HttpResult(
+            statusCode: e.statusCode,
+            success: false,
+            message: e.message,
+            result: e.details
+        );
+      }
+
       rethrow;
     } on ServerErrorException catch (e, s) {
       Log.e('$runtimeType', '🔥 Server error on PUT method.', e, s);
@@ -236,18 +280,20 @@ class ApiProvider {
     }
   }
 
-  // TODO: Catch exception on caller
   Future<HttpResult> delete(String endPoint, {bool useToken = true, bool checkErrors = true, int attempt = 0, String? content}) async {
     endPoint = 'api/$endPoint';
 
     final Uri url;
     url = DEF_USE_HTTPS ? Uri.https(_host, endPoint) : Uri.http(_host, endPoint);
-    Log.d('$runtimeType', 'DELETE url $url');
+
+    if(GlobalVariables.DEF_PRINT_HTTP_REQUEST) {
+      Log.d('$runtimeType', 'REQUEST DELETE $url');
+    }
 
     try {
       final http.Response response = await http.delete(url, headers: _getHeader(useToken), body: content);
 
-      final httpResult = handleHttpResponse(response);
+      final httpResult = handleHttpResponse(url, response);
       return httpResult;
     } on ClientErrorException catch (e, s) {
       Log.e('$runtimeType', '❌ Client error on DELETE method.', e, s);
@@ -265,6 +311,15 @@ class ApiProvider {
         }
       }
 
+      if([401, 403].contains(e.statusCode)) {
+        return HttpResult(
+            statusCode: e.statusCode,
+            success: false,
+            message: e.message,
+            result: e.details
+        );
+      }
+
       rethrow;
     } on ServerErrorException catch (e, s) {
       Log.e('$runtimeType', '🔥 Server error on DELETE method.', e, s);
@@ -278,7 +333,6 @@ class ApiProvider {
     }
   }
 
-  // TODO: Catch exception on caller
   Future<HttpResult> postWithFiles(String endPoint, List<File> files, {bool useToken = true, bool checkErrors = true, int attempt = 0, Map<String, dynamic>? otherFields}) async {
     endPoint = 'api/$endPoint';
 
@@ -299,11 +353,15 @@ class ApiProvider {
       }
     }
 
+    if(GlobalVariables.DEF_PRINT_HTTP_REQUEST) {
+      Log.d('$runtimeType', 'REQUEST POST_WITH_FILES $url - files count ${files.length}');
+    }
+
     try {
-      final http.StreamedResponse streamedResponse = await request.send().timeout(const Duration(seconds: 10));
+      final http.StreamedResponse streamedResponse = await request.send().timeout(const Duration(seconds: DEF_TIMEOUT_IN_SECONDS));
       final response = await http.Response.fromStream(streamedResponse);
 
-      final httpResult = handleHttpResponse(response);
+      final httpResult = handleHttpResponse(url, response);
       return httpResult;
     } on ClientErrorException catch (e, s) {
       Log.e('$runtimeType', '❌ Client error on POST_WITH_FILES method.', e, s);
@@ -323,6 +381,15 @@ class ApiProvider {
         }
       }
 
+      if([401, 403].contains(e.statusCode)) {
+        return HttpResult(
+            statusCode: e.statusCode,
+            success: false,
+            message: e.message,
+            result: e.details
+        );
+      }
+
       rethrow;
     } on ServerErrorException catch (e, s) {
       Log.e('$runtimeType', '🔥 Server error on POST_WITH_FILES method.', e, s);
@@ -337,8 +404,12 @@ class ApiProvider {
   }
 
   //region ## AUX METHODS
-  HttpResult handleHttpResponse(http.Response response) {
+  HttpResult handleHttpResponse(Uri url, http.Response response) {
     final status = response.statusCode;
+
+    if(GlobalVariables.DEF_PRINT_HTTP_RESPONSES) {
+      Log.d(runtimeType.toString(), 'RESPONSE (${response.statusCode}) $url - ${response.body}');
+    }
 
     // try to decode JSON if possible
     dynamic body;
@@ -361,7 +432,7 @@ class ApiProvider {
         responseData = body['result']?? body;
       }
 
-      return HttpResult(
+      final httpResult = HttpResult(
           statusCode: status,
           success: true,
           message: (body is Map)
@@ -369,35 +440,57 @@ class ApiProvider {
               : null,
           result: responseData
       );
+
+      if(GlobalVariables.DEF_PRINT_HTTP_RESPONSES_FORMATTED) {
+        Log.d(runtimeType.toString(), 'HttpResult for ($url): ${httpResult.toString()}');
+      }
+      return httpResult;
     } else if (status >= 400 && status < 500) {
-      throw ClientErrorException(
+      final ex = ClientErrorException(
           statusCode: status,
-          message: body is Map && body['message'] != null
-              ? body['message']
-              : 'Erro na requisição (${status})',
+          message: _getErrorMessage(body, 'Erro na requisição (${status})'),
           details: body,
           success: body['success']?? false,
           stackTrace: body['stack']
       );
+      //Log.e(runtimeType.toString(), 'Error on request (${url}):', ex);
+      throw ex;
     } else if (status >= 500 && status < 600) {
-      throw ServerErrorException(
+      final ex = ServerErrorException(
           statusCode: status,
-          message: body is Map && body['message'] != null
-              ? body['message']
-              : 'Erro no servidor (${status})',
+          message: _getErrorMessage(body, 'Erro no servidor (${status})'),
           details: body,
           success: body['success']?? false,
           stackTrace: body['stack']
       );
+      //Log.e(runtimeType.toString(), 'Error on request (${url}):', ex);
+      throw ex;
     } else {
-      throw HttpRequestException(
+      final ex = HttpRequestException(
           statusCode: status,
           message: 'Erro inesperado (${status})',
           details: body,
           success: body['success']?? false,
           stackTrace: body['stack']
       );
+      //Log.e(runtimeType.toString(), 'Error on request (${url}):', ex);
+      throw ex;
     }
+  }
+
+  String _getErrorMessage(dynamic body, String defaultMessage) {
+
+    var message  = defaultMessage;
+
+    if(body is Map) {
+      if(body['message'] != null) {
+        message = body['message'];
+      } else if(body['error'] != null) {
+        message = body['error'];
+      }
+    }
+
+    return message;
   }
 
   Future<bool> _checkError403(Uri uri, int respStatusCode) async {
@@ -439,7 +532,7 @@ class ApiProvider {
           try {
             tokenRefreshed = await refreshAuthToken();
           } catch(e, stack) {
-            Log.e('$runtimeType', 'Tokiuz could not be refreshed! (ERROR)', e);
+            Log.e('$runtimeType', 'Tokiuz could not be refreshed! (ERROR)', e, stack);
             //CrashlyticsUtil.reportError("$TAG: Tokiuz could not be refreshed! (ERROR)", e, stack);
           }
 
@@ -487,9 +580,9 @@ class ApiProvider {
         });
 
         try {
-          final rawData = await post('refresh', body, useToken: false, checkErrors: false);
+          final httpResult = await post('refresh', body, useToken: false, checkErrors: false);
 
-          final auth = AuthModel.fromJson(rawData.result).toEntity();
+          final auth = AuthModel.fromJson(httpResult.result).toEntity();
           await setAuthData(auth);
           return RefreshTokenResult.TOKEN_REFRESHED;
         } catch(e) {

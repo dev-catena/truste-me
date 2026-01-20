@@ -5,6 +5,14 @@ sealed class AppDataState {}
 
 final class AppDataInitial extends AppDataState {}
 
+final class AppDataLoading extends AppDataState {}
+
+final class AppDataError extends AppDataState {
+  final String message;
+
+  AppDataError(this.message);
+}
+
 final class AppDataReady extends AppDataState {
   final List<ContractType> contractTypes;
   final List<Seal> seals;

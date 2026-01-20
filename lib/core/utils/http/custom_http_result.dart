@@ -13,6 +13,6 @@ class HttpResult implements Exception {
 
   @override
   String toString() {
-    return 'HttpResult($statusCode): Success: $success\nMessage: $message\nResult: $result';
+    return 'HttpResult ($statusCode): Success: $success | Message: $message | Result: $result';
   }
 }

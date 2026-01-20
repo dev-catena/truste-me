@@ -15,64 +15,57 @@ import 'package:trustme/features/home/presentation/widgets/components/user_home_
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
 
-  //final bloc = HomeBloc(HomeDataSource());
-
   @override
   Widget build(BuildContext context) {
-    final userData = context.read<UserDataCubit>();
-    final appData = context.read<AppDataCubit>();
     final titleLarge = Theme.of(context).textTheme.titleLarge!;
 
     final List<FeatureData> features = [
       FeatureData(name: 'Conexões', icon: Symbols.partner_exchange, destinationRoute: AppRoutes.connectionPanelScreen),
       FeatureData(name: 'Selos', icon: Symbols.asterisk, destinationRoute: AppRoutes.sealsScreen),
-      // FeatureData(name: 'Carteira', icon: Symbols.account_balance_wallet, destinationRoute: AppRoutes.contractsScreen),
     ];
 
-    return BlocProvider(
-      create: (_) => HomeBloc(HomeDataSource(), userData, appData),
-      child: CustomScaffold(
-        child: BlocBuilder<HomeBloc, HomeState>(
-          builder: (blocCtx, state) {
-            final bloc = blocCtx.read<HomeBloc>();
+    return CustomScaffold(
+      child: BlocBuilder<HomeBloc, HomeState>(
+        builder: (blocCtx, homeState) {
+          final bloc = blocCtx.read<HomeBloc>();
 
-            if(state is HomeReady) {
-              return RefreshIndicator(
-                onRefresh: () async => bloc.add(HomeStarted()),
-                child: SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Informações gerais', style: titleLarge, textAlign: TextAlign.start),
-                      const SizedBox(height: 10),
-                      const UserHomeInfoComponent(),
-                      const SizedBox(height: 20),
-                      Text('Serviços', style: titleLarge, textAlign: TextAlign.start),
-                      const SizedBox(height: 10),
-                      Wrap(
-                        spacing: 5,
-                        runSpacing: 5,
-                        children: List.generate(
-                          features.length,
-                              (index) {
-                            return features[index].buildCard();
-                          },
-                        ),
+          if (homeState is HomeReady) {
+            return RefreshIndicator(
+              onRefresh: () async => bloc.add(HomeStarted()),
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Informações gerais', style: titleLarge, textAlign: TextAlign.start),
+                    const SizedBox(height: 10),
+                    const UserHomeInfoComponent(),
+                    const SizedBox(height: 20),
+                    Text('Serviços', style: titleLarge, textAlign: TextAlign.start),
+                    const SizedBox(height: 10),
+                    Wrap(
+                      spacing: 5,
+                      runSpacing: 5,
+                      children: List.generate(
+                        features.length,
+                        (index) {
+                          return features[index].buildCard();
+                        },
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              );
-            } else if(state is HomeLoadInProgress) {
-              return Center(child: const CircularProgressIndicator());
-            } else if(state is HomeError) {
-              return GenericErrorComponent(state.msg, onRefresh: () async => bloc.add(HomeStarted()));
-            } else {
-              return const Text("Invalid state");
-            }
+              ),
+            );
+          } else if (homeState is HomeLoadInProgress) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (homeState is HomeError) {
+            return GenericErrorComponent(homeState.msg, onRefresh: () async => bloc.add(HomeStarted()));
+          } else {
+            // Initial State
+            return const Center(child: CircularProgressIndicator());
           }
-        ),
+        },
       ),
     );
   }

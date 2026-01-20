@@ -1,13 +1,12 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:brasil_fields/brasil_fields.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:trustme/core/api_provider.dart';
 import 'package:trustme/core/extensions/context_extensions.dart';
 import 'package:trustme/core/extensions/datetime_extensions.dart';
 import 'package:trustme/core/utils/custom_colors.dart';
+import 'package:trustme/features/common/data/data_source/app_data_source.dart';
 import 'package:trustme/features/common/presentation/widgets/components/custom_selectable_tile.dart';
 import 'package:trustme/features/register/domain/entities/user_info_data.dart';
 
@@ -45,6 +44,7 @@ class _PersonalInfoFormState extends State<PersonalInfoForm> {
   bool wasBirthdayTouched = false;
 
   Timer? _debounce;
+  final _appDataSource = AppDataSource();
 
   @override
   void initState() {
@@ -120,10 +120,10 @@ class _PersonalInfoFormState extends State<PersonalInfoForm> {
       _validatingEmail = true;
       _emailExists = false;
     });
-    final resp = (await ApiProvider().post('cadastro/verificar-dados', jsonEncode({'email': email}), useToken: personalData.id > 0)).result;
+    final emailExists = await _appDataSource.checkIfEmailExists(email, id: personalData.id);
     setState(() {
       _validatingEmail = false;
-      _emailExists = resp['email_exists'] == true;
+      _emailExists = emailExists;
     });
     if (_emailExists) {
       if (mounted) context.showSnack('Já existe um login com este email!');
@@ -136,10 +136,10 @@ class _PersonalInfoFormState extends State<PersonalInfoForm> {
       _validatingCpf = true;
       _cpfExists = false;
     });
-    final resp = (await ApiProvider().post('cadastro/verificar-dados', jsonEncode({'CPF': cpf}), useToken: personalData.id > 0)).result;
+    final cpfExists = await _appDataSource.checkIfCpfExists(cpf, id: personalData.id);
     setState(() {
       _validatingCpf = false;
-      _cpfExists = resp['cpf_exists'] == true;
+      _cpfExists = cpfExists;
     });
     if (_cpfExists) {
       if (mounted) context.showSnack('Já existe um cadastro com este CPF!');

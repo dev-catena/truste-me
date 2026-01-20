@@ -5,6 +5,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:trustme/core/enums/connection_status.dart';
 import 'package:trustme/core/extensions/context_extensions.dart';
 import 'package:trustme/core/providers/user_data_cubit.dart';
+import 'package:trustme/core/providers/user_data_event.dart';
 import 'package:trustme/features/common/presentation/widgets/components/custom_scaffold.dart';
 import 'package:trustme/features/common/presentation/widgets/components/header_line.dart';
 import 'package:trustme/features/common/presentation/widgets/components/stateful_filter_chips.dart';
@@ -41,6 +42,7 @@ class _ConnectionPanelScreenState extends State<ConnectionPanelScreen> {
     final userData = context.read<UserDataCubit>();
 
     return CustomScaffold(
+      showAvatar: false,
       floatingActionButton: FloatingActionButton(
         heroTag: 'btn1',
         onPressed: () {
@@ -48,18 +50,23 @@ class _ConnectionPanelScreenState extends State<ConnectionPanelScreen> {
               context: context,
               builder: (_) {
                 return RequestConnectionDialog(onRequested: userData.requestConnection);
-              }).then((value) { userData.refreshConnections(userData.getUser); });
+              }).then((value) { userData.refreshConnections(); });
         },
         child: const Icon(Icons.add),
       ),
       child: BlocConsumer<UserDataCubit, UserDataState>(
         bloc: userData,
         listener: (context, state) {
-          if (state is UserDataReady) {
+          if (state is UserDataReady && state.event is ConnectionRequestResult) {
+            final event = state.event as ConnectionRequestResult;
+
             if (state.connectionRequestStatus == ConnectionRequestStatus.failure) {
-              context.showSnack(state.message);
+              context.showSnack(event.message);
+              userData.clearEvent();
             } else if (state.connectionRequestStatus == ConnectionRequestStatus.success) {
               context.showSnack('Conexão solicitada!');
+              userData.clearEvent();
+              userData.refreshConnections();
             }
           }
         },
@@ -79,7 +86,7 @@ class _ConnectionPanelScreenState extends State<ConnectionPanelScreen> {
                   height: 50,
                   width: size.width * 0.95,
                   child: StatefulFilterChips(
-                    filtersLabel: ConnectionStatus.values.map((e) => e.name).toList()..insert(0, 'Todos'),
+                    filtersLabel: ConnectionStatus.values.map((e) => e.name).toList()..add('Todos'),
                     initialFilter: activeFilter,
                     onSelected: (value) => setFilter(value),
                   ),
@@ -90,14 +97,14 @@ class _ConnectionPanelScreenState extends State<ConnectionPanelScreen> {
                         children: [
                           const Text('Nenhuma conexão'),
                           IconButton(
-                            onPressed: () => userData.refreshConnections(userData.getUser),
+                            onPressed: () => userData.refreshConnections(),
                             icon: const Icon(Icons.refresh_outlined),
                           ),
                         ],
                       )
                     : Expanded(
                         child: RefreshIndicator(
-                          onRefresh: () async => await userData.refreshConnections(userData.getUser),
+                          onRefresh: () async => await userData.refreshConnections(),
                           child: ListView.separated(
                             shrinkWrap: true,
                             separatorBuilder: (_, __) {
@@ -108,7 +115,7 @@ class _ConnectionPanelScreenState extends State<ConnectionPanelScreen> {
                               if (index == filteredConnections.length) {
                                 return IconButton(
                                   onPressed: () {
-                                    userData.refreshConnections(userData.getUser);
+                                    userData.refreshConnections();
                                   },
                                   icon: const Icon(Icons.refresh_outlined),
                                 );

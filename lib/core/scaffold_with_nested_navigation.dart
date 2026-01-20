@@ -1,56 +1,62 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:material_symbols_icons/material_symbols_icons.dart';
-
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:trustme/core/extensions/context_extensions.dart';
 import 'package:trustme/core/global/global_variables.dart';
+import 'package:trustme/core/providers/user_data_cubit.dart';
+import 'package:trustme/core/providers/user_data_event.dart';
 import 'package:trustme/core/utils/custom_colors.dart';
+import 'package:trustme/features/home/presentation/blocs/home_bloc.dart';
 
-final scaffoldKey = GlobalKey<ScaffoldState>();
+class ScaffoldWithNestedNavigation extends StatelessWidget {
+  const ScaffoldWithNestedNavigation({Key? key, required this.navigationShell}) : super(key: key);
 
-class ScaffoldWithNestedNavigation extends StatefulWidget {
-  const ScaffoldWithNestedNavigation({
-    Key? key,
-    required this.navigationShell,
-  }) : super(key: key ?? const ValueKey('ScaffoldWithNestedNavigation'));
   final StatefulNavigationShell navigationShell;
 
-  @override
-  State<ScaffoldWithNestedNavigation> createState() => _ScaffoldWithNestedNavigationState();
-}
-
-class _ScaffoldWithNestedNavigationState extends State<ScaffoldWithNestedNavigation> {
   void _goBranch(int index) {
-    widget.navigationShell.goBranch(
-      index,
-      /// Quando o usuário aperta no ícone da branch que ele já está, ele é direcionado para a initialLocation da branch
-      initialLocation: index == widget.navigationShell.currentIndex,
-    );
+    navigationShell.goBranch(index, initialLocation: index == navigationShell.currentIndex);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: scaffoldKey,
-      body: widget.navigationShell,
-      bottomNavigationBar: NavigationBar(
-        backgroundColor: CustomColor.bottomBarBg,
-        selectedIndex: widget.navigationShell.currentIndex,
-        indicatorColor: CustomColor.activeColor,
-        destinations: [
-          NavigationDestination(label: 'Contratos', icon: Icon(Symbols.contract_rounded)),
-          NavigationDestination(label: 'Home', icon: Icon(Icons.home_outlined)),
-          if(!GlobalVariables.isFirebaseTestLab)
-            NavigationDestination(label: 'Notificações', icon: Icon(Icons.notifications_active_outlined)),
-        ],
-        onDestinationSelected: (index) {
-          if(index == 2) {
-            context.showSnack("Em construção...");
-          } else {
-            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-            _goBranch(index);
-          }
-        },
+    return BlocListener<UserDataCubit, UserDataState>(
+      listener: (context, state) {
+        if (state is UserDataReady && state.event is SealRequestResult) {
+          final event = state.event as SealRequestResult;
+          context.showSnack(event.message);
+          context.read<UserDataCubit>().clearEvent();
+        }
+      },
+      child: Scaffold(
+        body: navigationShell,
+        bottomNavigationBar: BlocBuilder<HomeBloc, HomeState>(
+          builder: (context, state) {
+            // Only show the navigation bar when the HomeBloc is in the ready state.
+            if (state is HomeReady) {
+              return NavigationBar(
+                selectedIndex: navigationShell.currentIndex,
+                indicatorColor: CustomColor.activeColor,
+                destinations: [
+                  NavigationDestination(label: 'Contratos', icon: Icon(Symbols.list_alt_rounded)),
+                  NavigationDestination(label: 'Home', icon: Icon(Icons.home_outlined)),
+                  if(!GlobalVariables.isFirebaseTestLab)
+                    NavigationDestination(label: 'Notificações', icon: Icon(Icons.notifications_active_outlined)),
+                ],
+                onDestinationSelected: (index) {
+                  if (index == 2) {
+                    context.showSnack('Em construção...');
+                  } else {
+                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                    _goBranch(index);
+                  }
+                },
+              );
+            }
+            // While loading or in an error state, show nothing.
+            return const SizedBox.shrink();
+          },
+        ),
       ),
     );
   }

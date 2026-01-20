@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:trustme/core/extensions/context_extensions.dart';
+import 'package:trustme/core/global/global_variables.dart';
 import 'package:trustme/core/providers/app_data_cubit.dart';
 import 'package:trustme/core/providers/user_data_cubit.dart';
 import 'package:trustme/core/routes.dart';
@@ -31,7 +33,7 @@ class LoginScreen extends StatelessWidget {
             listener: (_, state) {
               if (state is LoginReady) {
                 if (state.error) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.errorMsg!)));
+                  context.showSnack(state.errorMsg!);
                 } else if (state.loginSuccess) {
                   context.goNamed('home');
                 }
@@ -45,16 +47,16 @@ class LoginScreen extends StatelessWidget {
               } else if (state is LoginReady) {
 
                 if(DEF_TEST && kDebugMode) {
-                  //state.emailController.text = "069.091.440-74";
-                  //state.pwdController.text = "12312345";
-                  //state.pwdController.text = "dev@2025";
+                  state.emailController.text = '069.091.440-74';
+                  //state.emailController.text = '370.175.700-30';
+                  state.pwdController.text = '123123';
                 }
 
                 return SingleChildScrollView(
                   child: Column(
                     children: [
                       const SizedBox(height: 60),
-                      Text('TrueConnect', style: displayMedium),
+                      Text('${GlobalVariables.DEF_APP_NAME}${GlobalVariables.DEF_USE_DEV_ENVIRONMENT ? ' - HML' : ''}', style: displayMedium),
                       const SizedBox(height: 16),
                       Image.asset('assets/imgs/trustme-logo.png', height: 100),
                       const SizedBox(height: 24),
@@ -62,7 +64,7 @@ class LoginScreen extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: CustomColor.activeColor),
+                          border: Border.all(color: CustomColor.primaryColor),
                         ),
                         padding: const EdgeInsets.only(left: 40, right: 40, bottom: 20, top: 20),
                         child: Padding(

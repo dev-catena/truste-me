@@ -1,10 +1,9 @@
 import 'dart:convert';
 
+import 'package:trustme/core/api_provider.dart';
 import 'package:trustme/core/utils/log/log.dart';
-
-import '../../../../core/api_provider.dart';
-import '../../../../core/utils/preferences/app_preferences.dart';
-import '../../../common/domain/entities/auth.dart';
+import 'package:trustme/core/utils/preferences/app_preferences.dart';
+import 'package:trustme/features/common/domain/entities/auth.dart';
 
 class LogoutDataSource {
   LogoutDataSource();
@@ -14,11 +13,13 @@ class LogoutDataSource {
   Future<void> logout() async {
     try {
       await _apiProvider.post('logout', jsonEncode({}), checkErrors: false);
-    } catch(ex) {
-      Log.e('$runtimeType', 'Error trying to logout');
-      // Do nothing...
+    } catch (e, s) {
+      // Even if the server-side logout fails, we must clear local data.
+      // Log the error for debugging purposes.
+      Log.e('$runtimeType', 'Server logout failed', e, s);
     }
 
+    // Always proceed to clear local authentication data.
     final prefs = AppPreferences();
     await prefs.remove(KeyPrefs.AUTH_TOKEN);
     await prefs.remove(KeyPrefs.REFRESH_TOKEN);

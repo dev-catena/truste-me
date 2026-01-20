@@ -287,8 +287,11 @@ class _ContractReady extends StatelessWidget {
             if (state.contract.status == ContractStatus.pending)
               FilledButton(
                 onPressed: () {
-                  if (!canProceed()) return;
-                  bloc.add(ContractDetailContractSigned());
+                  if (canProceed()) {
+                    bloc.add(ContractDetailContractSigned());
+                  } else {
+                    context.showSnack('Aguarde o preenchimento da outra parte.');
+                  }
                 },
                 style: ButtonStyle(
                   backgroundColor: WidgetStatePropertyAll(canProceed() ? null : CustomColor.activeGreyed),

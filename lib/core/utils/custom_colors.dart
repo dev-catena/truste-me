@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:trustme/core/global/global_variables.dart';
 
 abstract class CustomColor {
   static const Color vividRed = Color.fromARGB(255, 224, 54, 54);
   static const Color successGreen = Color.fromARGB(255, 73, 189, 45);
   static const Color pendingYellow = Color.fromARGB(255, 210, 179, 65);
 
-  static const Color activeColor = Color.fromARGB(255, 16, 129, 203);
+  //static const Color primaryColor = ;
+  static const Color primaryColor = GlobalVariables.DEF_USE_LOGO_COLOR_AS_APP_COLOR ? Color(0xFF17355B) : Color.fromARGB(255, 16, 129, 203);
+
+  //static const Color activeColor = Color.fromARGB(255, 16, 129, 203);
+  static const Color activeColor = GlobalVariables.DEF_USE_LOGO_COLOR_AS_APP_COLOR ? const Color(0xFF17355B) : Color.fromARGB(255, 16, 129, 203);
   static const Color activeGreyed = Color.fromARGB(255, 118, 132, 138);
   static const Color bottomBarBg = Colors.white;
 
@@ -23,6 +28,4 @@ abstract class CustomColor {
   static const colorLTSurfaceContainerHighest = const Color(0xFFe2e1eb);
   static const colorLTOutline = const Color(0xFFb9bac1);
   static const colorLTOutlineVariant = const Color(0xFFe5e5e5);
-
-  static const Color primaryColor = Color.fromARGB(255, 16, 129, 203);
 }

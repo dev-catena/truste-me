@@ -57,31 +57,31 @@ class LoginCubit extends Cubit<LoginState> {
     if (internalState.emailController.text.trim() == '' || internalState.pwdController.text.trim() == '') {
       emit(internalState.copyWith(error: true, errorMsg: 'Preencha os campos de usuário e senha!'));
       return;
-    } else {
-      emit(internalState.copyWith(isSubmitting: true, error: false, errorMsg: null));
+    }
 
-      try {
-        final bool isAuthenticated = await dataSource.login(internalState.emailController.text, internalState.pwdController.text);
-        if (isAuthenticated) {
-          emit(internalState.copyWith(
-            loginSuccess: true,
-            isSubmitting: false,
-            error: false,
-            errorMsg: null,
-          ));
-        } else {
-          emit(internalState.copyWith(
-            loginSuccess: false,
-            isSubmitting: false,
-            error: true,
-            errorMsg: 'Usuário ou senha incorretos',
-          ));
-        }
-      } catch (e, s) {
-        CrashlyticsUtil.reportError('Error trying to login', e, s);
-        final String msg = ExceptionHandler(e, s).getMessage();
-        emit(internalState.copyWith(loginSuccess: false, isSubmitting: false, error: true, errorMsg: msg));
+    emit(internalState.copyWith(isSubmitting: true, error: false, errorMsg: null));
+
+    try {
+      final bool isAuthenticated = await dataSource.login(internalState.emailController.text, internalState.pwdController.text);
+      if (isAuthenticated) {
+        emit(internalState.copyWith(
+          loginSuccess: true,
+          isSubmitting: false,
+          error: false,
+          errorMsg: null,
+        ));
+      } else {
+        emit(internalState.copyWith(
+          loginSuccess: false,
+          isSubmitting: false,
+          error: true,
+          errorMsg: 'Usuário ou senha incorretos',
+        ));
       }
+    } catch (e, s) {
+      CrashlyticsUtil.reportError('Error trying to login', e, s);
+      final String msg = ExceptionHandler(e, s).getMessage();
+      emit(internalState.copyWith(loginSuccess: false, isSubmitting: false, error: true, errorMsg: msg));
     }
   }
 

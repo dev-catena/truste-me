@@ -1,8 +1,12 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/foundation.dart';
+import 'package:trustme/core/providers/user_data_event.dart';
 import 'package:trustme/core/utils/firebase/crashlytics_util.dart';
 import 'package:trustme/core/utils/http/custom_http_error.dart';
 import 'package:trustme/core/utils/preferences/app_preferences.dart';
+import 'package:trustme/features/common/data/data_source/seal_data_source.dart';
+import 'package:trustme/features/contracts/domain/entities/contract_type.dart';
+import 'package:trustme/features/home/data/data_source/home_datasource.dart';
 
 import 'package:trustme/features/common/data/data_source/user_data_source.dart';
 import 'package:trustme/features/common/domain/entities/seal.dart';
@@ -19,13 +23,13 @@ class UserDataCubit extends Cubit<UserDataState> {
   final UserDataSource userDataSource;
   final ContractDataSource contractDataSource;
   final ConnectionDataSource connectionDataSource;
-
-  // late GeneralUserInfo _userInfo;
+  final SealDataSource sealDataSource;
 
   UserDataCubit(
     this.userDataSource,
     this.contractDataSource,
     this.connectionDataSource,
+    this.sealDataSource,
   ) : super(UserDataInitial());
 
   User get getUser => (state as UserDataReady).user;
@@ -34,140 +38,311 @@ class UserDataCubit extends Cubit<UserDataState> {
 
   List<Connection> get getConnections => (state as UserDataReady).connections;
 
-  Future<void> initialize(User user) async {
-    final List<Contract> contracts = [];
-    final List<Connection> connections = [];
-    final List<Seal> seals = [];
+  // CHECKED
+  Future<void> initialize(User user, {GeneralUserInfo? userInfo}) async {
+    emit(UserDataLoading());
+    try {
+      final List<Contract> contracts = [];
+      final List<Connection> connections = [];
+      final List<Seal> seals = [];
+      late GeneralUserInfo finalUserInfo;
 
-    setLoggedInUser(user);
+      setLoggedInUser(user);
 
-    //await refreshUserInfo();
+      final futures = <Future>[
+        userDataSource.getSeals(user).then((value) => seals.addAll(value)),
+        contractDataSource.getContractsForUser().then((value) => contracts.addAll(value)),
+        connectionDataSource.getConnectionsForUser().then((value) => connections.addAll(value)),
+      ];
 
-    await Future.wait([
-      // userDataSource.getGeneralInfo().then((value) => _userInfo = value),
-      userDataSource.getSeals(user).then((value) => seals.addAll(value)),
-      contractDataSource.getContractsForUser().then((value) => contracts.addAll(value)),
-      connectionDataSource.getConnectionsForUser().then((value) => connections.addAll(value)),
-    ]);
+      if (userInfo == null) {
+        futures.add(userDataSource.getGeneralInfo().then((value) => finalUserInfo = value));
+      } else {
+        finalUserInfo = userInfo;
+      }
 
-    user.sealsObtained.clear();
-    user.sealsObtained.addAll(seals);
+      await Future.wait(futures);
 
-    //region ## SET USER DATA TO PREFERENCES
-    final prefs = AppPreferences();
-    await prefs.setString(KeyPrefs.USER_CODE, user.connectionCode.toString());
-    await prefs.setString(KeyPrefs.USER_FULL_NAME, user.fullName.toString());
-    await prefs.setString(KeyPrefs.USER_CPF, user.cpf.toString());
-    await prefs.setString(KeyPrefs.USER_EMAIL, user.email.toString());
+      user.sealsObtained.clear();
+      user.sealsObtained.addAll(seals);
 
-    // Set Crashlytics variables
-    CrashlyticsUtil.setCrashlyticsCustomVariables();
-    CrashlyticsUtil.setUserIdentifier(user.id.toString(), user.fullName);
-    //endregion
+      //region ## SET USER DATA TO PREFERENCES
+      final prefs = AppPreferences();
+      await prefs.setString(KeyPrefs.USER_CODE, user.connectionCode.toString());
+      await prefs.setString(KeyPrefs.USER_FULL_NAME, user.fullName.toString());
+      await prefs.setString(KeyPrefs.USER_CPF, user.cpf.toString());
+      await prefs.setString(KeyPrefs.USER_EMAIL, user.email.toString());
 
-    emit(UserDataReady(
-      user: user,
-      contracts: contracts,
-      connections: connections,
-    ));
+      // Set Crashlytics variables
+      CrashlyticsUtil.setCrashlyticsCustomVariables();
+      CrashlyticsUtil.setUserIdentifier(user.id.toString(), user.fullName);
+      //endregion
+
+      emit(UserDataReady(
+        user: user,
+        userInfo: finalUserInfo,
+        contracts: contracts,
+        connections: connections,
+      ));
+    } on HttpRequestException catch (e) {
+      emit(UserDataError('Erro ao carregar os dados do usuário: ${e.message}'));
+    } on Exception catch (e) {
+      emit(UserDataError('Ocorreu um erro inesperado ao carregar os dados: ${e.toString()}'));
+    }
   }
 
+  void updateLocalContract(Contract updatedContract) {
+    if (state is! UserDataReady) return;
+    final internState = state as UserDataReady;
+
+    final contractIndex = internState.contracts.indexWhere((c) => c.id == updatedContract.id);
+
+    if (contractIndex != -1) {
+      final updatedContracts = List<Contract>.of(internState.contracts);
+      updatedContracts[contractIndex] = updatedContract;
+      emit(internState.copyWith(contracts: updatedContracts));
+    }
+  }
+
+  Future<void> fetchClausesForType(ContractType type) async {
+    final internState = state as UserDataReady;
+    try {
+      final clausesFetched = await contractDataSource.getClausesForContractType(type);
+      emit(internState.copyWith(
+        event: ClausesFetchResult(
+          isSuccess: true,
+          clauses: clausesFetched.clauses,
+          practices: clausesFetched.practices,
+        ),
+      ));
+    } on HttpRequestException catch (e) {
+      emit(internState.copyWith(
+        event: ClausesFetchResult(isSuccess: false, message: e.message),
+      ));
+    } on Exception catch (e) {
+      emit(internState.copyWith(
+        event: ClausesFetchResult(isSuccess: false, message: e.toString()),
+      ));
+    }
+  }
+
+  Future<void> requestSeal(Seal seal) async {
+    final internState = state as UserDataReady;
+    try {
+      final result = await sealDataSource.requestSeal(seal);
+      emit(internState.copyWith(
+        event: SealRequestResult(
+          isSuccess: true,
+          message: result['message'] ?? 'Solicitação de selo realizada com sucesso!',
+        ),
+      ));
+    } on HttpRequestException catch (e) {
+      emit(internState.copyWith(
+        event: SealRequestResult(isSuccess: false, message: e.message),
+      ));
+    } on Exception catch (e) {
+      emit(internState.copyWith(
+        event: SealRequestResult(isSuccess: false, message: e.toString()),
+      ));
+    }
+  }
+
+  // CHECKED
   Future<void> refreshUserInfo() async {
     final internState = state as UserDataReady;
-    final info = await userDataSource.getGeneralInfo();
-
-    emit(internState.copyWith(userInfo: info));
+    try {
+      final info = await userDataSource.getGeneralInfo();
+      emit(internState.copyWith(
+        userInfo: info,
+        event: RefreshResult(isSuccess: true, message: 'Informações atualizadas com sucesso!'),
+      ));
+    } on HttpRequestException catch (e) {
+      emit(internState.copyWith(
+        event: RefreshResult(isSuccess: false, message: e.message),
+      ));
+    } on Exception catch (e) {
+      emit(internState.copyWith(
+        event: RefreshResult(isSuccess: false, message: e.toString()),
+      ));
+    }
   }
 
+  // CHECKED
   Future<void> establishConnection(final Connection connection, final bool accepted) async {
     final internState = state as UserDataReady;
+    try {
+      final httpResult = await connectionDataSource.acceptConnection(connection, accepted);
 
-    await connectionDataSource.acceptConnection(connection, accepted);
-    final connectionIndex = internState.connections.indexOf(connection);
-    final updatedConnections = List<Connection>.of(internState.connections);
+      final updatedConnections = List<Connection>.of(internState.connections);
+      final connectionIndex = updatedConnections.indexOf(connection);
 
-    updatedConnections.removeAt(connectionIndex);
+      if (connectionIndex != -1) {
+        updatedConnections.removeAt(connectionIndex);
+        if (accepted) {
+          updatedConnections.insert(connectionIndex, connection.copyWith(status: ConnectionStatus.accepted));
+        }
+      }
 
-    if (accepted) {
-      updatedConnections.insert(connectionIndex, connection.copyWith(status: ConnectionStatus.accepted));
+      final message = accepted ? 'Conexão aceita com sucesso!' : 'Conexão recusada com sucesso!';
+
+      emit(internState.copyWith(
+        connections: updatedConnections,
+        connectionRequestStatus: ConnectionRequestStatus.success,
+        event: ConnectionRequestResult(isSuccess: true, message: httpResult.message ?? message),
+      ));
+    } on HttpRequestException catch (e) {
+      emit(internState.copyWith(
+        connectionRequestStatus: ConnectionRequestStatus.failure,
+        event: ConnectionRequestResult(isSuccess: false, message: e.message),
+      ));
+    } on Exception catch (e) {
+      emit(internState.copyWith(
+        connectionRequestStatus: ConnectionRequestStatus.failure,
+        event: ConnectionRequestResult(isSuccess: false, message: e.toString()),
+      ));
     }
-
-    emit(internState.copyWith(connections: updatedConnections));
   }
 
+  // CHECKED
   Future<void> requestConnection(int userCode) async {
     final internState = state as UserDataReady;
 
     try {
-      final resp = await connectionDataSource.requestConnection(userCode);
-
-      // TODO: Check if it can be changed by emit(internState.copyWith(connectionRequestStatus: ConnectionRequestStatus.success));
-      if (resp.containsKey('error')) {
-        emit(internState.copyWith(connectionRequestStatus: ConnectionRequestStatus.failure, message: (resp['error'] as String)));
-      } else {
-        emit(internState.copyWith(connectionRequestStatus: ConnectionRequestStatus.success));
-      }
-      //
-
-      emit(internState.copyWith(connectionRequestStatus: ConnectionRequestStatus.initial));
+      final httpResult = await connectionDataSource.requestConnection(userCode);
+      emit(internState.copyWith(
+        connectionRequestStatus: ConnectionRequestStatus.success,
+        event: ConnectionRequestResult(isSuccess: true, message: httpResult.message ?? 'Requisição de conexão realizada com sucesso!'),
+      ));
     } on HttpRequestException catch (e, s) {
-      emit(internState.copyWith(connectionRequestStatus: ConnectionRequestStatus.failure, message: e.message));
+      emit(internState.copyWith(
+        connectionRequestStatus: ConnectionRequestStatus.failure,
+        event: ConnectionRequestResult(isSuccess: false, message: e.message),
+      ));
     } on Exception catch(e, s) {
-      emit(internState.copyWith(connectionRequestStatus: ConnectionRequestStatus.failure));
+      emit(internState.copyWith(
+        connectionRequestStatus: ConnectionRequestStatus.failure,
+        event: ConnectionRequestResult(isSuccess: false, message: e.toString()),
+      ));
     }
   }
 
+  /// Method used to clear event after one shot event
+  void clearEvent() {
+    final internState = state as UserDataReady;
+    emit(internState.copyWith(
+      event: null,
+      connectionRequestStatus: ConnectionRequestStatus.initial,
+    ));
+  }
+
+  // CHECKED
   Future<void> deleteConnection(Connection connection) async {
     final internState = state as UserDataReady;
 
-    await connectionDataSource.deleteConnection(connection);
+    try {
+      final httpResult = await connectionDataSource.deleteConnection(connection);
 
-    final connectionIndex = internState.connections.indexOf(connection);
-    final updatedConnections = List<Connection>.of(internState.connections);
+      final updatedConnections = List<Connection>.of(internState.connections)
+        ..remove(connection);
 
-    updatedConnections.removeAt(connectionIndex);
-
-    emit(internState.copyWith(connections: updatedConnections));
+      emit(internState.copyWith(
+        connections: updatedConnections,
+        connectionRequestStatus: ConnectionRequestStatus.success,
+        event: ConnectionRequestResult(isSuccess: true, message: httpResult.message ?? 'Conexão removida com sucesso!'),
+      ));
+    } on HttpRequestException catch (e) {
+      emit(internState.copyWith(
+        connectionRequestStatus: ConnectionRequestStatus.failure,
+        event: ConnectionRequestResult(isSuccess: false, message: e.message),
+      ));
+    } on Exception catch (e) {
+      emit(internState.copyWith(
+        connectionRequestStatus: ConnectionRequestStatus.failure,
+        event: ConnectionRequestResult(isSuccess: false, message: e.toString()),
+      ));
+    }
   }
 
-  // Future<void> createContract(User user, ContractType type, List<Clause> clauses, List<SexualPractice> practicesTaken) async {
-  //   final internState = state as UserDataReady;
-  //
-  //   final clausesId = clauses.map((e) => e.id).toList();
-  //   clausesId.addAll(practicesTaken.map((e) => e.id));
-  //
-  //   final newContract = await contractDataSource.createContract(type, [user], clausesId);
-  //   final updatedContracts = List<Contract>.of(internState.contracts)..insert(0, newContract);
-  //   final updatedQuantity = internState.userInfo.pendingContracts + 1;
-  //   final updatedInfo = internState.userInfo.copyWith(pendingContracts: updatedQuantity);
-  //
-  //   emit(internState.copyWith(contracts: updatedContracts, userInfo: updatedInfo));
-  // }
-
-
+  // CHECKED
   Future<void> createContract(Contract contract) async {
     final internState = state as UserDataReady;
+    try {
+      final model = contract.toModel();
+      final newContract = await contractDataSource.createContract(model);
+      final updatedContracts = List<Contract>.of(internState.contracts)
+        ..insert(0, newContract);
+      final updatedInfo = internState.userInfo.copyWith(pendingContracts: internState.userInfo.pendingContracts + 1);
 
-    final model = contract.toModel();
-
-    final newContract = await contractDataSource.createContract(model);
-    final updatedContracts = List<Contract>.of(internState.contracts)..insert(0, newContract);
-
-    emit(internState.copyWith(contracts: updatedContracts));
+      emit(
+        internState.copyWith(
+          contracts: updatedContracts,
+          userInfo: updatedInfo,
+          event: ContractCreationResult(
+            isSuccess: true,
+            message: 'Contrato criado com sucesso!',
+            contract: newContract,
+          ),
+        ),
+      );
+    } on HttpRequestException catch (e) {
+      emit(
+        internState.copyWith(
+          event: ContractCreationResult(
+            isSuccess: false,
+            message: e.message,
+          ),
+        ),
+      );
+    } on Exception catch (e) {
+      emit(
+        internState.copyWith(
+          event: ContractCreationResult(
+            isSuccess: false,
+            message: e.toString(),
+          ),
+        ),
+      );
+    }
   }
 
-  Future<void> refreshContracts() async {
+  // CHECKED
+  Future<void> refreshContracts({bool showSnackbar = true}) async {
+    if (state is! UserDataReady) return;
     final internState = state as UserDataReady;
-    final newContracts = await contractDataSource.getContractsForUser();
-
-    emit(internState.copyWith(contracts: newContracts));
+    try {
+      final newContracts = await contractDataSource.getContractsForUser();
+      emit(internState.copyWith(
+        contracts: newContracts,
+        event: showSnackbar ? RefreshResult(isSuccess: true, message: 'Contratos atualizados com sucesso!') : null,
+      ));
+    } on HttpRequestException catch (e) {
+      emit(internState.copyWith(
+        event: showSnackbar ? RefreshResult(isSuccess: false, message: e.message) : null,
+      ));
+    } on Exception catch (e) {
+      emit(internState.copyWith(
+        event: showSnackbar ? RefreshResult(isSuccess: false, message: e.toString()) : null,
+      ));
+    }
   }
 
-  Future<void> refreshConnections(User user) async {
+  // CHECKED
+  Future<void> refreshConnections() async {
     final internState = state as UserDataReady;
-
-    final updatedConnections = await connectionDataSource.getConnectionsForUser();
-
-    emit(internState.copyWith(connections: updatedConnections));
+    try {
+      final updatedConnections = await connectionDataSource.getConnectionsForUser();
+      emit(internState.copyWith(
+        connections: updatedConnections,
+        event: RefreshResult(isSuccess: true, message: 'Conexões atualizadas com sucesso!'),
+      ));
+    } on HttpRequestException catch (e) {
+      emit(internState.copyWith(
+        event: RefreshResult(isSuccess: false, message: e.message),
+      ));
+    } on Exception catch (e) {
+      emit(internState.copyWith(
+        event: RefreshResult(isSuccess: false, message: e.toString()),
+      ));
+    }
   }
 }

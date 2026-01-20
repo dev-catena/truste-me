@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:trustme/core/extensions/context_extensions.dart';
+import 'package:trustme/core/global/global_variables.dart';
 
 import 'package:trustme/core/providers/user_data_cubit.dart';
 import 'package:trustme/core/routes.dart';
 import 'package:trustme/core/utils/custom_colors.dart';
+import 'package:trustme/features/home/presentation/blocs/home_bloc.dart';
 
 class CustomScaffold extends StatelessWidget {
   const CustomScaffold({
@@ -23,7 +26,6 @@ class CustomScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final headlineMedium = Theme.of(context).textTheme.headlineMedium!;
-    final userData = context.read<UserDataCubit>();
 
     return Scaffold(
       floatingActionButton: floatingActionButton,
@@ -34,6 +36,7 @@ class CustomScaffold extends StatelessWidget {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
+            if(!GlobalVariables.DEF_USE_APP_LOGO_ON_APPBAR)
             Container(
               padding: EdgeInsets.only(right: 8),
               child: Icon(
@@ -42,7 +45,14 @@ class CustomScaffold extends StatelessWidget {
                 size: 40,
               ),
             ),
-            Text('TrueConnect', style: headlineMedium.copyWith(color: Colors.white)),
+            if(GlobalVariables.DEF_USE_APP_LOGO_ON_APPBAR)
+              Container(
+                height: 50,
+                width: 50,
+                padding: EdgeInsets.only(right: 8),
+                child: Image.asset('assets/imgs/trustme-logo-white.png'),
+              ),
+            Text('${GlobalVariables.DEF_APP_NAME}${GlobalVariables.DEF_USE_DEV_ENVIRONMENT ? ' - HML' : ''}', style: headlineMedium.copyWith(color: Colors.white)),
           ],
         ),
         actions: [
@@ -50,20 +60,25 @@ class CustomScaffold extends StatelessWidget {
             visible: showAvatar,
             child: InkWell(
               onTap: () {
-                if (GoRouter.of(context).state.name != AppRoutes.profileScreen) {
-                  context.pushNamed(AppRoutes.profileScreen, extra: { 'showEditButton': true, 'showSealsInfo': false, 'showPrivacyPoliceLink': true, 'showDeleteAccountLink': true, 'showChildSafetyLink': true, });
+                final homeState = context.read<HomeBloc>().state;
+                if (homeState is HomeReady) {
+                  if (GoRouter.of(context).routerDelegate.currentConfiguration.fullPath != AppRoutes.profileScreen) {
+                    context.pushNamed(AppRoutes.profileScreen, extra: { 'showEditButton': true, 'showSealsInfo': false, 'showPrivacyPoliceLink': true, 'showDeleteAccountLink': true, 'showChildSafetyLink': true, });
+                  }
+                } else {
+                  context.showSnack(homeState is HomeError ? 'Erro ao carregar os dados. Tente carregá-los' : 'Aguarde o carregamento dos dados...');
                 }
               },
               child: const CircleAvatar(
                 backgroundColor: Colors.white,
-                child: Icon(Icons.person, color: CustomColor.activeColor, size: 30,),
+                child: Icon(Icons.person, color: CustomColor.primaryColor, size: 30,),
                 // backgroundImage: userData.getUser.photoPath != null ? NetworkImage(userData.getUser.photoPath!) : null,
               ),
             ),
           ),
           const SizedBox(width: 8),
         ],
-        backgroundColor: CustomColor.activeColor,
+        backgroundColor: CustomColor.primaryColor,
       ),
       body: SafeArea(
         child: Padding(

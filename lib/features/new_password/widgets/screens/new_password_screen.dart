@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:trustme/core/global/global_variables.dart';
 
 import 'package:trustme/core/utils/custom_colors.dart';
 import 'package:trustme/features/new_password/presentation/blocs/new_password_cubit.dart';
@@ -32,14 +33,14 @@ class NewPasswordScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: CustomColor.backgroundPrimaryColor,
       appBar: AppBar(
-        title: const Text('TrueConnect', style: TextStyle(color: Colors.white)),
-        backgroundColor: CustomColor.activeColor,
+        title: Text('${GlobalVariables.DEF_APP_NAME}${GlobalVariables.DEF_USE_DEV_ENVIRONMENT ? ' - HML' : ''}', style: TextStyle(color: Colors.white)),
+        backgroundColor: CustomColor.primaryColor,
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
             const SizedBox(height: 60),
-            Text('TrueConnect', style: displayMedium),
+            Text('${GlobalVariables.DEF_APP_NAME}${GlobalVariables.DEF_USE_DEV_ENVIRONMENT ? ' - HML' : ''}', style: displayMedium),
             const SizedBox(height: 10),
             Image.asset('assets/imgs/trustme-logo.png', height: 100),
             const SizedBox(height: 20),

@@ -17,10 +17,10 @@ class LoginDataSource {
 
   Future<bool> login(String cpf, String pwd) async {
     final content = {'CPF': cpf, 'password': pwd};
-    final rawData = await _apiProvider.post('login', jsonEncode(content), useToken: false);
+    final httpResult = await _apiProvider.post('login', jsonEncode(content), useToken: false);
 
-    if (rawData.result['token'] != null) {
-      final auth = AuthModel.fromJson(rawData.result).toEntity();
+    if (httpResult.result['token'] != null) {
+      final auth = AuthModel.fromJson(httpResult.result).toEntity();
       await setAuthData(auth);
       await appData.initialize();
       return true;

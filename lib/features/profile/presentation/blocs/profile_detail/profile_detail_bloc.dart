@@ -113,32 +113,32 @@ class ProfileDetailBloc extends Bloc<ProfileDetailEvent, ProfileDetailState> {
     };
 
     try {
-      // TODO: Change it to updateUser2 and call await userData.initialize(updatedUser); properly
-      await datasource.updateUser(userDataUpdated);
+      //region !! OLD code
+      // await datasource.updateUser(userDataUpdated);
+      //
+      // // Manual reconstruction to call initialize() method
+      // final currentUser = userData.getUser;
+      //
+      // final updatedUser = currentUser.copyWith(
+      //   fullName: personalData.name,
+      //   email: personalData.email,
+      //   cpf: personalData.cpf,
+      //   birthDate: personalData.birthDate,
+      //
+      //   cep: addressData.loc!.cep,
+      //   state: addressData.loc!.state,
+      //   city: addressData.loc!.city,
+      //   neighborhood: addressData.loc!.neighborhood,
+      //   address: addressData.loc!.street,
+      //   addressNumber: addressData.loc!.number,
+      //   addressComplement: addressData.loc!.complement,
+      //
+      //   profession: professionValue,
+      //   income: complementaryInfoData.userIncome?.description,
+      // );
+      //endregion
 
-      // Manuel reconstruction to call initialize() method
-      final currentUser = userData.getUser;
-
-      final updatedUser = currentUser.copyWith(
-        fullName: personalData.name,
-        email: personalData.email,
-        cpf: personalData.cpf,
-        birthDate: personalData.birthDate,
-
-        cep: addressData.loc!.cep,
-        state: addressData.loc!.state,
-        city: addressData.loc!.city,
-        neighborhood: addressData.loc!.neighborhood,
-        address: addressData.loc!.street,
-        addressNumber: addressData.loc!.number,
-        addressComplement: addressData.loc!.complement,
-
-        profession: professionValue,
-        income: complementaryInfoData.userIncome?.description,
-      );
-
-      // Refresh user data globally
-      //await datasource.loadUser();
+      final updatedUser = await datasource.updateUser2(userDataUpdated);
 
       // Update user data properly
       await userData.initialize(updatedUser);

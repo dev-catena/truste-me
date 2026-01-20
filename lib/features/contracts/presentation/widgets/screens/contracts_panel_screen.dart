@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:trustme/core/extensions/context_extensions.dart';
 
 import 'package:trustme/core/enums/contract_status.dart';
 import 'package:trustme/core/providers/user_data_cubit.dart';
+import 'package:trustme/core/providers/user_data_event.dart';
 import 'package:trustme/core/routes.dart';
-import 'package:trustme/core/utils/log/log.dart';
+import 'package:trustme/features/common/domain/entities/user.dart';
 import 'package:trustme/features/common/presentation/widgets/components/custom_scaffold.dart';
+import 'package:trustme/features/common/presentation/widgets/components/generic_error_component.dart';
 import 'package:trustme/features/common/presentation/widgets/components/header_line.dart';
 import 'package:trustme/features/common/presentation/widgets/components/stateful_filter_chips.dart';
 
@@ -44,13 +47,30 @@ class _ContractsScreenState extends State<ContractsScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           context.pushNamed(AppRoutes.newContractScreen).then((value) {
-            userData.refreshContracts();
+            // The listener will show the result of the refresh.
+            userData.refreshContracts(showSnackbar: false);
           });
         },
         child: const Icon(Icons.add),
       ),
-      child: BlocBuilder<UserDataCubit, UserDataState>(
+      child: BlocConsumer<UserDataCubit, UserDataState>(
+        listener: (context, state) {
+          if (state is UserDataReady && state.event is RefreshResult) {
+            final event = state.event as RefreshResult;
+            context.showSnack(event.message);
+            userData.clearEvent();
+          }
+        },
         builder: (_, state) {
+          if (state is UserDataError) {
+            // Use the global userLoggedIn variable to re-initialize
+            return GenericErrorComponent(state.message, onRefresh: () async => userData.initialize(userLoggedIn));
+          }
+
+          if (state is UserDataInitial || state is UserDataLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
           if (state is UserDataReady) {
             final allContracts = state.contracts;
 
@@ -59,7 +79,7 @@ class _ContractsScreenState extends State<ContractsScreen> {
                 : allContracts.where((c) => c.status.description == activeFilter).toList();
 
             return RefreshIndicator(
-              onRefresh: () async => userData.refreshContracts(),
+              onRefresh: () async => userData.refreshContracts(showSnackbar: true),
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 child: Column(
@@ -71,56 +91,56 @@ class _ContractsScreenState extends State<ContractsScreen> {
                       height: 50,
                       width: size.width * 0.95,
                       child: StatefulFilterChips(
-                        filtersLabel: ContractStatus.values.map((e) => e.description).toList()..insert(0, 'Todos'),
+                        filtersLabel: ContractStatus.values.map((e) => e.description).toList()..add('Todos'),
                         initialFilter: activeFilter,
                         onSelected: setFilter,
                       ),
                     ),
                     const SizedBox(height: 20),
-                    filteredContracts.isEmpty
-                        ? const Text('Nenhum contrato existente')
-                        : GridView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 5,
-                              mainAxisSpacing: 5,
-                              childAspectRatio: 0.7,
-                            ),
-                            itemCount: filteredContracts.length,
-                            itemBuilder: (_, index) {
-                              final contract = filteredContracts[index];
+                    if (filteredContracts.isEmpty)
+                      const Text('Nenhum contrato'),
+                    if (filteredContracts.isEmpty)
+                      IconButton(
+                        onPressed: () => userData.refreshContracts(),
+                        icon: const Icon(Icons.refresh_outlined),
+                      ),
+                    if (!filteredContracts.isEmpty)
+                      GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 5,
+                          mainAxisSpacing: 5,
+                          childAspectRatio: 0.7,
+                        ),
+                        itemCount: filteredContracts.length,
+                        itemBuilder: (_, index) {
+                          final contract = filteredContracts[index];
 
-                              return contract.buildCard(
-                                onExpire: (contract) {
-                                  final allContractIndex = allContracts.indexOf(contract);
-
-                                  // if(contract.status == ContractStatus.pending){
-                                  if(contract.status == ContractStatus.expired){
-                                    allContracts[allContractIndex] = contract.copyWith(status: ContractStatus.expired);
-                                  // } else if (contract.status == ContractStatus.active){
-                                  } else if (contract.status == ContractStatus.pending){
-                                    allContracts[allContractIndex] = contract.copyWith(status: ContractStatus.completed);
-                                  }
-                                  Log.d('$runtimeType', 'onExpire called');
-                                  if(context.mounted) {
-                                    setState(() {});
-                                  }
-                                },
-                                onReloadList: (){
-                                  userData.refreshContracts();
-                                }
-                              );
+                          return contract.buildCard(
+                            onExpire: (expiredContract) {
+                              // Based on the old logic, a pending contract becomes completed.
+                              // Let's follow that, but using the Cubit to manage the state.
+                              if (expiredContract.status == ContractStatus.pending) {
+                                userData.updateLocalContract(expiredContract.copyWith(status: ContractStatus.completed));
+                              } else {
+                                // For other statuses (like active), we'll mark as expired.
+                                userData.updateLocalContract(expiredContract.copyWith(status: ContractStatus.expired));
+                              }
                             },
-                          ),
+                            onReloadList: () {
+                              userData.refreshContracts(showSnackbar: false);
+                            },
+                          );
+                        },
+                      ),
                   ],
                 ),
               ),
             );
-          } else {
-            return const Text('No state');
           }
+          return const Center(child: Text('Estado inesperado'));
         },
       ),
     );

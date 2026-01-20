@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:trustme/core/extensions/context_extensions.dart';
 
 import 'package:trustme/features/common/presentation/widgets/components/custom_selectable_tile.dart';
 
@@ -61,7 +62,7 @@ class _StartEndDatepickerState extends State<StartEndDatepicker> {
           title: formatDate(endDate) ?? 'Data final',
           onTap: () {
             if (initialDate == null) {
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Selecione uma data de início')));
+              context.showSnack('Selecione uma data de início');
               return;
             }
             showDatePicker(

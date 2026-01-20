@@ -17,7 +17,7 @@ class GlobalVariables {
   static bool DEF_PRINT_HTTP_RESPONSES_FORMATTED = false && kDebugMode;
 
   // TODO: Don't use it for PRODUCTION deploy
-  static bool DEF_USE_DEV_ENVIRONMENT = true;
+  static bool DEF_USE_DEV_ENVIRONMENT = false;
 
   static var isGoogleTestUser = false;
   static var isFirebaseTestLab = false;
